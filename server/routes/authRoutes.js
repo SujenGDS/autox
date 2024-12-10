@@ -8,10 +8,18 @@ const router = express.Router();
 // Registration
 router.post("/register", async (req, res) => {
   // console.log(req);
-  const { firstName, lastName, email, phoneNumber, password } = req.body;
+  const { firstName, lastName, email, phoneNumber, licenseNumber, password } =
+    req.body;
 
   // Validate input
-  if (!firstName || !lastName || !email || !phoneNumber || !password) {
+  if (
+    !firstName ||
+    !lastName ||
+    !email ||
+    !phoneNumber ||
+    !licenseNumber ||
+    !password
+  ) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
@@ -34,8 +42,8 @@ router.post("/register", async (req, res) => {
 
     // Insert user data into database
     await db.query(
-      "INSERT INTO authentication (firstName, lastName, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?)",
-      [firstName, lastName, email, phoneNumber, hashPassword]
+      "INSERT INTO authentication (firstName, lastName, email, phoneNumber, licenseNumber, password) VALUES (?, ?, ?, ?, ?, ?)",
+      [firstName, lastName, email, phoneNumber, licenseNumber, hashPassword]
     );
     return res.status(201).json({ message: "User created successfully" });
   } catch (err) {

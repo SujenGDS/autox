@@ -7,6 +7,7 @@ import {
   Box,
   Button,
   Container,
+  Grid2,
   Paper,
   TextField,
   Typography,
@@ -14,6 +15,7 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ImageUpload from "../components/ImageUpload";
 
 const Register = () => {
   const [values, setValues] = useState({
@@ -21,6 +23,7 @@ const Register = () => {
     lastName: "",
     email: "",
     phoneNumber: "",
+    licenseNumber: "",
     password: "",
   });
 
@@ -53,139 +56,136 @@ const Register = () => {
     }
   };
   return (
-    <Container maxWidth="xs">
-      <Paper
-        elevation={10}
-        sx={{ backgroundColor: "white", marginTop: 8, padding: 2 }}
-      >
-        {/* <Avatar
-          sx={{
-            mx: "auto",
-            bgcolor: "grey",
-            textAlign: "center",
-            mb: 1,
-          }}
+    <Box
+      sx={{
+        height: "100vh",
+        width: "100%",
+        backgroundImage: "url('/images/background-image.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Container maxWidth="sm">
+        <Paper
+          elevation={10}
+          sx={{ backgroundColor: "white", marginTop: 8, padding: 2 }}
         >
-          <LockOutlinedIcon />
-        </Avatar> */}
-        <Typography component="h1" variant="h5" sx={{ textAlign: "center" }}>
-          Get Started
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-          <TextField
-            name="firstName"
-            placeholder="Enter first name"
-            onChange={handleChanges}
-            fullWidth
-            required
-            autoFocus
-            sx={{ mb: 2 }}
-          />
+          <Typography component="h1" variant="h5" sx={{ textAlign: "center" }}>
+            Get Started
+          </Typography>
 
-          {
-            <TextField
-              name="lastName"
-              placeholder="Enter last name"
-              onChange={handleChanges}
-              fullWidth
-              required
-              autoFocus
-              sx={{ mb: 2 }}
-            />
-          }
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
+            <Grid2 container spacing={2}>
+              <Grid2 item xs={12} sm={6}>
+                <TextField
+                  name="firstName"
+                  placeholder="Enter first name"
+                  onChange={handleChanges}
+                  fullWidth
+                  required
+                  autoFocus
+                  sx={{ mb: 2 }}
+                />
+              </Grid2>
 
-          <TextField
-            name="email"
-            placeholder="Enter email"
-            onChange={handleChanges}
-            fullWidth
-            required
-            autoFocus
-            sx={{ mb: 2 }}
-          />
+              <Grid2 item xs={12} sm={7}>
+                <TextField
+                  name="lastName"
+                  placeholder="Enter last name"
+                  onChange={handleChanges}
+                  fullWidth
+                  required
+                  autoFocus
+                  sx={{ mb: 2 }}
+                />
+              </Grid2>
 
-          <TextField
-            name="phoneNumber"
-            placeholder="Enter Phone number"
-            onChange={handleChanges}
-            fullWidth
-            required
-            autoFocus
-            sx={{ mb: 2 }}
-          />
+              <Grid2 item xs={12} sm={6}>
+                <TextField
+                  name="email"
+                  placeholder="Enter email"
+                  onChange={handleChanges}
+                  fullWidth
+                  required
+                  autoFocus
+                  sx={{ mb: 2 }}
+                />
+              </Grid2>
 
-          <TextField
-            name="license photo"
-            placeholder="upload license photo"
-            onChange={handleChanges}
-            fullWidth
-            required
-            autoFocus
-            sx={{ mb: 2 }}
-          />
+              <Grid2 item xs={12} sm={6}>
+                <TextField
+                  name="phoneNumber"
+                  placeholder="Enter Phone number"
+                  onChange={handleChanges}
+                  fullWidth
+                  required
+                  autoFocus
+                  sx={{ mb: 2 }}
+                />
+              </Grid2>
 
-          <TextField
-            name="password"
-            placeholder="Enter password"
-            onChange={handleChanges}
-            fullWidth
-            required
-            type="password"
-            sx={{ mb: 2 }}
-          />
+              <Grid2 item xs={12} sm={6}>
+                <TextField
+                  name="licenseNumber"
+                  placeholder="Enter license Number"
+                  onChange={handleChanges}
+                  fullWidth
+                  required
+                  type="text"
+                  sx={{ mb: 2 }}
+                />
+              </Grid2>
 
-          <Button type="submit" variant="contained" fullWidth sx={{ mt: 1 }}>
-            Sign in
-          </Button>
-        </Box>
-        <Box display="flex" justifyContent="space-between" sx={{ mt: 1 }}>
-          <Typography>Already have an account?</Typography>
-          <Link to="/sujen-login"> Log in </Link>
-        </Box>
-      </Paper>
-      <ToastContainer />
-    </Container>
+              <Grid2 item xs={12} sm={6}>
+                <TextField
+                  name="password"
+                  placeholder="Enter password"
+                  onChange={handleChanges}
+                  fullWidth
+                  required
+                  type="password"
+                  sx={{ mb: 2 }}
+                />
+              </Grid2>
+
+              <Grid2 item xs={12} sm={6}>
+                <ImageUpload label="license photo front" />
+              </Grid2>
+
+              <Grid2 item xs={12} sm={6}>
+                <ImageUpload label="license photo back" />
+              </Grid2>
+
+              <Grid2 item xs={12} sm={6}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  sx={{ mt: 1 }}
+                >
+                  Sign in
+                </Button>
+              </Grid2>
+            </Grid2>
+          </Box>
+          <Box display="flex" justifyContent="flex-start" sx={{ mt: 2 }}>
+            <Typography>Already have an account?</Typography>
+            <Link to="/sujen-login"> Log in </Link>
+          </Box>
+        </Paper>
+        <ToastContainer />
+      </Container>
+    </Box>
   );
 };
 
 export default Register;
-
-//   <div>
-//     <div>
-//       <form onSubmit={handleSubmit}>
-//         <div>
-//           <label htmlFor="username">Username</label>
-//           <input
-//             type="text"
-//             placeholder="Enter Username"
-//             name="username"
-//             onChange={handleChanges}
-//           ></input>
-//         </div>
-//         <div>
-//           <label htmlFor="email">Email</label>
-//           <input
-//             type="email"
-//             placeholder="Enter Email"
-//             name="email"
-//             onChange={handleChanges}
-//           ></input>
-//         </div>
-//         <div>
-//           <label htmlFor="password">Password</label>
-//           <input
-//             type="password"
-//             placeholder="Enter Password"
-//             name="password"
-//             onChange={handleChanges}
-//           ></input>
-//         </div>
-//         <button>Submit</button>
-//       </form>
-//       <div>
-//         <p>Already have a account</p>
-//         <Link to="/sujen-login">Login</Link>
-//       </div>
-//     </div>
-//   </div>
-// );
