@@ -40,8 +40,14 @@ const ImageUpload = ({ label }) => {
       <Button
         variant="outlined"
         component="label"
-        color="secondary"
+        color="black"
         size="small"
+        sx={{
+          "&:hover": {
+            backgroundColor: "black",
+            color: "white",
+          },
+        }}
       >
         Upload Image
         <input

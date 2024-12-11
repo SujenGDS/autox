@@ -55,9 +55,11 @@ const Register = () => {
       console.log(err.message);
     }
   };
+
   return (
     <Box
       sx={{
+        position: "absolute",
         height: "100vh",
         width: "100%",
         backgroundImage: "url('/images/background-image.png')",
@@ -67,16 +69,24 @@ const Register = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+
+        // filter: "blur(5px)",
       }}
     >
       <Container maxWidth="sm">
         <Paper
           elevation={10}
-          sx={{ backgroundColor: "white", marginTop: 8, padding: 2 }}
+          sx={{
+            backgroundColor: "white",
+            padding: 2,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 3,
+          }}
         >
-          <Typography component="h1" variant="h5" sx={{ textAlign: "center" }}>
+          {/* <Typography component="h1" variant="h5" sx={{ textAlign: "center" }}>
             Get Started
-          </Typography>
+          </Typography> */}
 
           <Box
             component="form"
@@ -85,22 +95,35 @@ const Register = () => {
             sx={{ mt: 1 }}
           >
             <Grid2 container spacing={2}>
-              <Grid2 item xs={12} sm={6}>
+              <Grid2 size={6}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    mb: 1,
+                    fontWeight: "bold",
+                  }}
+                >
+                  First Name
+                </Typography>
                 <TextField
                   name="firstName"
-                  placeholder="Enter first name"
+                  // placeholder="Enter first name"
                   onChange={handleChanges}
                   fullWidth
                   required
                   autoFocus
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 1 }}
                 />
               </Grid2>
 
-              <Grid2 item xs={12} sm={7}>
+              <Grid2 item size={6}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+                  Last Name
+                </Typography>
+
                 <TextField
                   name="lastName"
-                  placeholder="Enter last name"
+                  // placeholder="Enter last name"
                   onChange={handleChanges}
                   fullWidth
                   required
@@ -109,10 +132,14 @@ const Register = () => {
                 />
               </Grid2>
 
-              <Grid2 item xs={12} sm={6}>
+              <Grid2 item size={6}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+                  Email
+                </Typography>
+
                 <TextField
                   name="email"
-                  placeholder="Enter email"
+                  // placeholder="Enter email"
                   onChange={handleChanges}
                   fullWidth
                   required
@@ -121,10 +148,13 @@ const Register = () => {
                 />
               </Grid2>
 
-              <Grid2 item xs={12} sm={6}>
+              <Grid2 item size={6}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+                  Phone Number
+                </Typography>
                 <TextField
                   name="phoneNumber"
-                  placeholder="Enter Phone number"
+                  // placeholder="Enter Phone number"
                   onChange={handleChanges}
                   fullWidth
                   required
@@ -133,10 +163,13 @@ const Register = () => {
                 />
               </Grid2>
 
-              <Grid2 item xs={12} sm={6}>
+              <Grid2 item size={6}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+                  License Number
+                </Typography>
                 <TextField
                   name="licenseNumber"
-                  placeholder="Enter license Number"
+                  // placeholder="Enter license Number"
                   onChange={handleChanges}
                   fullWidth
                   required
@@ -145,10 +178,13 @@ const Register = () => {
                 />
               </Grid2>
 
-              <Grid2 item xs={12} sm={6}>
+              <Grid2 item size={6}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+                  Password
+                </Typography>
                 <TextField
                   name="password"
-                  placeholder="Enter password"
+                  // placeholder="Enter password"
                   onChange={handleChanges}
                   fullWidth
                   required
@@ -157,27 +193,36 @@ const Register = () => {
                 />
               </Grid2>
 
-              <Grid2 item xs={12} sm={6}>
+              <Grid2 item size={6}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+                  License Photo
+                </Typography>
                 <ImageUpload label="license photo front" />
               </Grid2>
 
-              <Grid2 item xs={12} sm={6}>
+              <Grid2 item size={6} sx={{ mt: 5 }}>
                 <ImageUpload label="license photo back" />
               </Grid2>
-
-              <Grid2 item xs={12} sm={6}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  sx={{ mt: 1 }}
-                >
-                  Sign in
-                </Button>
-              </Grid2>
             </Grid2>
+            <Button
+              type="submit"
+              variant="outlined"
+              fullWidth
+              sx={{
+                mt: 4,
+                color: "black",
+                borderColor: "black",
+                "&:hover": {
+                  backgroundColor: "black",
+                  color: "white",
+                },
+              }}
+            >
+              Register
+            </Button>
           </Box>
-          <Box display="flex" justifyContent="flex-start" sx={{ mt: 2 }}>
+
+          <Box display="flex" justifyContent="space-between" sx={{ mt: 1 }}>
             <Typography>Already have an account?</Typography>
             <Link to="/sujen-login"> Log in </Link>
           </Box>

@@ -48,84 +48,79 @@ const Login = () => {
   };
 
   return (
-    <Container maxWidth="xs">
-      <Paper elevation={10} sx={{ marginTop: 8, padding: 2 }}>
-        {/* <Avatar
-          sx={{
-            mx: "auto",
-            bgcolor: "grey",
-            textAlign: "center",
-            mb: 1,
-          }}
-        >
-          <LockOutlinedIcon />
-        </Avatar> */}
-        <Typography component="h1" variant="h5" sx={{ textAlign: "center" }}>
-          Log in
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-          <TextField
-            name="email"
-            placeholder="Enter email"
-            onChange={handleChanges}
-            fullWidth
-            required
-            autoFocus
-            sx={{ mb: 2 }}
-          />
+    <Box
+      sx={{
+        position: "absolute",
+        height: "100vh",
+        width: "100%",
+        backgroundImage: "url('/images/background-image.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
 
-          <TextField
-            name="password"
-            placeholder="Enter password"
-            onChange={handleChanges}
-            fullWidth
-            required
-            type="password"
-            sx={{ mb: 2 }}
-          />
+        // filter: "blur(5px)",
+      }}
+    >
+      <Container maxWidth="sm">
+        <Paper elevation={10} sx={{ padding: 2 }}>
+          <Typography component="h1" variant="h5" sx={{ textAlign: "center" }}>
+            Log in
+          </Typography>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
+            <TextField
+              name="email"
+              placeholder="Enter email"
+              onChange={handleChanges}
+              fullWidth
+              required
+              autoFocus
+              sx={{ mb: 2 }}
+            />
 
-          <Button type="submit" variant="contained" fullWidth sx={{ mt: 1 }}>
-            Sign in
-          </Button>
-        </Box>
-        <Box display="flex" justifyContent="space-between" sx={{ mt: 1 }}>
-          <Typography>Don't have an account?</Typography>
-          <Link to="/sujen-register"> Register </Link>
-        </Box>
-      </Paper>
-      <ToastContainer />
-    </Container>
+            <TextField
+              name="password"
+              placeholder="Enter password"
+              onChange={handleChanges}
+              fullWidth
+              required
+              type="password"
+              sx={{ mb: 2 }}
+            />
+
+            <Button
+              type="submit"
+              variant="outlined"
+              fullWidth
+              sx={{
+                mt: 1,
+                color: "black",
+                borderColor: "black",
+                "&:hover": {
+                  backgroundColor: "black",
+                  color: "white",
+                },
+              }}
+            >
+              Sign in
+            </Button>
+          </Box>
+          <Box display="flex" justifyContent="space-between" sx={{ mt: 1 }}>
+            <Typography>Don't have an account?</Typography>
+            <Link to="/sujen-register"> Register </Link>
+          </Box>
+        </Paper>
+        <ToastContainer />
+      </Container>
+    </Box>
   );
 };
 
 export default Login;
-
-// <div>
-//   <div>
-//     <form onSubmit={handleSubmit}>
-//       <div>
-//         <label htmlFor="email">Email</label>
-//         <input
-//           type="email"
-//           placeholder="Enter Email"
-//           name="email"
-//           onChange={handleChanges}
-//         ></input>
-//       </div>
-//       <div>
-//         <label htmlFor="password">Password</label>
-//         <input
-//           type="password"
-//           placeholder="Enter Password"
-//           name="password"
-//           onChange={handleChanges}
-//         ></input>
-//       </div>
-//       <button>Submit</button>
-//     </form>
-//     <div>
-//       <p>Don't have an account</p>
-//       <Link to="/sujen-register">Sign up</Link>
-//     </div>
-//   </div>
-// </div>
