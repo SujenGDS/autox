@@ -1,0 +1,11 @@
+.car-card {
+  height: 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.car-card img {
+  height: 190px;
+  object-fit: cover;
+}

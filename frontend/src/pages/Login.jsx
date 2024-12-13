@@ -14,6 +14,7 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import NavBar from "../components/NavBar";
 
 const Login = () => {
   const [values, setValues] = useState({
@@ -48,78 +49,86 @@ const Login = () => {
   };
 
   return (
-    <Box
-      sx={{
-        position: "absolute",
-        height: "100vh",
-        width: "100%",
-        backgroundImage: "url('/images/background-image.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+    <>
+      <Box
+        sx={{
+          position: "absolute",
+          height: "100vh",
+          width: "100%",
+          backgroundImage: "url('/images/background-image.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
 
-        // filter: "blur(5px)",
-      }}
-    >
-      <Container maxWidth="sm">
-        <Paper elevation={10} sx={{ padding: 2 }}>
-          <Typography component="h1" variant="h5" sx={{ textAlign: "center" }}>
-            Log in
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
-          >
-            <TextField
-              name="email"
-              placeholder="Enter email"
-              onChange={handleChanges}
-              fullWidth
-              required
-              autoFocus
-              sx={{ mb: 2 }}
-            />
-
-            <TextField
-              name="password"
-              placeholder="Enter password"
-              onChange={handleChanges}
-              fullWidth
-              required
-              type="password"
-              sx={{ mb: 2 }}
-            />
-
-            <Button
-              type="submit"
-              variant="outlined"
-              fullWidth
-              sx={{
-                mt: 1,
-                color: "black",
-                borderColor: "black",
-                "&:hover": {
-                  backgroundColor: "black",
-                  color: "white",
-                },
-              }}
+          // filter: "blur(5px)",
+        }}
+      >
+        <Container maxWidth="sm">
+          <Paper elevation={10} sx={{ padding: 2 }}>
+            <Typography
+              component="h1"
+              variant="h5"
+              sx={{ textAlign: "center", mb: 3 }}
             >
-              Sign in
-            </Button>
-          </Box>
-          <Box display="flex" justifyContent="space-between" sx={{ mt: 1 }}>
-            <Typography>Don't have an account?</Typography>
-            <Link to="/sujen-register"> Register </Link>
-          </Box>
-        </Paper>
-        <ToastContainer />
-      </Container>
-    </Box>
+              Log in
+            </Typography>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              noValidate
+              sx={{ mt: 1 }}
+            >
+              <TextField
+                name="email"
+                label="Email"
+                size="medium"
+                onChange={handleChanges}
+                fullWidth
+                // required
+                autoFocus
+                sx={{ mb: 2 }}
+              />
+
+              <TextField
+                name="password"
+                label="Password"
+                size="medium"
+                onChange={handleChanges}
+                fullWidth
+                // required
+                type="password"
+                sx={{ mb: 2 }}
+              />
+
+              <Button
+                type="submit"
+                variant="outlined"
+                fullWidth
+                sx={{
+                  mt: 1,
+                  color: "black",
+                  borderColor: "black",
+                  "&:hover": {
+                    backgroundColor: "black",
+                    color: "white",
+                  },
+                }}
+              >
+                Sign in
+              </Button>
+            </Box>
+            <Box display="flex" justifyContent="space-between" sx={{ mt: 1 }}>
+              <Typography>Don't have an account?</Typography>
+              <Link to="/sujen-register"> Register </Link>
+            </Box>
+          </Paper>
+          <ToastContainer />
+        </Container>
+      </Box>
+    </>
   );
 };
 
