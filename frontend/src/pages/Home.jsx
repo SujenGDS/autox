@@ -40,7 +40,7 @@ const Home = () => {
         style={{ width: "100%", height: "80vh", objectFit: "cover" }}
       />
 
-      <div className="p-5 d-flex gap-4">
+      <div className="p-5 d-flex gap-3 overflow-x-scroll">
         <CarCard
           title="Hyundai"
           description="AN amazing car with amazing features ksjdhfsaghsdaljghaskljghdskjhjksdh"

@@ -13,7 +13,7 @@ const CarCard = ({ title, description, price, imgLink }) => {
           <Card.Text>{description}</Card.Text>
         </Card.Body>
         <Card.Footer className="d-flex justify-content-between align-items-center">
-          <small className="text-muted">{price}</small>
+          <small className="text-dark">{price}</small>
           <Button variant="outline-dark">Book Now</Button>
         </Card.Footer>
       </Card>

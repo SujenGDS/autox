@@ -9,3 +9,12 @@
   height: 190px;
   object-fit: cover;
 }
+
+.car-card .card-body {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.car-card .card-footer {
+  height: 50px;
+}
