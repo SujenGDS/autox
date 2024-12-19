@@ -1,0 +1,350 @@
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import Form from "react-bootstrap/Form";
+import InputGroup from "react-bootstrap/InputGroup";
+import Row from "react-bootstrap/Row";
+import * as formik from "formik";
+import * as yup from "yup";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+
+const UploadCar = () => {
+  const { Formik } = formik;
+
+  const [photos, setPhotos] = useState([]);
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    if (photos.length && files.length > 5) {
+      toast.error("you can upload only 5 photos");
+      return;
+    }
+
+    const newPhotos = files.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+
+    setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
+
+    const handleUpload = () => {
+      if (photos.length < 2) {
+        toast.error("Upload atleast 2 photos of your car.");
+      } else {
+        console.log("photos ready to upload");
+        toast.success("photos are uploaded");
+        //backend
+      }
+    };
+  };
+
+  const handleRemovePhoto = (index) => {
+    setPhotos((prevPhotos) => {
+      URL.revokeObjectURL(prevPhotos[index].preview);
+      return prevPhotos.filter((_, i) => i !== index);
+    });
+  };
+
+  const schema = yup.object().shape({
+    carName: yup.string().required(),
+    company: yup.string().required(),
+    makeYear: yup.string().required(),
+    seatCapacity: yup.string().required(),
+    carPlateNumber: yup.string().required(),
+    pricePerDay: yup.mixed().required(),
+
+    terms: yup.bool().required().oneOf([true], "terms must be accepted"),
+  });
+
+  const handleSubmit = (values) => {
+    console.log(values);
+  };
+
+  return (
+    <Formik
+      validationSchema={schema}
+      onSubmit={handleSubmit}
+      initialValues={{
+        carName: "",
+        company: "",
+        makeYear: "",
+        seatCapacity: "",
+        carPlateNumber: "",
+        pricePerDay: "",
+        file: null,
+        terms: false,
+      }}
+    >
+      {({ handleSubmit, handleChange, values, touched, errors }) => (
+        <Form noValidate className="m-3" onSubmit={handleSubmit}>
+          <Row className="mb-3 g-3">
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationFormikCarName"
+              className="position-relative"
+            >
+              <Form.Label>Car Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="carName"
+                value={values.carName}
+                onChange={handleChange}
+                isValid={!!errors.carName}
+              />
+            </Form.Group>
+
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationFormikCompanyName"
+              className="position-relative"
+            >
+              <Form.Label>Company</Form.Label>
+              <Form.Control
+                type="text"
+                name="company"
+                value={values.company}
+                onChange={handleChange}
+                isValid={!!errors.company}
+              />
+            </Form.Group>
+
+            <Form.Group as={Col} md="4" controlId="validationFormikMakeYear">
+              <Form.Label>Make Year</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder=""
+                aria-describedby="inputGroupPrepend"
+                name="makeYear"
+                value={values.makeYear}
+                onChange={handleChange}
+                isInvalid={!!errors.makeYear}
+              />
+            </Form.Group>
+          </Row>
+
+          <Row className="mb-3 g-3">
+            <Form.Group
+              as={Col}
+              md="3"
+              controlId="validationFormik103"
+              className="position-relative"
+            >
+              <Form.Label>Seat capacity</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder=""
+                name="seatCapacity"
+                value={values.seatCapacity}
+                onChange={handleChange}
+                isInvalid={!!errors.seatCapacity}
+              />
+
+              <Form.Control.Feedback type="invalid" tooltip>
+                {errors.seatCapacity}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group
+              as={Col}
+              md="3"
+              controlId="validationFormik104"
+              className="position-relative"
+            >
+              <Form.Label>Car plate number</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder=""
+                name="carPlateNumber"
+                value={values.carPlateNumber}
+                onChange={handleChange}
+                isInvalid={!!errors.carPlateNumber}
+              />
+              <Form.Control.Feedback type="invalid" tooltip>
+                {errors.carPlateNumber}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group
+              as={Col}
+              md="3"
+              controlId="validationFormik105"
+              className="position-relative"
+            >
+              <Form.Label>Price per day</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder=""
+                name="pricePerDay"
+                value={values.pricePerDay}
+                onChange={handleChange}
+                isInvalid={!!errors.pricePerDay}
+              />
+
+              <Form.Control.Feedback type="invalid" tooltip>
+                {errors.pricePerDay}
+              </Form.Control.Feedback>
+            </Form.Group>
+          </Row>
+
+          <Form.Group as={Col} md="3" className="position-relative mb-3">
+            <Form.Label>Car photos</Form.Label>
+            <Form.Control
+              type="file"
+              required
+              name="file"
+              onChange={handleFileChange}
+              isInvalid={!!errors.file}
+              multiple={true}
+            />
+            <Form.Control.Feedback type="invalid" tooltip>
+              {errors.file}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Row>
+            {photos.map((photo, index) => (
+              <Col key={index} md={2} className="mb-3">
+                <img
+                  src={photo.preview}
+                  alt={`preview-${index}`}
+                  style={{ width: "100%", height: "auto", marginBottom: "5px" }}
+                />
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => handleRemovePhoto(index)}
+                >
+                  Remove
+                </Button>
+              </Col>
+            ))}
+          </Row>
+
+          <Row>
+            <Col lg="4" md="6" sm="6">
+              <Form.Check
+                inline
+                label="Air Conditioning"
+                name="air_condition"
+                type={"checkbox"}
+                id={`air_condition`}
+              />
+            </Col>
+
+            <Col lg="4" md="6" sm="6">
+              <Form.Check
+                inline
+                label="GPS Navigation"
+                name="GPS_Navigation"
+                type={"checkbox"}
+                id={`GPS_Navigation`}
+              />
+            </Col>
+
+            <Col lg="4" md="6" sm="6">
+              <Form.Check
+                inline
+                label="Bluetooth Audio"
+                name="bluetooth"
+                type={"checkbox"}
+                id={`bluetooth`}
+              />
+            </Col>
+
+            <Col lg="4" md="6" sm="6">
+              <Form.Check
+                inline
+                label="Power Steering"
+                name="power_steering"
+                type={"checkbox"}
+                id={`Power_Steering`}
+              />
+            </Col>
+
+            <Col lg="4" md="6" sm="6">
+              <Form.Check
+                inline
+                label="Rearview Camera"
+                name="Rearview_Camera"
+                type={"checkbox"}
+                id={`Rearview_Camera`}
+              />
+            </Col>
+
+            <Col lg="4" md="6" sm="6">
+              <Form.Check
+                inline
+                label="Cruise Control"
+                name="Cruise_Control"
+                type={"checkbox"}
+                id={`Cruise_Control`}
+              />
+            </Col>
+
+            <Col lg="4" md="6" sm="6">
+              <Form.Check
+                inline
+                label="Anti-lock Braking System"
+                name="abs"
+                type={"checkbox"}
+                id={`abs`}
+              />
+            </Col>
+
+            <Col lg="4" md="6" sm="6">
+              <Form.Check
+                inline
+                label="Power Windows"
+                name="window"
+                type={"checkbox"}
+                id={`window`}
+              />
+            </Col>
+
+            <Col lg="4" md="6" sm="6">
+              <Form.Check
+                inline
+                label="Keyless Entry"
+                name="key"
+                type={"checkbox"}
+                id={`key`}
+              />
+            </Col>
+          </Row>
+
+          <Form.Group className="position-relative mb-3">
+            <Form.Check
+              required
+              name="terms"
+              label="Agree to terms and conditions"
+              onChange={handleChange}
+              isInvalid={!!errors.terms}
+              feedback={errors.terms}
+              feedbackType="invalid"
+              id="validationFormik106"
+              feedbackTooltip
+            />
+          </Form.Group>
+
+          <Button
+            type="submit"
+            style={{
+              backgroundColor: "black",
+              border: "none",
+              color: "white",
+              opacity: 1,
+              transition: "opacity 0.3s ease",
+            }}
+            onMouseEnter={(e) => (e.target.style.opacity = 0.7)}
+            onMouseLeave={(e) => (e.target.style.opacity = 1)}
+          >
+            Upload
+          </Button>
+        </Form>
+      )}
+    </Formik>
+  );
+};
+
+export default UploadCar;

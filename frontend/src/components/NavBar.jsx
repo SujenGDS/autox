@@ -4,19 +4,36 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const NavBar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
-    <Navbar bg="dark" data-bs-theme="dark" className="sticky-top">
-      <Container fluid className="justify-content-between">
+    <Navbar
+      bg="dark"
+      data-bs-theme="dark"
+      className="sticky-top"
+      style={{ height: "62px" }}
+    >
+      <Container fluid className="justify-content-between px-5">
         <Navbar.Brand href="#home" className="fs-3">
-          AutoX
+          <img
+            src="images/l2.png"
+            alt="logo"
+            style={{ width: "90px", height: "auto" }}
+          />
         </Navbar.Brand>
         <Nav className="me-auto  ms-auto">
-          <Nav.Link href="#home" className="mx-3 fs-5">
+          <Nav.Link
+            href="/sujen-home"
+            className={`mx-3 fs-5 ${
+              location.pathname === "/sujen-home" || location.pathname === "/"
+                ? "active"
+                : ""
+            }`}
+          >
             Home
           </Nav.Link>
           <Nav.Link href="#Cars" className="mx-3 fs-5">

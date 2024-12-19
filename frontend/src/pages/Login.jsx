@@ -55,7 +55,7 @@ const Login = () => {
           position: "absolute",
           height: "100vh",
           width: "100%",
-          backgroundImage: "url('/images/background-image.png')",
+          backgroundImage: "url('/images/bg-4.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",

@@ -62,7 +62,7 @@ const Register = () => {
         position: "absolute",
         height: "100vh",
         width: "100%",
-        backgroundImage: "url('/images/background-image.png')",
+        backgroundImage: "url('/images/bg-4.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -81,7 +81,6 @@ const Register = () => {
             padding: 2,
             justifyContent: "center",
             alignItems: "center",
-            padding: 3,
           }}
         >
           <Typography component="h1" variant="h5" sx={{ textAlign: "center" }}>
@@ -178,13 +177,13 @@ const Register = () => {
                 />
               </Grid2>
 
-              <Grid2 item size={6}>
+              {/* <Grid2 item size={6}>
                 <ImageUpload label="license photo front" />
-              </Grid2>
+              </Grid2> */}
 
-              <Grid2 item size={6}>
+              {/* <Grid2 item size={6}>
                 <ImageUpload label="license photo back" />
-              </Grid2>
+              </Grid2> */}
             </Grid2>
             <Button
               type="submit"
