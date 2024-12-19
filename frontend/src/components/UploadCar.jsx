@@ -8,6 +8,45 @@ import * as yup from "yup";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
+const carFeatures = [
+  {
+    id: 1,
+    feature: "Air Conditioning",
+    ariaLabel: "Checkbox for Air Conditioning",
+    name: "air_conditioning",
+  },
+  {
+    id: 2,
+    feature: "GPS Navigation",
+    ariaLabel: "Checkbox for GPS Navigation",
+    name: "gps_navigation",
+  },
+  {
+    id: 3,
+    feature: "Bluetooth Audio",
+    ariaLabel: "Checkbox for Bluetooth Audio",
+    name: "bluetooth_audio",
+  },
+  {
+    id: 4,
+    feature: "Heated Seats",
+    ariaLabel: "Checkbox for Heated Seats",
+    name: "heated_seats",
+  },
+  {
+    id: 5,
+    feature: "Sunroof",
+    ariaLabel: "Checkbox for Sunroof",
+    name: "sunroof",
+  },
+  {
+    id: 6,
+    feature: "All Wheel Drive",
+    ariaLabel: "Checkbox for All Wheel Drive",
+    name: "all_wheel_drive",
+  },
+];
+
 const UploadCar = () => {
   const { Formik } = formik;
 
@@ -54,6 +93,12 @@ const UploadCar = () => {
     carPlateNumber: yup.string().required(),
     pricePerDay: yup.mixed().required(),
 
+    air_conditioning: yup.bool(),
+    gps_navigation: yup.bool(),
+    bluetooth_audio: yup.bool(),
+    heated_seats: yup.bool(),
+    sunroof: yup.bool(),
+    all_wheel_drive: yup.bool(),
     terms: yup.bool().required().oneOf([true], "terms must be accepted"),
   });
 
@@ -74,6 +119,12 @@ const UploadCar = () => {
         pricePerDay: "",
         file: null,
         terms: false,
+        air_conditioning: false,
+        gps_navigation: false,
+        bluetooth_audio: false,
+        heated_seats: false,
+        sunroof: false,
+        all_wheel_drive: false,
       }}
     >
       {({ handleSubmit, handleChange, values, touched, errors }) => (
@@ -81,7 +132,7 @@ const UploadCar = () => {
           <Row className="mb-3 g-3">
             <Form.Group
               as={Col}
-              md="4"
+              xs="12"
               controlId="validationFormikCarName"
               className="position-relative"
             >
@@ -97,7 +148,7 @@ const UploadCar = () => {
 
             <Form.Group
               as={Col}
-              md="4"
+              xs="12"
               controlId="validationFormikCompanyName"
               className="position-relative"
             >
@@ -111,7 +162,7 @@ const UploadCar = () => {
               />
             </Form.Group>
 
-            <Form.Group as={Col} md="4" controlId="validationFormikMakeYear">
+            <Form.Group as={Col} xs="12" controlId="validationFormikMakeYear">
               <Form.Label>Make Year</Form.Label>
               <Form.Control
                 type="text"
@@ -124,7 +175,6 @@ const UploadCar = () => {
               />
             </Form.Group>
           </Row>
-
           <Row className="mb-3 g-3">
             <Form.Group
               as={Col}
@@ -186,7 +236,6 @@ const UploadCar = () => {
               </Form.Control.Feedback>
             </Form.Group>
           </Row>
-
           <Form.Group as={Col} md="3" className="position-relative mb-3">
             <Form.Label>Car photos</Form.Label>
             <Form.Control
@@ -201,7 +250,6 @@ const UploadCar = () => {
               {errors.file}
             </Form.Control.Feedback>
           </Form.Group>
-
           <Row>
             {photos.map((photo, index) => (
               <Col key={index} md={2} className="mb-3">
@@ -220,8 +268,22 @@ const UploadCar = () => {
               </Col>
             ))}
           </Row>
-
+          <h3>Features</h3>
           <Row>
+            {carFeatures.map((feature) => (
+              <Col lg="4" md="6" sm="6">
+                <Form.Check
+                  inline
+                  label={feature.feature}
+                  name={feature.name}
+                  onChange={handleChange}
+                  type={"checkbox"}
+                  key={feature.id}
+                />
+              </Col>
+            ))}
+          </Row>
+          {/* <Row>
             <Col lg="4" md="6" sm="6">
               <Form.Check
                 inline
@@ -311,8 +373,7 @@ const UploadCar = () => {
                 id={`key`}
               />
             </Col>
-          </Row>
-
+          </Row> */}
           <Form.Group className="position-relative mb-3">
             <Form.Check
               required
@@ -326,7 +387,6 @@ const UploadCar = () => {
               feedbackTooltip
             />
           </Form.Group>
-
           <Button
             type="submit"
             style={{
