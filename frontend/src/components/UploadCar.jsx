@@ -132,23 +132,25 @@ const UploadCar = () => {
           <Row className="mb-3 g-3">
             <Form.Group
               as={Col}
-              xs="12"
+              md="12"
               controlId="validationFormikCarName"
-              className="position-relative"
+              // className="position-relative"
             >
               <Form.Label>Car Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="carName"
-                value={values.carName}
-                onChange={handleChange}
-                isValid={!!errors.carName}
-              />
+              <InputGroup hasValidation>
+                <Form.Control
+                  type="text"
+                  name="carName"
+                  value={values.carName}
+                  onChange={handleChange}
+                  isInvalid={!!errors.carName}
+                />
+              </InputGroup>
             </Form.Group>
 
             <Form.Group
               as={Col}
-              xs="12"
+              md="6"
               controlId="validationFormikCompanyName"
               className="position-relative"
             >
@@ -158,11 +160,11 @@ const UploadCar = () => {
                 name="company"
                 value={values.company}
                 onChange={handleChange}
-                isValid={!!errors.company}
+                isInvalid={!!errors.company}
               />
             </Form.Group>
 
-            <Form.Group as={Col} xs="12" controlId="validationFormikMakeYear">
+            <Form.Group as={Col} md="6" controlId="validationFormikMakeYear">
               <Form.Label>Make Year</Form.Label>
               <Form.Control
                 type="text"
@@ -178,7 +180,7 @@ const UploadCar = () => {
           <Row className="mb-3 g-3">
             <Form.Group
               as={Col}
-              md="3"
+              md="4"
               controlId="validationFormik103"
               className="position-relative"
             >
@@ -192,13 +194,13 @@ const UploadCar = () => {
                 isInvalid={!!errors.seatCapacity}
               />
 
-              <Form.Control.Feedback type="invalid" tooltip>
+              {/* <Form.Control.Feedback type="invalid" tooltip>
                 {errors.seatCapacity}
-              </Form.Control.Feedback>
+              </Form.Control.Feedback> */}
             </Form.Group>
             <Form.Group
               as={Col}
-              md="3"
+              md="4"
               controlId="validationFormik104"
               className="position-relative"
             >
@@ -211,13 +213,10 @@ const UploadCar = () => {
                 onChange={handleChange}
                 isInvalid={!!errors.carPlateNumber}
               />
-              <Form.Control.Feedback type="invalid" tooltip>
-                {errors.carPlateNumber}
-              </Form.Control.Feedback>
             </Form.Group>
             <Form.Group
               as={Col}
-              md="3"
+              md="4"
               controlId="validationFormik105"
               className="position-relative"
             >
@@ -231,13 +230,13 @@ const UploadCar = () => {
                 isInvalid={!!errors.pricePerDay}
               />
 
-              <Form.Control.Feedback type="invalid" tooltip>
+              {/* <Form.Control.Feedback type="invalid" tooltip>
                 {errors.pricePerDay}
-              </Form.Control.Feedback>
+              </Form.Control.Feedback> */}
             </Form.Group>
           </Row>
-          <Form.Group as={Col} md="3" className="position-relative mb-3">
-            <Form.Label>Car photos</Form.Label>
+          <Form.Group as={Col} md="12" className="position-relative mb-3">
+            <Form.Label>Car photos | Max - 5 Min - 3 |</Form.Label>
             <Form.Control
               type="file"
               required
@@ -252,11 +251,16 @@ const UploadCar = () => {
           </Form.Group>
           <Row>
             {photos.map((photo, index) => (
-              <Col key={index} md={2} className="mb-3">
+              <Col key={index} md={6} className="mb-3">
                 <img
                   src={photo.preview}
                   alt={`preview-${index}`}
-                  style={{ width: "100%", height: "auto", marginBottom: "5px" }}
+                  style={{
+                    width: "100%",
+                    height: "200px",
+                    objectFit: "cover",
+                    marginBottom: "5px",
+                  }}
                 />
                 <Button
                   variant="danger"
@@ -283,97 +287,9 @@ const UploadCar = () => {
               </Col>
             ))}
           </Row>
-          {/* <Row>
-            <Col lg="4" md="6" sm="6">
-              <Form.Check
-                inline
-                label="Air Conditioning"
-                name="air_condition"
-                type={"checkbox"}
-                id={`air_condition`}
-              />
-            </Col>
 
-            <Col lg="4" md="6" sm="6">
-              <Form.Check
-                inline
-                label="GPS Navigation"
-                name="GPS_Navigation"
-                type={"checkbox"}
-                id={`GPS_Navigation`}
-              />
-            </Col>
+          <hr />
 
-            <Col lg="4" md="6" sm="6">
-              <Form.Check
-                inline
-                label="Bluetooth Audio"
-                name="bluetooth"
-                type={"checkbox"}
-                id={`bluetooth`}
-              />
-            </Col>
-
-            <Col lg="4" md="6" sm="6">
-              <Form.Check
-                inline
-                label="Power Steering"
-                name="power_steering"
-                type={"checkbox"}
-                id={`Power_Steering`}
-              />
-            </Col>
-
-            <Col lg="4" md="6" sm="6">
-              <Form.Check
-                inline
-                label="Rearview Camera"
-                name="Rearview_Camera"
-                type={"checkbox"}
-                id={`Rearview_Camera`}
-              />
-            </Col>
-
-            <Col lg="4" md="6" sm="6">
-              <Form.Check
-                inline
-                label="Cruise Control"
-                name="Cruise_Control"
-                type={"checkbox"}
-                id={`Cruise_Control`}
-              />
-            </Col>
-
-            <Col lg="4" md="6" sm="6">
-              <Form.Check
-                inline
-                label="Anti-lock Braking System"
-                name="abs"
-                type={"checkbox"}
-                id={`abs`}
-              />
-            </Col>
-
-            <Col lg="4" md="6" sm="6">
-              <Form.Check
-                inline
-                label="Power Windows"
-                name="window"
-                type={"checkbox"}
-                id={`window`}
-              />
-            </Col>
-
-            <Col lg="4" md="6" sm="6">
-              <Form.Check
-                inline
-                label="Keyless Entry"
-                name="key"
-                type={"checkbox"}
-                id={`key`}
-              />
-            </Col>
-          </Row> */}
           <Form.Group className="position-relative mb-3">
             <Form.Check
               required
@@ -384,7 +300,6 @@ const UploadCar = () => {
               feedback={errors.terms}
               feedbackType="invalid"
               id="validationFormik106"
-              feedbackTooltip
             />
           </Form.Group>
           <Button

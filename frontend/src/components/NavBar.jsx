@@ -5,77 +5,86 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import CarPostModal from "./Modal/CarPostModal";
 
 const NavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [show, setShow] = useState(false);
+  const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
 
   return (
-    <Navbar
-      bg="dark"
-      data-bs-theme="dark"
-      className="sticky-top"
-      style={{ height: "62px" }}
-    >
-      <Container fluid className="justify-content-between px-5">
-        <Navbar.Brand href="#home" className="fs-3">
-          <img
-            src="images/l2.png"
-            alt="logo"
-            style={{ width: "90px", height: "auto" }}
-          />
-        </Navbar.Brand>
-        <Nav className="me-auto  ms-auto">
-          <Nav.Link
-            href="/sujen-home"
-            className={`mx-3 fs-5 ${
-              location.pathname === "/sujen-home" || location.pathname === "/"
-                ? "active"
-                : ""
-            }`}
-          >
-            Home
-          </Nav.Link>
-          <Nav.Link href="#Cars" className="mx-3 fs-5">
-            Cars
-          </Nav.Link>
-          <Nav.Link href="#lift" className="mx-3 fs-5">
-            Lift
-          </Nav.Link>
-          <Nav.Link href="#compare" className="mx-3 fs-5">
-            Compare
-          </Nav.Link>
-        </Nav>
-        <div className="" aria-label="Basic example">
-          <Button
-            className="me-1"
-            variant="primary"
-            style={{
-              backgroundColor: "#800000",
-              border: "none",
-              outline: "none",
-            }}
-          >
-            Rent your car
-          </Button>
-          <Button
-            className="me-2"
-            variant="secondary"
-            onClick={() => navigate("/sujen-login")}
-          >
-            Login
-          </Button>
+    <>
+      <CarPostModal show={show} setShow={setShow} />
+      <Navbar
+        bg="dark"
+        data-bs-theme="dark"
+        className="sticky-top"
+        style={{ height: "62px" }}
+      >
+        <Container fluid className="justify-content-between px-5">
+          <Navbar.Brand href="#home" className="fs-3">
+            <img
+              src="images/l2.png"
+              alt="logo"
+              style={{ width: "90px", height: "auto" }}
+            />
+          </Navbar.Brand>
+          <Nav className="me-auto  ms-auto">
+            <Nav.Link
+              href="/sujen-home"
+              className={`mx-3 fs-5 ${
+                location.pathname === "/sujen-home" || location.pathname === "/"
+                  ? "active"
+                  : ""
+              }`}
+            >
+              Home
+            </Nav.Link>
+            <Nav.Link href="#Cars" className="mx-3 fs-5">
+              Cars
+            </Nav.Link>
+            <Nav.Link href="#lift" className="mx-3 fs-5">
+              Lift
+            </Nav.Link>
+            <Nav.Link href="#compare" className="mx-3 fs-5">
+              Compare
+            </Nav.Link>
+          </Nav>
+          <div className="" aria-label="Rent Button">
+            <Button
+              className="me-1"
+              variant="primary"
+              style={{
+                backgroundColor: "#800000",
+                border: "none",
+                outline: "none",
+              }}
+              onClick={() => setShow(true)}
+            >
+              Rent your car
+            </Button>
+            <Button
+              className="me-2"
+              variant="secondary"
+              onClick={() => navigate("/sujen-login")}
+            >
+              Login
+            </Button>
 
-          <Button
-            className="me-2 "
-            variant="secondary"
-            onClick={() => navigate("/sujen-register")}
-          >
-            Register
-          </Button>
-        </div>
-      </Container>
-    </Navbar>
+            <Button
+              className="me-2 "
+              variant="secondary"
+              onClick={() => navigate("/sujen-register")}
+            >
+              Register
+            </Button>
+          </div>
+        </Container>
+      </Navbar>
+    </>
   );
 };
 
