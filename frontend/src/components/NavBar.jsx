@@ -5,7 +5,7 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CarPostModal from "./Modal/CarPostModal";
 
 const NavBar = () => {
@@ -14,6 +14,9 @@ const NavBar = () => {
   const [show, setShow] = useState(false);
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    Boolean(localStorage.getItem("token"))
+  );
 
   return (
     <>
@@ -54,33 +57,40 @@ const NavBar = () => {
             </Nav.Link>
           </Nav>
           <div className="" aria-label="Rent Button">
-            <Button
-              className="me-1"
-              variant="primary"
-              style={{
-                backgroundColor: "#800000",
-                border: "none",
-                outline: "none",
-              }}
-              onClick={() => setShow(true)}
-            >
-              Rent your car
-            </Button>
-            <Button
-              className="me-2"
-              variant="secondary"
-              onClick={() => navigate("/sujen-login")}
-            >
-              Login
-            </Button>
+            {isLoggedIn && (
+              <Button
+                className="me-1"
+                variant="primary"
+                style={{
+                  backgroundColor: "#800000",
+                  border: "none",
+                  outline: "none",
+                }}
+                onClick={() => setShow(true)}
+              >
+                Rent your car
+              </Button>
+            )}
 
-            <Button
-              className="me-2 "
-              variant="secondary"
-              onClick={() => navigate("/sujen-register")}
-            >
-              Register
-            </Button>
+            {!isLoggedIn && (
+              <>
+                <Button
+                  className="me-2"
+                  variant="secondary"
+                  onClick={() => navigate("/sujen-login")}
+                >
+                  Login
+                </Button>
+
+                <Button
+                  className="me-2 "
+                  variant="secondary"
+                  onClick={() => navigate("/sujen-register")}
+                >
+                  Register
+                </Button>
+              </>
+            )}
           </div>
         </Container>
       </Navbar>

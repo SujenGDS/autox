@@ -10,26 +10,26 @@ import CarCard from "../components/CarCard";
 
 const Home = () => {
   const navigate = useNavigate();
-  const fetchUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:3000/auth/home", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.status !== 201) {
-        navigate("/sujen-login");
-      }
-    } catch (err) {
-      navigate("/sujen-login");
-      console.log(err);
-    }
-  };
+  // const fetchUser = async () => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const response = await axios.get("http://localhost:3000/auth/home", {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     if (response.status !== 201) {
+  //       navigate("/sujen-login");
+  //     }
+  //   } catch (err) {
+  //     navigate("/sujen-login");
+  //     console.log(err);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
+  // useEffect(() => {
+  //   fetchUser();
+  // }, []);
 
   return (
     <>

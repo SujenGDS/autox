@@ -7,6 +7,7 @@ import * as formik from "formik";
 import * as yup from "yup";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const carFeatures = [
   {
@@ -47,7 +48,7 @@ const carFeatures = [
   },
 ];
 
-const UploadCar = () => {
+const UploadCar = ({ setShow }) => {
   const { Formik } = formik;
 
   const [photos, setPhotos] = useState([]);
@@ -88,11 +89,14 @@ const UploadCar = () => {
   const schema = yup.object().shape({
     carName: yup.string().required(),
     company: yup.string().required(),
-    makeYear: yup.string().required(),
-    seatCapacity: yup.string().required(),
+    makeYear: yup.number().required(),
+    seatCapacity: yup.number().required(),
     carPlateNumber: yup.string().required(),
-    pricePerDay: yup.mixed().required(),
-
+    pricePerDay: yup.number().required(),
+    mileage: yup.number().required(),
+    km: yup.number().required(),
+    transmission: yup.string().required(),
+    fuelType: yup.mixed().required(),
     air_conditioning: yup.bool(),
     gps_navigation: yup.bool(),
     bluetooth_audio: yup.bool(),
@@ -102,8 +106,48 @@ const UploadCar = () => {
     terms: yup.bool().required().oneOf([true], "terms must be accepted"),
   });
 
-  const handleSubmit = (values) => {
-    console.log(values);
+  const handleSubmit = async (values) => {
+    const featuresArray = Object.keys(values).filter(
+      (key) =>
+        [
+          "air_conditioning",
+          "gps_navigation",
+          "bluetooth_audio",
+          "heated_seats",
+          "sunroof",
+          "all_wheel_drive",
+        ].includes(key) && values[key] === true
+    );
+
+    const payload = {
+      ...values,
+      featuresArray,
+    };
+
+    delete payload.air_conditioning;
+    delete payload.gps_navigation;
+    delete payload.bluetooth_audio;
+    delete payload.heated_seats;
+    delete payload.sunroof;
+    delete payload.all_wheel_drive;
+
+    console.log(payload);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/car/upload-car",
+        payload
+      );
+      if (response.status === 201) {
+        toast.success("Your car has been uploaded successfully");
+        setShow(false);
+      } else {
+        toast.error("Error Uploading");
+      }
+    } catch (err) {
+      toast.error("Invalid Credentials");
+      console.log("error", err.message);
+    }
   };
 
   return (
@@ -117,6 +161,11 @@ const UploadCar = () => {
         seatCapacity: "",
         carPlateNumber: "",
         pricePerDay: "",
+        mileage: "",
+        km: "",
+        transmission: "",
+        fuelType: "",
+
         file: null,
         terms: false,
         air_conditioning: false,
@@ -132,7 +181,7 @@ const UploadCar = () => {
           <Row className="mb-3 g-3">
             <Form.Group
               as={Col}
-              md="12"
+              md="6"
               controlId="validationFormikCarName"
               // className="position-relative"
             >
@@ -175,6 +224,23 @@ const UploadCar = () => {
                 onChange={handleChange}
                 isInvalid={!!errors.makeYear}
               />
+            </Form.Group>
+            <Form.Group
+              as={Col}
+              md="6"
+              controlId="validationFormikCarName"
+              // className="position-relative"
+            >
+              <Form.Label>Transmission</Form.Label>
+              <InputGroup hasValidation>
+                <Form.Control
+                  type="text"
+                  name="transmission"
+                  value={values.transmission}
+                  onChange={handleChange}
+                  isInvalid={!!errors.transmission}
+                />
+              </InputGroup>
             </Form.Group>
           </Row>
           <Row className="mb-3 g-3">
@@ -229,14 +295,61 @@ const UploadCar = () => {
                 onChange={handleChange}
                 isInvalid={!!errors.pricePerDay}
               />
+            </Form.Group>
 
-              {/* <Form.Control.Feedback type="invalid" tooltip>
-                {errors.pricePerDay}
-              </Form.Control.Feedback> */}
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationFormik105"
+              className="position-relative"
+            >
+              <Form.Label>Mileage</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder=""
+                name="mileage"
+                value={values.mileage}
+                onChange={handleChange}
+                isInvalid={!!errors.mileage}
+              />
+            </Form.Group>
+
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationFormik105"
+              className="position-relative"
+            >
+              <Form.Label>Current k/m</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder=""
+                name="km"
+                value={values.km}
+                onChange={handleChange}
+                isInvalid={!!errors.km}
+              />
+            </Form.Group>
+
+            <Form.Group
+              as={Col}
+              md="4"
+              controlId="validationFormik105"
+              className="position-relative"
+            >
+              <Form.Label>Fuel type</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder=""
+                name="fuelType"
+                value={values.fuelType}
+                onChange={handleChange}
+                isInvalid={!!errors.fuelType}
+              />
             </Form.Group>
           </Row>
           <Form.Group as={Col} md="12" className="position-relative mb-3">
-            <Form.Label>Car photos | Max - 5 Min - 3 |</Form.Label>
+            <Form.Label>Car photos | Max - 5 | Min - 3 |</Form.Label>
             <Form.Control
               type="file"
               required
@@ -272,6 +385,7 @@ const UploadCar = () => {
               </Col>
             ))}
           </Row>
+          <hr />
           <h3>Features</h3>
           <Row>
             {carFeatures.map((feature) => (

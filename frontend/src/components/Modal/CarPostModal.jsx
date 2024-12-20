@@ -13,7 +13,7 @@ const CarPostModal = ({ show, setShow }) => {
           overflowY: "auto",
         }}
       >
-        <UploadCar />
+        <UploadCar setShow={setShow} />
       </Modal.Body>
     </Modal>
   );
