@@ -48,7 +48,7 @@ const carFeatures = [
   },
 ];
 
-const UploadCar = ({ setShow }) => {
+const UploadCar = ({ setShow, setRefresh }) => {
   const { Formik } = formik;
 
   const [photos, setPhotos] = useState([]);
@@ -56,10 +56,10 @@ const UploadCar = ({ setShow }) => {
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
 
-    if (photos.length && files.length > 5) {
-      toast.error("you can upload only 5 photos");
-      return;
-    }
+    // if (photos.length && files.length > 5) {
+    //   toast.error("you can upload only 5 photos");
+    //   return;
+    // }
 
     const newPhotos = files.map((file) => ({
       file,
@@ -68,15 +68,15 @@ const UploadCar = ({ setShow }) => {
 
     setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
 
-    const handleUpload = () => {
-      if (photos.length < 2) {
-        toast.error("Upload atleast 2 photos of your car.");
-      } else {
-        console.log("photos ready to upload");
-        toast.success("photos are uploaded");
-        //backend
-      }
-    };
+    // const handleUpload = () => {
+    //   if (photos.length < 2) {
+    //     toast.error("Upload atleast 2 photos of your car.");
+    //   } else {
+    //     console.log("photos ready to upload");
+    //     toast.success("photos are uploaded");
+    //     //backend
+    //   }
+    // };
   };
 
   const handleRemovePhoto = (index) => {
@@ -141,6 +141,7 @@ const UploadCar = ({ setShow }) => {
       if (response.status === 201) {
         toast.success("Your car has been uploaded successfully");
         setShow(false);
+        setRefresh((prev) => !prev);
       } else {
         toast.error("Error Uploading");
       }

@@ -53,4 +53,19 @@ carRouter.post("/upload-car", async (req, res) => {
   }
 });
 
+// Endpoint to fetch all cars
+carRouter.get("/get-cars", async (req, res) => {
+  try {
+    const db = await connectToDataBase();
+
+    // Fetch all cars from the database
+    const [cars] = await db.query("SELECT * FROM cars");
+
+    return res.status(200).json({ cars });
+  } catch (err) {
+    console.error("Error in /get-cars:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 export default carRouter;

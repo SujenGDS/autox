@@ -8,7 +8,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import CarPostModal from "./Modal/CarPostModal";
 
-const NavBar = () => {
+const NavBar = ({ setRefresh }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [show, setShow] = useState(false);
@@ -20,9 +20,9 @@ const NavBar = () => {
 
   return (
     <>
-      <CarPostModal show={show} setShow={setShow} />
+      <CarPostModal show={show} setShow={setShow} setRefresh={setRefresh} />
       <Navbar
-        bg="dark"
+        bg="black"
         data-bs-theme="dark"
         className="sticky-top"
         style={{ height: "62px" }}
@@ -30,7 +30,7 @@ const NavBar = () => {
         <Container fluid className="justify-content-between px-5">
           <Navbar.Brand href="#home" className="fs-3">
             <img
-              src="images/l2.png"
+              src="images/newLG.png"
               alt="logo"
               style={{ width: "90px", height: "auto" }}
             />
@@ -46,9 +46,18 @@ const NavBar = () => {
             >
               Home
             </Nav.Link>
-            <Nav.Link href="#Cars" className="mx-3 fs-5">
+
+            <Nav.Link
+              href="/Cars"
+              className={`mx-3 fs-5 ${
+                location.pathname === "/Cars" || location.pathname === "/Cars"
+                  ? "active"
+                  : ""
+              }`}
+            >
               Cars
             </Nav.Link>
+
             <Nav.Link href="#lift" className="mx-3 fs-5">
               Lift
             </Nav.Link>
