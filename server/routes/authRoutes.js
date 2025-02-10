@@ -1,7 +1,7 @@
 import express from "express";
 import { connectToDataBase } from "../lib/db.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { decode } from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -78,7 +78,7 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: rows[0].id, email: rows[0].email },
+      { id: rows[0].userId, email: rows[0].email },
       process.env.SECRET_KEY,
       {
         expiresIn: "3h",
@@ -98,13 +98,28 @@ const verifyToken = async (req, res, next) => {
     if (!token) {
       return res.status(403).json({ message: "No token provided" });
     }
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    console.log(decoded);
-    req.userId = decoded.id;
-    req.email = decoded.email;
+    const decodedToken = decodeToken(token);
+    const id = decodedToken.id;
+    const email = decodedToken.email;
+    req.userId = id;
+    req.email = email;
     next();
   } catch (err) {
     return res.status(500).json({ message: "server error" });
+  }
+};
+
+export const decodeToken = (token) => {
+  try {
+    if (!token) {
+      throw new Error("Token is required");
+    }
+
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    return decoded;
+  } catch (err) {
+    console.error("Error in getUserIdFromToken:", err.message);
+    return null;
   }
 };
 
@@ -124,6 +139,15 @@ router.get("/home", verifyToken, async (req, res) => {
     return res.status(201).json({ user: rows[0] });
   } catch (err) {
     return res.status(500).json({ message: "server error" });
+  }
+});
+
+router.post("/logout", (req, res) => {
+  try {
+    res.status(200).json({ message: "Logged out succesfully" });
+  } catch (err) {
+    console.error("error in /logout", err);
+    res.status(500).json({ error: "internal server error" });
   }
 });
 export default router;

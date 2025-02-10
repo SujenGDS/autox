@@ -1,36 +1,50 @@
 import express from "express";
 import { connectToDataBase } from "../lib/db.js";
+import jwt from "jsonwebtoken";
 
 const carRouter = express.Router();
 
 carRouter.post("/upload-car", async (req, res) => {
-  const {
-    carName,
-    company,
-    makeYear,
-    seatCapacity,
-    carPlateNumber,
-    pricePerDay,
-    mileage,
-    km,
-    transmission,
-    fuelType,
-    featuresArray,
-    terms,
-  } = req.body;
-
-  if (!terms) {
-    return res
-      .status(400)
-      .json({ error: "You must accept the terms and conditions" });
-  }
-
   try {
+    // Extract token from request headers
+    const token = req.headers["authorization"]?.split(" ")[1];
+
+    if (!token) {
+      return res.status(403).json({ error: "No token provided" });
+    }
+
+    // Decode the token
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    console.log("token", token);
+    console.log(decoded, decoded.id);
+    const userId = decoded.id;
+
+    const {
+      carName,
+      company,
+      makeYear,
+      seatCapacity,
+      carPlateNumber,
+      pricePerDay,
+      mileage,
+      km,
+      transmission,
+      fuelType,
+      featuresArray,
+      terms,
+    } = req.body;
+
+    if (!terms) {
+      return res
+        .status(400)
+        .json({ error: "You must accept the terms and conditions" });
+    }
+
     const db = await connectToDataBase();
 
     // Insert car data into database
     await db.query(
-      "INSERT INTO cars (carName, company, makeYear, seatCapacity, carPlateNumber, pricePerDay, mileage, currentKm, transmission, fuelType, featuresArray) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO cars (carName, company, makeYear, seatCapacity, carPlateNumber, pricePerDay, mileage, currentKm, transmission, fuelType, featuresArray, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         carName,
         company,
@@ -43,6 +57,7 @@ carRouter.post("/upload-car", async (req, res) => {
         transmission,
         fuelType,
         JSON.stringify(featuresArray),
+        userId,
       ]
     );
 

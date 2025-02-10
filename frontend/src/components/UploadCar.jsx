@@ -134,10 +134,17 @@ const UploadCar = ({ setShow, setRefresh }) => {
     console.log(payload);
 
     try {
+      const token = localStorage.getItem("token");
       const response = await axios.post(
         "http://localhost:3000/car/upload-car",
-        payload
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
+
       if (response.status === 201) {
         toast.success("Your car has been uploaded successfully");
         setShow(false);

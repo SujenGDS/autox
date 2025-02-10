@@ -18,6 +18,14 @@ const NavBar = ({ setRefresh }) => {
     Boolean(localStorage.getItem("token"))
   );
 
+  const logout = () => {
+    // Remove the token from localStorage (or sessionStorage)
+    localStorage.removeItem("token");
+
+    // Optionally, redirect the user to the login page or home page
+    window.location.reload();
+  };
+
   return (
     <>
       <CarPostModal show={show} setShow={setShow} setRefresh={setRefresh} />
@@ -78,6 +86,21 @@ const NavBar = ({ setRefresh }) => {
                 onClick={() => setShow(true)}
               >
                 Rent your car
+              </Button>
+            )}
+
+            {isLoggedIn && (
+              <Button
+                className="me-1"
+                variant="primary"
+                style={{
+                  backgroundColor: "#800000",
+                  border: "none",
+                  outline: "none",
+                }}
+                onClick={logout}
+              >
+                Log out
               </Button>
             )}
 
