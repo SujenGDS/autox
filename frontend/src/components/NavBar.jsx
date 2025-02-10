@@ -7,6 +7,8 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import CarPostModal from "./Modal/CarPostModal";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 
 const NavBar = ({ setRefresh }) => {
   const navigate = useNavigate();
@@ -18,12 +20,12 @@ const NavBar = ({ setRefresh }) => {
     Boolean(localStorage.getItem("token"))
   );
 
-  const logout = () => {
-    // Remove the token from localStorage (or sessionStorage)
+  const logout = function () {
+    toast.success("You have been logged out successfully.");
     localStorage.removeItem("token");
-
-    // Optionally, redirect the user to the login page or home page
-    window.location.reload();
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
 
   return (
@@ -126,6 +128,7 @@ const NavBar = ({ setRefresh }) => {
           </div>
         </Container>
       </Navbar>
+      <ToastContainer></ToastContainer>
     </>
   );
 };

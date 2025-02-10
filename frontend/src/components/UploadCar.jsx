@@ -183,6 +183,8 @@ const UploadCar = ({ setShow, setRefresh }) => {
         sunroof: false,
         all_wheel_drive: false,
       }}
+      validateOnChange={false}
+      validateOnBlur={false}
     >
       {({ handleSubmit, handleChange, values, touched, errors }) => (
         <Form noValidate className="m-3" onSubmit={handleSubmit}>
