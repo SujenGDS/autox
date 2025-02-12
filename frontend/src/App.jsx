@@ -7,6 +7,7 @@ import UploadCarPage from "./pages/CarUpload.jsx";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+import UserProfile from "./pages/UserProfile.jsx";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/sujen-login" element={<Login />}></Route>
         <Route path="/Cars" element={<Cars />}></Route>
         <Route path="/upload-car" element={<UploadCarPage />}></Route>
+        <Route path="/userProfile" element={<UserProfile />}></Route>
       </Routes>
     </BrowserRouter>
   );

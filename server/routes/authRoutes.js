@@ -142,6 +142,21 @@ router.get("/home", verifyToken, async (req, res) => {
   }
 });
 
+// car posted by the logged in user
+router.get("/my-cars", verifyToken, async (req, res) => {
+  try {
+    const db = await connectToDataBase();
+    const [cars] = await db.query("SELECT * From cars WHERE userId = ?", [
+      req.userId,
+    ]);
+
+    return res.status(200).json({ cars });
+  } catch (err) {
+    console.error("error in /my-cars:", err);
+    return res.status(500).json({ error: "internal server error" });
+  }
+});
+
 router.post("/logout", (req, res) => {
   try {
     res.status(200).json({ message: "Logged out succesfully" });
