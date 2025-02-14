@@ -83,4 +83,25 @@ carRouter.get("/get-cars", async (req, res) => {
   }
 });
 
+carRouter.get("/:carId", async (req, res) => {
+  try {
+    const { carId } = req.params;
+    const db = await connectToDataBase();
+
+    // Fetch the car with the given carId
+    const [cars] = await db.query("SELECT * FROM cars WHERE carId = ?", [
+      carId,
+    ]);
+
+    if (cars.length === 0) {
+      return res.status(404).json({ error: "Car not found" });
+    }
+
+    return res.status(200).json({ car: cars[0] });
+  } catch (err) {
+    console.error("Error in /car/:carId:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 export default carRouter;

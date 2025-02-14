@@ -148,12 +148,12 @@ const UploadCar = ({ setShow, setRefresh }) => {
       if (response.status === 201) {
         toast.success("Your car has been uploaded successfully");
         setShow(false);
-        setRefresh((prev) => !prev);
       } else {
         toast.error("Error Uploading");
       }
+      setRefresh((prev) => !prev);
     } catch (err) {
-      toast.error("Invalid Credentials");
+      // toast.error("Invalid Credentials");
       console.log("error", err.message);
     }
   };

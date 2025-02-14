@@ -38,6 +38,7 @@ const Cars = () => {
                   title={car.carName}
                   fuel={car.fuelType}
                   transmission={car.transmission}
+                  carId={car.carId}
                   price={`${car.pricePerDay}/day`}
                   imgLink="https://via.placeholder.com/150" // Replace with a car image URL if available
                 />

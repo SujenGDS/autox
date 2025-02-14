@@ -140,7 +140,6 @@ const NavBar = ({ setRefresh }) => {
           </div>
         </Container>
       </Navbar>
-      <ToastContainer></ToastContainer>
     </>
   );
 };

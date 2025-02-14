@@ -208,7 +208,6 @@ const Register = () => {
             <Link to="/sujen-login"> Log in </Link>
           </Box>
         </Paper>
-        <ToastContainer />
       </Container>
     </Box>
   );
