@@ -10,7 +10,7 @@ import UploadCarPage from "./pages/CarUpload.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import UserProfile from "./pages/UserProfile.jsx";
-import CarDetail from "./components/CarDetail.jsx";
+import CarDetail from "./pages/CarDetail.jsx";
 
 function App() {
   return (
