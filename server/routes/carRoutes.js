@@ -23,6 +23,7 @@ carRouter.post("/upload-car", async (req, res) => {
       carName,
       company,
       makeYear,
+      type,
       seatCapacity,
       carPlateNumber,
       pricePerDay,
@@ -44,11 +45,12 @@ carRouter.post("/upload-car", async (req, res) => {
 
     // Insert car data into database
     await db.query(
-      "INSERT INTO cars (carName, company, makeYear, seatCapacity, carPlateNumber, pricePerDay, mileage, currentKm, transmission, fuelType, featuresArray, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO cars (carName, company, makeYear, type, seatCapacity, carPlateNumber, pricePerDay, mileage, currentKm, transmission, fuelType, featuresArray, userId) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         carName,
         company,
         makeYear,
+        type,
         seatCapacity,
         carPlateNumber,
         pricePerDay,

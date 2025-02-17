@@ -90,6 +90,10 @@ const CarDetail = () => {
               <p>
                 <strong>Make Year:</strong> {car?.makeYear}
               </p>
+
+              <p>
+                <strong>Type:</strong> {car?.type}
+              </p>
               <p>
                 <strong>Kilometers:</strong> {car?.currentKm}
               </p>

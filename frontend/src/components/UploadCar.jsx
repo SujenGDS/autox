@@ -90,6 +90,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
     carName: yup.string().required(),
     company: yup.string().required(),
     makeYear: yup.number().required(),
+    type: yup.string().required(),
     seatCapacity: yup.number().required(),
     carPlateNumber: yup.string().required(),
     pricePerDay: yup.number().required(),
@@ -166,6 +167,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
         carName: "",
         company: "",
         makeYear: "",
+        type: "",
         seatCapacity: "",
         carPlateNumber: "",
         pricePerDay: "",
@@ -214,13 +216,19 @@ const UploadCar = ({ setShow, setRefresh }) => {
               className="position-relative"
             >
               <Form.Label>Company</Form.Label>
-              <Form.Control
-                type="text"
+              <Form.Select
                 name="company"
                 value={values.company}
                 onChange={handleChange}
                 isInvalid={!!errors.company}
-              />
+              >
+                <option value=""> Select company</option>
+                <option value="Mercedes">Mercedes</option>
+                <option value="Hyundai">Hyundai</option>
+                <option value="Rolls Royce">Rolls Royce</option>
+                <option value="Bentley">Bentley</option>
+                <option value="McLaren">McLaren</option>
+              </Form.Select>
             </Form.Group>
 
             <Form.Group as={Col} md="6" controlId="validationFormikMakeYear">
@@ -235,6 +243,24 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 isInvalid={!!errors.makeYear}
               />
             </Form.Group>
+
+            <Form.Group as={Col} md="6" controlId="validationFormikMakeYear">
+              <Form.Label>Type</Form.Label>
+              <Form.Select
+                name="type"
+                value={values.type}
+                onChange={handleChange}
+                isInvalid={!!errors.type}
+              >
+                <option value="">Select Type</option>
+                <option value="Sedan">Sedan</option>
+                <option value="Hatchback">Hatchback</option>
+                <option value="SUV">SUV</option>
+                <option value="Crossover">Crossover</option>
+                <option value="Pick Up">Pick Up</option>
+              </Form.Select>
+            </Form.Group>
+
             <Form.Group
               as={Col}
               md="6"
@@ -243,16 +269,20 @@ const UploadCar = ({ setShow, setRefresh }) => {
             >
               <Form.Label>Transmission</Form.Label>
               <InputGroup hasValidation>
-                <Form.Control
-                  type="text"
+                <Form.Select
                   name="transmission"
                   value={values.transmission}
                   onChange={handleChange}
                   isInvalid={!!errors.transmission}
-                />
+                >
+                  <option value="">Select Transmission</option>
+                  <option value="Automatic">Automatic</option>
+                  <option value="Manual">Manual</option>
+                </Form.Select>
               </InputGroup>
             </Form.Group>
           </Row>
+
           <Row className="mb-3 g-3">
             <Form.Group
               as={Col}
@@ -269,10 +299,6 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 onChange={handleChange}
                 isInvalid={!!errors.seatCapacity}
               />
-
-              {/* <Form.Control.Feedback type="invalid" tooltip>
-                {errors.seatCapacity}
-              </Form.Control.Feedback> */}
             </Form.Group>
             <Form.Group
               as={Col}
@@ -348,14 +374,19 @@ const UploadCar = ({ setShow, setRefresh }) => {
               className="position-relative"
             >
               <Form.Label>Fuel type</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder=""
-                name="fuelType"
-                value={values.fuelType}
-                onChange={handleChange}
-                isInvalid={!!errors.fuelType}
-              />
+              <InputGroup hasValidation>
+                <Form.Select
+                  name="fuelType"
+                  value={values.fuelType}
+                  onChange={handleChange}
+                  isInvalid={!!errors.fuelType}
+                >
+                  <option value=""> Select Fuel type </option>
+                  <option value="Petrol"> Petrol </option>
+                  <option value="Diesel"> Diesel </option>
+                  <option value="EV"> EV </option>
+                </Form.Select>
+              </InputGroup>
             </Form.Group>
           </Row>
           <Form.Group as={Col} md="12" className="position-relative mb-3">
