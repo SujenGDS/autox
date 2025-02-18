@@ -223,11 +223,47 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 isInvalid={!!errors.company}
               >
                 <option value=""> Select company</option>
-                <option value="Mercedes">Mercedes</option>
                 <option value="Hyundai">Hyundai</option>
+                <option value="Tata">Tata</option>
+                <option value="Mahindra">Mahindra</option>
+                <option value="Maruti Suzuki">Maruti Suzuki</option>
+                <option value="Honda">Honda</option>
+                <option value="Kia">Kia</option>
+                <option value="Toyota">Toyota</option>
+                <option value="Nissan">Nissan</option>
+                <option value="Datsun">Datsun</option>
+                <option value="Ford">Ford</option>
+                <option value="Renault">Renault</option>
+                <option value="MG">MG</option>
+                <option value="Skoda">Skoda</option>
+                <option value="Volkswagen">Volkswagen</option>
+                <option value="Peugeot">Peugeot</option>
+                <option value="Jeep">Jeep</option>
+                <option value="Isuzu">Isuzu</option>
+                <option value="BYD">BYD</option>
+                <option value="Changan">Changan</option>
+                <option value="GWM (Great Wall Motors)">
+                  GWM (Great Wall Motors)
+                </option>
+                <option value="Haval">Haval</option>
+                <option value="DFSK">DFSK</option>
+                <option value="Citroën">Citroën</option>
+                <option value="Mitsubishi">Mitsubishi</option>
+                <option value="Subaru">Subaru</option>
+                <option value="Land Rover">Land Rover</option>
+                <option value="Lexus">Lexus</option>
+                <option value="Jaguar">Jaguar</option>
+                <option value="Mercedes-Benz">Mercedes-Benz</option>
+                <option value="BMW">BMW</option>
+                <option value="Porsche">Porsche</option>
+                <option value="Volvo">Volvo</option>
+                <option value="Tesla">Tesla</option>
+                <option value="Fiat">Fiat</option>
+                <option value="Maserati">Maserati</option>
                 <option value="Rolls Royce">Rolls Royce</option>
                 <option value="Bentley">Bentley</option>
                 <option value="McLaren">McLaren</option>
+                <option value="Aston Martin">Aston Martin</option>
               </Form.Select>
             </Form.Group>
 
@@ -258,6 +294,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 <option value="SUV">SUV</option>
                 <option value="Crossover">Crossover</option>
                 <option value="Pick Up">Pick Up</option>
+                <option value="Coupe">Coupe</option>
               </Form.Select>
             </Form.Group>
 

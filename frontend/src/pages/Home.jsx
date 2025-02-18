@@ -36,13 +36,15 @@ const Home = () => {
         className="px-5 d-flex gap-4 overflow-x-scroll"
         style={{ scrollbarWidth: "none" }}
       >
-        <CarCard
-          title="Maybach"
-          fuel={"Petrol"}
-          transmission={"Automatic"}
-          price="1200/day"
-          imgLink="https://cdn.jdpower.com/JDP_2023%20Mercedes-Maybach%20S680%20Cashmere%20White%20Magno%20Front%20Quarter%20View.jpg"
-        />
+        <div style={{ width: "290px", flexShrink: 0 }}>
+          <CarCard
+            title="Maybach"
+            fuel={"Petrol"}
+            transmission={"Automatic"}
+            price="1200/day"
+            imgLink="https://cdn.jdpower.com/JDP_2023%20Mercedes-Maybach%20S680%20Cashmere%20White%20Magno%20Front%20Quarter%20View.jpg"
+          />
+        </div>
 
         <CarCard
           title="Verna"
