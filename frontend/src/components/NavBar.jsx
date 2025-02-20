@@ -24,8 +24,9 @@ const NavBar = ({ setRefresh }) => {
   const logout = function () {
     toast.success("You have been logged out successfully.");
     localStorage.removeItem("token");
+
     setTimeout(() => {
-      window.location.reload();
+      window.location.href = "/";
     }, 500);
   };
 

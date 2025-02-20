@@ -56,27 +56,12 @@ const UploadCar = ({ setShow, setRefresh }) => {
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
 
-    // if (photos.length && files.length > 5) {
-    //   toast.error("you can upload only 5 photos");
-    //   return;
-    // }
-
     const newPhotos = files.map((file) => ({
       file,
       preview: URL.createObjectURL(file),
     }));
 
     setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
-
-    // const handleUpload = () => {
-    //   if (photos.length < 2) {
-    //     toast.error("Upload atleast 2 photos of your car.");
-    //   } else {
-    //     console.log("photos ready to upload");
-    //     toast.success("photos are uploaded");
-    //     //backend
-    //   }
-    // };
   };
 
   const handleRemovePhoto = (index) => {

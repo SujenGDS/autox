@@ -165,4 +165,5 @@ router.post("/logout", (req, res) => {
     res.status(500).json({ error: "internal server error" });
   }
 });
+
 export default router;

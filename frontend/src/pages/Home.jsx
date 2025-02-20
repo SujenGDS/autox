@@ -46,45 +46,55 @@ const Home = () => {
           />
         </div>
 
-        <CarCard
-          title="Verna"
-          fuel={"Petrol"}
-          transmission={"Automatic"}
-          price="1200"
-          imgLink="https://apollo.olx.in/v1/files/ugjab7o17e8x1-IN/image;s=360x0"
-        />
+        <div style={{ width: "290px", flexShrink: 0 }}>
+          <CarCard
+            title="Verna"
+            fuel={"Petrol"}
+            transmission={"Automatic"}
+            price="1200"
+            imgLink="https://apollo.olx.in/v1/files/ugjab7o17e8x1-IN/image;s=360x0"
+          />
+        </div>
 
-        <CarCard
-          title="Rolls Royce"
-          fuel={"Petrol"}
-          transmission={"Automatic"}
-          price="74747"
-          imgLink="https://res.cloudinary.com/unix-center/image/upload/c_limit,dpr_3.0,f_auto,fl_progressive,g_center,h_240,q_auto:good,w_385/pnv7ncbgaqvsstbfkjr8.jpg"
-        />
+        <div style={{ width: "290px", flexShrink: 0 }}>
+          <CarCard
+            title="Rolls Royce"
+            fuel={"Petrol"}
+            transmission={"Automatic"}
+            price="74747"
+            imgLink="https://res.cloudinary.com/unix-center/image/upload/c_limit,dpr_3.0,f_auto,fl_progressive,g_center,h_240,q_auto:good,w_385/pnv7ncbgaqvsstbfkjr8.jpg"
+          />
+        </div>
 
-        <CarCard
-          title="Flying Spur"
-          fuel={"Petrol"}
-          transmission={"Automatic"}
-          price="74747"
-          imgLink="https://assets.bwbx.io/images/users/iqjWHBFdfxIU/i.Bj4m.V11iQ/v1/-1x-1.webp"
-        />
+        <div style={{ width: "290px", flexShrink: 0 }}>
+          <CarCard
+            title="Flying Spur"
+            fuel={"Petrol"}
+            transmission={"Automatic"}
+            price="74747"
+            imgLink="https://assets.bwbx.io/images/users/iqjWHBFdfxIU/i.Bj4m.V11iQ/v1/-1x-1.webp"
+          />
+        </div>
 
-        <CarCard
-          title="Mclaren"
-          fuel={"Petrol"}
-          transmission={"Automatic"}
-          price="74747"
-          imgLink="https://auto.cdn-rivamedia.com/photos/annoncecli/big/mclaren-720s-coupe-luxury-launch-edition-v8-4-0-720-146742811.jpg"
-        />
+        <div style={{ width: "290px", flexShrink: 0 }}>
+          <CarCard
+            title="Mclaren"
+            fuel={"Petrol"}
+            transmission={"Automatic"}
+            price="74747"
+            imgLink="https://auto.cdn-rivamedia.com/photos/annoncecli/big/mclaren-720s-coupe-luxury-launch-edition-v8-4-0-720-146742811.jpg"
+          />
+        </div>
 
-        <CarCard
-          title="G-Wagon"
-          fuel={"Petrol"}
-          transmission={"Automatic"}
-          price="74747"
-          imgLink="https://static1.topspeedimages.com/wordpress/wp-content/uploads/2023/01/mercedes-g-wagen.jpg"
-        />
+        <div style={{ width: "290px", flexShrink: 0 }}>
+          <CarCard
+            title="G-Wagon"
+            fuel={"Petrol"}
+            transmission={"Automatic"}
+            price="74747"
+            imgLink="https://static1.topspeedimages.com/wordpress/wp-content/uploads/2023/01/mercedes-g-wagen.jpg"
+          />
+        </div>
       </div>
 
       <div

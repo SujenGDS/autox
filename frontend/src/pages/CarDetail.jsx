@@ -5,12 +5,16 @@ import { Container, Card, Button, Spinner, Alert } from "react-bootstrap";
 import NavBar from "../components/NavBar";
 import { Carousel, Row, Col } from "react-bootstrap";
 import CarCard from "../components/CarCard";
+import BookNowModal from "../components/BookNowModal";
 
 const CarDetail = () => {
   const { carId } = useParams();
   const [car, setCar] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [price, setPrice] = useState(0);
+  const [title, setTitle] = useState("Car");
 
   useEffect(() => {
     const fetchCarDetail = async () => {
@@ -30,6 +34,10 @@ const CarDetail = () => {
     fetchCarDetail();
   }, [carId]);
 
+  const openBookNowModal = () => {
+    setShowModal(true);
+  };
+
   if (loading)
     return (
       <Container className="text-center mt-5">
@@ -46,6 +54,12 @@ const CarDetail = () => {
 
   return (
     <>
+      <BookNowModal
+        title={title}
+        price={price}
+        showModal={showModal}
+        setShowModal={setShowModal}
+      />
       <NavBar />
       <Row className="d-flex align-items-center m-4">
         <Col md={6}>
@@ -139,7 +153,9 @@ const CarDetail = () => {
           </Row>
 
           <div className="text-end mt-4">
-            <Button variant="outline-dark">Book Now</Button>
+            <Button variant="outline-dark" onClick={openBookNowModal}>
+              Book Now
+            </Button>
           </div>
         </Col>
       </Row>
@@ -160,53 +176,65 @@ const CarDetail = () => {
         className="px-5 d-flex gap-4 overflow-x-scroll"
         style={{ scrollbarWidth: "none" }}
       >
-        <CarCard
-          title="Maybach"
-          fuel={"Petrol"}
-          transmission={"Automatic"}
-          price="1200/day"
-          imgLink="https://cdn.jdpower.com/JDP_2023%20Mercedes-Maybach%20S680%20Cashmere%20White%20Magno%20Front%20Quarter%20View.jpg"
-        />
+        <div style={{ width: "290px", flexShrink: 0 }}>
+          <CarCard
+            title="Maybach"
+            fuel={"Petrol"}
+            transmission={"Automatic"}
+            price="1200/day"
+            imgLink="https://cdn.jdpower.com/JDP_2023%20Mercedes-Maybach%20S680%20Cashmere%20White%20Magno%20Front%20Quarter%20View.jpg"
+          />
+        </div>
 
-        <CarCard
-          title="Verna"
-          fuel={"Petrol"}
-          transmission={"Automatic"}
-          price="1200"
-          imgLink="https://apollo.olx.in/v1/files/ugjab7o17e8x1-IN/image;s=360x0"
-        />
+        <div style={{ width: "290px", flexShrink: 0 }}>
+          <CarCard
+            title="Verna"
+            fuel={"Petrol"}
+            transmission={"Automatic"}
+            price="1200"
+            imgLink="https://apollo.olx.in/v1/files/ugjab7o17e8x1-IN/image;s=360x0"
+          />
+        </div>
 
-        <CarCard
-          title="Rolls Royce"
-          fuel={"Petrol"}
-          transmission={"Automatic"}
-          price="74747"
-          imgLink="https://res.cloudinary.com/unix-center/image/upload/c_limit,dpr_3.0,f_auto,fl_progressive,g_center,h_240,q_auto:good,w_385/pnv7ncbgaqvsstbfkjr8.jpg"
-        />
+        <div style={{ width: "290px", flexShrink: 0 }}>
+          <CarCard
+            title="Rolls Royce"
+            fuel={"Petrol"}
+            transmission={"Automatic"}
+            price="74747"
+            imgLink="https://res.cloudinary.com/unix-center/image/upload/c_limit,dpr_3.0,f_auto,fl_progressive,g_center,h_240,q_auto:good,w_385/pnv7ncbgaqvsstbfkjr8.jpg"
+          />
+        </div>
 
-        <CarCard
-          title="Flying Spur"
-          fuel={"Petrol"}
-          transmission={"Automatic"}
-          price="74747"
-          imgLink="https://assets.bwbx.io/images/users/iqjWHBFdfxIU/i.Bj4m.V11iQ/v1/-1x-1.webp"
-        />
+        <div style={{ width: "290px", flexShrink: 0 }}>
+          <CarCard
+            title="Flying Spur"
+            fuel={"Petrol"}
+            transmission={"Automatic"}
+            price="74747"
+            imgLink="https://assets.bwbx.io/images/users/iqjWHBFdfxIU/i.Bj4m.V11iQ/v1/-1x-1.webp"
+          />
+        </div>
 
-        <CarCard
-          title="Mclaren"
-          fuel={"Petrol"}
-          transmission={"Automatic"}
-          price="74747"
-          imgLink="https://auto.cdn-rivamedia.com/photos/annoncecli/big/mclaren-720s-coupe-luxury-launch-edition-v8-4-0-720-146742811.jpg"
-        />
+        <div style={{ width: "290px", flexShrink: 0 }}>
+          <CarCard
+            title="Mclaren"
+            fuel={"Petrol"}
+            transmission={"Automatic"}
+            price="74747"
+            imgLink="https://auto.cdn-rivamedia.com/photos/annoncecli/big/mclaren-720s-coupe-luxury-launch-edition-v8-4-0-720-146742811.jpg"
+          />
+        </div>
 
-        <CarCard
-          title="G-Wagon"
-          fuel={"Petrol"}
-          transmission={"Automatic"}
-          price="74747"
-          imgLink="https://static1.topspeedimages.com/wordpress/wp-content/uploads/2023/01/mercedes-g-wagen.jpg"
-        />
+        <div style={{ width: "290px", flexShrink: 0 }}>
+          <CarCard
+            title="G-Wagon"
+            fuel={"Petrol"}
+            transmission={"Automatic"}
+            price="74747"
+            imgLink="https://static1.topspeedimages.com/wordpress/wp-content/uploads/2023/01/mercedes-g-wagen.jpg"
+          />
+        </div>
       </div>
     </>
   );

@@ -146,7 +146,11 @@ const Cars = () => {
                 />
               </Form.Group>
 
-              <Button variant="primary" className="me-2" onClick={applyFilters}>
+              <Button
+                variant="outline-dark"
+                className="me-2"
+                onClick={applyFilters}
+              >
                 Apply Filter
               </Button>
               <Button variant="secondary" onClick={clearFilters}>
@@ -156,19 +160,21 @@ const Cars = () => {
           </Col>
 
           {/* Car List Section */}
-          <Col md={9}>
-            <div className="d-flex flex-wrap gap-3 w-100">
+          <Col md={9} className="ps-5">
+            <div className="row">
               {filteredCars.length > 0 ? (
                 filteredCars.map((car, index) => (
-                  <CarCard
-                    key={index}
-                    title={car.carName}
-                    fuel={car.fuelType}
-                    transmission={car.transmission}
-                    carId={car.carId}
-                    price={`${car.pricePerDay}/day`}
-                    imgLink="https://via.placeholder.com/150" // Replace with a real image
-                  />
+                  <Col md={4} xxl={3} className="mb-3">
+                    <CarCard
+                      key={index}
+                      title={car.carName}
+                      fuel={car.fuelType}
+                      transmission={car.transmission}
+                      carId={car.carId}
+                      price={`${car.pricePerDay}/day`}
+                      imgLink="https://via.placeholder.com/150" // Replace with a real image
+                    />
+                  </Col>
                 ))
               ) : (
                 <p>No cars match the selected filters.</p>

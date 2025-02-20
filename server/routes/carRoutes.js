@@ -43,7 +43,6 @@ carRouter.post("/upload-car", async (req, res) => {
 
     const db = await connectToDataBase();
 
-    // Insert car data into database
     await db.query(
       "INSERT INTO cars (carName, company, makeYear, type, seatCapacity, carPlateNumber, pricePerDay, mileage, currentKm, transmission, fuelType, featuresArray, userId) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
@@ -66,6 +65,7 @@ carRouter.post("/upload-car", async (req, res) => {
     return res.status(201).json({ message: "Car uploaded successfully" });
   } catch (err) {
     console.error("Error in /upload-car:", err);
+
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -74,6 +74,10 @@ carRouter.post("/upload-car", async (req, res) => {
 carRouter.get("/get-cars", async (req, res) => {
   try {
     const db = await connectToDataBase();
+    if (!db) {
+      console.error("Database connection failed");
+      return res.status(500).json({ error: "Database connection failed" });
+    }
 
     // Fetch all cars from the database
     const [cars] = await db.query("SELECT * FROM cars");
@@ -103,6 +107,28 @@ carRouter.get("/:carId", async (req, res) => {
   } catch (err) {
     console.error("Error in /car/:carId:", err);
     return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+carRouter.delete("/delete-car/:id", async (req, res) => {
+  try {
+    const db = await connectToDataBase();
+    const carId = parseInt(req.params.id);
+
+    if (isNaN(carId)) {
+      return res.status(400).json({ message: "Invalid car ID" });
+    }
+
+    const result = await db.query("DELETE FROM cars WHERE carId = ?", [carId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+
+    res.status(200).json({ message: "Car deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting car:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
