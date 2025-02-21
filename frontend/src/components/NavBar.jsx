@@ -40,7 +40,14 @@ const NavBar = ({ setRefresh }) => {
         style={{ height: "62px" }}
       >
         <Container fluid className="justify-content-between px-5">
-          <Navbar.Brand href="#home" className="fs-3">
+          <Navbar.Brand
+            href="/sujen-home"
+            className={`mx-3 fs-5 ${
+              location.pathname === "/sujen-home" || location.pathname === "/"
+                ? "active"
+                : ""
+            }`}
+          >
             <img
               src="images/newLG.png"
               alt="logo"

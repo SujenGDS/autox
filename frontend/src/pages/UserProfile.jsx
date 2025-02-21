@@ -19,6 +19,7 @@ const UserProfile = () => {
     fuelType: "",
     transmission: "",
     pricePerDay: "",
+    company: "",
   });
 
   useEffect(() => {
@@ -42,18 +43,36 @@ const UserProfile = () => {
     fetchData();
   }, [refresh]);
 
-  const handleEditCar = async () => {
+  const handleEditCar = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:3000/auth/edit-car/${currentCar.carId}`,
-        editedCar,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      if (!token) {
+        console.error("No authentication token found");
+        return;
+      }
+
+      if (!id) {
+        console.error("No car ID provided for editing");
+        return;
+      }
+
+      if (!editedCar || Object.keys(editedCar).length === 0) {
+        console.error("No car details provided for update");
+        return;
+      }
+
+      await axios.put(`http://localhost:3000/car/edit-car/${id}`, editedCar, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("Car updated successfully!");
       setShowEditModal(false);
-      setRefresh(!refresh);
+      setRefresh((prev) => !prev);
     } catch (err) {
-      console.error("Failed to edit car", err);
+      console.error("Failed to edit car:", err.response?.data || err.message);
     }
   };
 
@@ -80,7 +99,6 @@ const UserProfile = () => {
         {user && <h2 className="text-xl">Welcome, {user.firstName}</h2>}
 
         <Row>
-          {/* Car List - Takes 50% Width */}
           <Col md={6}>
             <h3 className="mt-4">My Cars</h3>
             <ul className="list-group list-group-flush">
@@ -115,6 +133,7 @@ const UserProfile = () => {
                             fuelType: car.fuelType,
                             transmission: car.transmission,
                             pricePerDay: car.pricePerDay,
+                            company: car.company,
                           });
                           setShowEditModal(true);
                         }}
@@ -155,7 +174,7 @@ const UserProfile = () => {
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Group controlId="formCarName">
+            <Form.Group name="carName">
               <Form.Label>Car Name</Form.Label>
               <Form.Control
                 type="text"
@@ -165,28 +184,25 @@ const UserProfile = () => {
                 }
               />
             </Form.Group>
-            <Form.Group controlId="formFuelType">
-              <Form.Label>Fuel Type</Form.Label>
-              <Form.Control
-                type="text"
-                value={editedCar.fuelType}
+
+            <Form.Group name="company">
+              <Form.Label>Company</Form.Label>
+              <Form.Select
+                value={editedCar.company || ""}
                 onChange={(e) =>
-                  setEditedCar({ ...editedCar, fuelType: e.target.value })
+                  setEditedCar({ ...editedCar, company: e.target.value })
                 }
-              />
+              >
+                <option value="">Select a company</option>{" "}
+                <option value="Toyota">Toyota</option>
+                <option value="Honda">Honda</option>
+                <option value="Ford">Ford</option>
+                <option value="BMW">BMW</option>
+              </Form.Select>
             </Form.Group>
-            <Form.Group controlId="formTransmission">
-              <Form.Label>Transmission</Form.Label>
-              <Form.Control
-                type="text"
-                value={editedCar.transmission}
-                onChange={(e) =>
-                  setEditedCar({ ...editedCar, transmission: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group controlId="formPrice">
-              <Form.Label>Price per Day</Form.Label>
+
+            <Form.Group name="pricePerDay">
+              <Form.Label>price</Form.Label>
               <Form.Control
                 type="text"
                 value={editedCar.pricePerDay}
@@ -201,8 +217,11 @@ const UserProfile = () => {
           <Button variant="secondary" onClick={() => setShowEditModal(false)}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleEditCar}>
-            Save Changes
+          <Button
+            variant="outline-dark"
+            onClick={() => handleEditCar(currentCar.carId)}
+          >
+            save changes
           </Button>
         </Modal.Footer>
       </Modal>

@@ -110,6 +110,40 @@ carRouter.get("/:carId", async (req, res) => {
   }
 });
 
+carRouter.put("/edit-car/:id", async (req, res) => {
+  try {
+    const carId = req.params.id;
+    const { carName, company, pricePerDay } = req.body;
+    const db = await connectToDataBase();
+
+    if (!carName || !company || !pricePerDay) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const query =
+      "UPDATE cars SET carName = ?, company = ?, pricePerDay = ? WHERE carId = ?";
+    const values = [carName, company, pricePerDay, carId];
+
+    db.query(query, values, (err, result) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ message: "Database error", error: err });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "Car not found" });
+      }
+    });
+
+    return res.status(200).json({ message: "Car updated successfully" });
+  } catch (error) {
+    console.error("Server error:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
+});
+
 carRouter.delete("/delete-car/:id", async (req, res) => {
   try {
     const db = await connectToDataBase();
