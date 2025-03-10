@@ -60,14 +60,35 @@ const Login = () => {
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           display: "flex",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           alignItems: "center",
-
+          // paddingLeft: "60%",
           // filter: "blur(5px)",
         }}
       >
+        <div
+          style={{
+            fontSize: "50px",
+            textAlign: "center",
+            color: "white",
+            lineHeight: "1.3",
+            padding: "10px",
+            background: "rgba(0, 0, 0, 0.1)", // Glass effect
+            backdropFilter: "blur(5px)",
+            borderRadius: "10px",
+            border: "1px solid rgba(0, 0, 0, 0.02)",
+            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)",
+            maxWidth: "400px",
+            margin: "auto",
+          }}
+        >
+          Join us today <br /> and experience a <br />
+          smarter way <br />
+          to rent <br /> and share vehicles!
+        </div>
+
         <Container maxWidth="sm">
-          <Paper elevation={10} sx={{ padding: 2 }}>
+          <Paper elevation={10} sx={{ padding: 4 }}>
             <Typography
               component="h1"
               variant="h5"

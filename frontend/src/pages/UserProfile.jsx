@@ -198,6 +198,7 @@ const UserProfile = () => {
                 <option value="Honda">Honda</option>
                 <option value="Ford">Ford</option>
                 <option value="BMW">BMW</option>
+                <option value="RollsRoyce">Rolls Royce</option>
               </Form.Select>
             </Form.Group>
 

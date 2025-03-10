@@ -70,7 +70,7 @@ carRouter.post("/upload-car", async (req, res) => {
   }
 });
 
-// Endpoint to fetch all cars
+// fetch all cars
 carRouter.get("/get-cars", async (req, res) => {
   try {
     const db = await connectToDataBase();

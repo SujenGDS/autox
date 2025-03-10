@@ -5,6 +5,7 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
 import "../styles/carCard.css";
+import BookNowModal from "./BookNowModal";
 
 const CarCard = ({ carId, title, fuel, transmission, price, imgLink }) => {
   const navigate = useNavigate();
@@ -53,7 +54,15 @@ const CarCard = ({ carId, title, fuel, transmission, price, imgLink }) => {
         </Card.Footer>
       </Card>
 
-      {/* Book Now Modal */}
+      <BookNowModal
+        key={carId}
+        setShowModal={setShowModal}
+        showModal={showModal}
+        title={title}
+        price={price}
+        carId={carId}
+      />
+      {/* Book Now Modal 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Book {title}</Modal.Title>
@@ -90,6 +99,7 @@ const CarCard = ({ carId, title, fuel, transmission, price, imgLink }) => {
           </div>
         </Modal.Footer>
       </Modal>
+      */}
     </div>
   );
 };

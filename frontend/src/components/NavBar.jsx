@@ -10,6 +10,7 @@ import CarPostModal from "./Modal/CarPostModal";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { UserCircle } from "lucide-react";
+import { Bell } from "lucide-react";
 
 const NavBar = ({ setRefresh }) => {
   const navigate = useNavigate();
@@ -84,6 +85,16 @@ const NavBar = ({ setRefresh }) => {
               Compare
             </Nav.Link>
           </Nav>
+
+          {isLoggedIn && (
+            <div
+              className="cursor-pointer flex items-center"
+              onClick={() => navigate("/notifications")}
+            >
+              <Bell size={32} color="#800000" />
+              <span className="ms-2 text-sm font-medium"></span>
+            </div>
+          )}
 
           {isLoggedIn && (
             <div
