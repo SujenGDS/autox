@@ -41,7 +41,7 @@ const UserProfile = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-
+        console.log(userBookings);
         setUser(res.data.user);
         setCars(userCars.data.cars);
         setBookings(userBookings.data.bookings);

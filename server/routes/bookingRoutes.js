@@ -97,7 +97,7 @@ bookingRouter.get("/my-bookings", verifyToken, async (req, res) => {
   try {
     const db = await connectToDataBase();
     const [bookings] = await db.query(
-      "SELECT * FROM booking WHERE userId = ?",
+      "SELECT * FROM booking JOIN cars ON cars.carId = booking.carId  WHERE booking.userId = ?",
       [req.userId]
     );
 
