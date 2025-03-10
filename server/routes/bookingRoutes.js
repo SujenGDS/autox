@@ -93,4 +93,19 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
   }
 });
 
+bookingRouter.get("/my-bookings", verifyToken, async (req, res) => {
+  try {
+    const db = await connectToDataBase();
+    const [bookings] = await db.query(
+      "SELECT * FROM booking WHERE userId = ?",
+      [req.userId]
+    );
+
+    return res.status(200).json({ bookings });
+  } catch (err) {
+    console.error("Error in /my-bookings:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 export default bookingRouter;

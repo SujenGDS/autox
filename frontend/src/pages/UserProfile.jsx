@@ -10,6 +10,7 @@ import Form from "react-bootstrap/Form";
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [cars, setCars] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -34,8 +35,16 @@ const UserProfile = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
+        const userBookings = await axios.get(
+          `http://localhost:3000/booking/my-bookings`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
         setUser(res.data.user);
         setCars(userCars.data.cars);
+        setBookings(userBookings.data.bookings);
       } catch (err) {
         console.error("Failed to fetch data", err);
       }
@@ -99,6 +108,34 @@ const UserProfile = () => {
         {user && <h2 className="text-xl">Welcome, {user.firstName}</h2>}
 
         <Row>
+          <Col md={6}>
+            <h3 className="mt-4">My Bookings</h3>
+            <ul className="list-group list-group-flush">
+              {bookings.length === 0 ? (
+                <p>No bookings found.</p>
+              ) : (
+                bookings.map((booking, index) => (
+                  <li key={index} className="list-group-item p-2">
+                    <div className="d-flex align-items-center">
+                      <div className="flex-grow-1">
+                        <h5 className="mb-1">{booking.carName}</h5>
+                        <p className="mb-1">
+                          <strong>From:</strong> {booking.startDate}
+                        </p>
+                        <p className="mb-1">
+                          <strong>To:</strong> {booking.endDate}
+                        </p>
+                        <p>
+                          <strong>Total:</strong> {`${booking.totalAmount}`}
+                        </p>
+                      </div>
+                    </div>
+                  </li>
+                ))
+              )}
+            </ul>
+          </Col>
+
           <Col md={6}>
             <h3 className="mt-4">My Cars</h3>
             <ul className="list-group list-group-flush">
