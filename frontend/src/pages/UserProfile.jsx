@@ -11,6 +11,7 @@ const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [cars, setCars] = useState([]);
   const [bookings, setBookings] = useState([]);
+  // const [rentedOutCars, setRentedOutCars] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -41,10 +42,19 @@ const UserProfile = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
+
+        // const rentedOutRes = await axios.get(
+        //   `http://localhost:3000/booking/my-rented-out-cars`,
+        //   {
+        //     headers: { Authorization: `Bearer ${token}` },
+        //   }
+        // );
+
         console.log(userBookings);
         setUser(res.data.user);
         setCars(userCars.data.cars);
         setBookings(userBookings.data.bookings);
+        // setRentedOutCars(rentedOutRes.data.rentedCars);
       } catch (err) {
         console.error("Failed to fetch data", err);
       }

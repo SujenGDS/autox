@@ -153,9 +153,13 @@ const CarDetail = () => {
           </Row>
 
           <div className="text-end mt-4">
-            <Button variant="outline-dark" onClick={openBookNowModal}>
-              Book Now
-            </Button>
+            {car?.isBooked ? (
+              <span className="text-danger fw-bold">Booked</span>
+            ) : (
+              <Button variant="outline-dark" onClick={openBookNowModal}>
+                Book Now
+              </Button>
+            )}
           </div>
         </Col>
       </Row>

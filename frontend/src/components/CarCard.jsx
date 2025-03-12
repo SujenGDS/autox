@@ -7,7 +7,15 @@ import { useNavigate } from "react-router-dom";
 import "../styles/carCard.css";
 import BookNowModal from "./BookNowModal";
 
-const CarCard = ({ carId, title, fuel, transmission, price, imgLink }) => {
+const CarCard = ({
+  carId,
+  title,
+  fuel,
+  transmission,
+  price,
+  imgLink,
+  isBooked,
+}) => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
 
@@ -48,9 +56,14 @@ const CarCard = ({ carId, title, fuel, transmission, price, imgLink }) => {
         </Card.Body>
         <Card.Footer className="d-flex justify-content-between align-items-center">
           <small className="text-dark">{price}</small>
-          <Button variant="outline-dark" onClick={handleBookNowClick}>
-            Book Now
-          </Button>
+          {/* Show "Booked" if car is already booked, else show "Book Now" button */}
+          {isBooked ? (
+            <span className="text-danger fw-bold">Booked</span>
+          ) : (
+            <Button variant="outline-dark" onClick={handleBookNowClick}>
+              Book Now
+            </Button>
+          )}
         </Card.Footer>
       </Card>
 

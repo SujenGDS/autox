@@ -80,7 +80,10 @@ carRouter.get("/get-cars", async (req, res) => {
     }
 
     // Fetch all cars from the database
-    const [cars] = await db.query("SELECT * FROM cars");
+    // const [cars] = await db.query("SELECT * FROM cars");
+    const [cars] = await db.query(
+      "SELECT carId, carName, fuelType, transmission, pricePerDay, isBooked FROM cars"
+    );
 
     return res.status(200).json({ cars });
   } catch (err) {

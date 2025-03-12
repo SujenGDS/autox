@@ -3,6 +3,8 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const BookNowModal = ({ showModal, setShowModal, price, title, carId }) => {
   const [startDate, setStartDate] = useState("");
@@ -14,20 +16,11 @@ const BookNowModal = ({ showModal, setShowModal, price, title, carId }) => {
     e.preventDefault();
 
     if (!startDate || !endDate || !pickUpLocation || !dropOffLocation) {
-      alert("Please fill in all the fields");
+      toast.error("Please fill in all the fields");
       return;
     }
 
-    // Log the values before sending the request
-    console.log("Booking details:");
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
-    console.log("Pick-up Location:", pickUpLocation);
-    console.log("Drop-off Location:", dropOffLocation);
-
     try {
-      console.log("Sending POST request to backend...");
-
       const payload = {
         carId: carId,
         startDate: startDate,
@@ -37,8 +30,6 @@ const BookNowModal = ({ showModal, setShowModal, price, title, carId }) => {
       };
 
       const token = localStorage.getItem("token");
-      console.log(token);
-      console.log(payload);
       const response = await axios.post(
         "http://localhost:3000/booking/book",
         payload,
@@ -49,12 +40,21 @@ const BookNowModal = ({ showModal, setShowModal, price, title, carId }) => {
         }
       );
 
-      console.log("Booking successful:", response.data);
-      // Proceed to payment or show confirmation
+      toast.success("Car booked successfully");
       setShowModal(false);
     } catch (err) {
-      console.error("Error during booking:", err);
-      alert("Something went wrong. Please try again.");
+      if (err.response) {
+        if (err.response.status === 403) {
+          toast.error("You cannot book your own car!");
+        } else {
+          toast.error(
+            err.response.data.message ||
+              "Something went wrong. Please try again."
+          );
+        }
+      } else {
+        toast.error("Network error. Please check your connection.");
+      }
     }
   };
 

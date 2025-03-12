@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 
 const bookingRouter = express.Router();
 
-// Middleware to verify token
 const verifyToken = async (req, res, next) => {
   try {
     const token = req.headers["authorization"].split(" ")[1];
@@ -43,6 +42,17 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
     }
 
     const db = await connectToDataBase();
+
+    // Check if the user is trying to book their own car
+    const [owner] = await db.query("SELECT userId FROM cars WHERE carId = ?", [
+      carId,
+    ]);
+    if (owner.length === 0) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+    if (owner[0].userId === req.userId) {
+      return res.status(403).json({ message: "You cannot book your own car" });
+    }
 
     // Check if the car is already booked for the selected dates
     const [existingBookings] = await db.query(
@@ -85,6 +95,8 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
         totalAmount,
       ]
     );
+    // Mark car as booked
+    await db.query("UPDATE cars SET isBooked = 1 WHERE carId = ?", [carId]);
 
     return res.status(201).json({ message: "Booking successful", totalAmount });
   } catch (err) {
@@ -96,8 +108,13 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
 bookingRouter.get("/my-bookings", verifyToken, async (req, res) => {
   try {
     const db = await connectToDataBase();
+    // const [bookings] = await db.query(
+    //   "SELECT * FROM booking JOIN cars ON cars.carId = booking.carId WHERE booking.userId = ?",
+    //   [req.userId]
+    // );
+
     const [bookings] = await db.query(
-      "SELECT * FROM booking JOIN cars ON cars.carId = booking.carId  WHERE booking.userId = ?",
+      "SELECT booking.*, cars.isBooked FROM booking JOIN cars ON cars.carId = booking.carId WHERE booking.userId = ?",
       [req.userId]
     );
 
@@ -107,5 +124,33 @@ bookingRouter.get("/my-bookings", verifyToken, async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+// bookingRouter.get("/my-rented-out-cars", verifyToken, async (req, res) => {
+//   try {
+//     const db = await connectToDataBase();
+//     const userId = req.userId; // Logged-in user ID
+
+//     const query = `
+//       SELECT b.bookingId, b.userId AS renterId, b.carId, c.carName,
+//              c.fuelType, c.transmission, c.pricePerDay, u.firstName AS renterName
+//       FROM booking b
+//       JOIN cars c ON b.carId = c.carId
+//       JOIN authentication u ON b.userId = u.userId
+//       WHERE c.userId = ?;
+//     `;
+
+//     db.query(query, [userId], (err, results) => {
+//       if (err) {
+//         console.error(err);
+//         return res.status(500).json({ error: "Failed to fetch rented cars" });
+//       }
+//       res.json({ rentedCars: results });
+//       console.log(results);
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Failed to fetch rented cars" });
+//   }
+// });
 
 export default bookingRouter;
