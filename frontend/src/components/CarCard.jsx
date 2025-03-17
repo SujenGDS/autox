@@ -15,6 +15,7 @@ const CarCard = ({
   price,
   imgLink,
   isBooked,
+  setRefresh,
 }) => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
@@ -74,6 +75,7 @@ const CarCard = ({
         title={title}
         price={price}
         carId={carId}
+        setRefresh={setRefresh}
       />
       {/* Book Now Modal 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>

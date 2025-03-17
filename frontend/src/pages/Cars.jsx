@@ -174,6 +174,7 @@ const Cars = () => {
                       price={`${car.pricePerDay}/day`}
                       imgLink="https://via.placeholder.com/150" // Replace with a real image
                       isBooked={car.isBooked} // Pass isBooked here
+                      setRefresh={setRefresh}
                     />
                   </Col>
                 ))

@@ -6,7 +6,14 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const BookNowModal = ({ showModal, setShowModal, price, title, carId }) => {
+const BookNowModal = ({
+  showModal,
+  setShowModal,
+  price,
+  title,
+  carId,
+  setRefresh,
+}) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [pickUpLocation, setPickUpLocation] = useState("");
@@ -41,6 +48,7 @@ const BookNowModal = ({ showModal, setShowModal, price, title, carId }) => {
       );
 
       toast.success("Car booked successfully");
+      setRefresh((prev) => !prev);
       setShowModal(false);
     } catch (err) {
       if (err.response) {
