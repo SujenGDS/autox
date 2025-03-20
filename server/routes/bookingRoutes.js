@@ -125,6 +125,12 @@ bookingRouter.get("/my-bookings", verifyToken, async (req, res) => {
   }
 });
 
+// bookingRouter.delete("/delete-booking/:id", async (req, res) => {
+//   try{
+
+//   }
+// });
+
 // bookingRouter.get("/my-rented-out-cars", verifyToken, async (req, res) => {
 //   try {
 //     const db = await connectToDataBase();
