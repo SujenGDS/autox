@@ -78,9 +78,18 @@ const NavBar = ({ setRefresh }) => {
               Cars
             </Nav.Link>
 
-            <Nav.Link href="#lift" className="mx-3 fs-5">
-              Lift
+            <Nav.Link
+              href="/booking/lifts"
+              className={`mx-3 fs-5 ${
+                location.pathname === "/booking/lifts" ||
+                location.pathname === "/booking/lifts"
+                  ? "active"
+                  : ""
+              }`}
+            >
+              Lifts
             </Nav.Link>
+
             <Nav.Link href="#compare" className="mx-3 fs-5">
               Compare
             </Nav.Link>

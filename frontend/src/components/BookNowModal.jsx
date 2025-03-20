@@ -18,7 +18,7 @@ const BookNowModal = ({
   const [endDate, setEndDate] = useState("");
   const [pickUpLocation, setPickUpLocation] = useState("");
   const [dropOffLocation, setDropOffLocation] = useState("");
-  const [enableRideShare, setEnableRideShare] = useState(false);
+  const [isRideShareEnabled, setisRideShareEnabled] = useState(false);
   const [rideSharePrice, setRideSharePrice] = useState("");
   const [rideShareDestination, setRideShareDestination] = useState("");
   const [agreeToTerms, setAgreeToTerms] = useState(false);
@@ -39,12 +39,12 @@ const BookNowModal = ({
       return;
     }
 
-    if (enableRideShare && (!rideSharePrice || !rideShareDestination)) {
+    if (isRideShareEnabled && (!rideSharePrice || !rideShareDestination)) {
       toast.error("Please enter ride share details");
       return;
     }
 
-    if (enableRideShare && !agreeToRideShareTerms) {
+    if (isRideShareEnabled && !agreeToRideShareTerms) {
       toast.error("You must agree to the ride share terms and conditions");
       return;
     }
@@ -56,8 +56,8 @@ const BookNowModal = ({
         endDate: endDate,
         pickUpLocation: pickUpLocation,
         dropOffLocation: dropOffLocation,
-        enableRideShare: enableRideShare,
-        ...(enableRideShare && {
+        isRideShareEnabled: isRideShareEnabled,
+        ...(isRideShareEnabled && {
           rideSharePrice: rideSharePrice,
           rideShareDestination: rideShareDestination,
         }),
@@ -133,13 +133,13 @@ const BookNowModal = ({
               <Form.Check
                 type="checkbox"
                 label="Enable Ride Share"
-                checked={enableRideShare}
-                onChange={(e) => setEnableRideShare(e.target.checked)}
+                checked={isRideShareEnabled}
+                onChange={(e) => setisRideShareEnabled(e.target.checked)}
               />
             </Form.Group>
 
             {/* Ride Share Form */}
-            {enableRideShare && (
+            {isRideShareEnabled && (
               <>
                 <Form.Group className="mb-3">
                   <Form.Label>Ride Share Price</Form.Label>

@@ -11,6 +11,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import UserProfile from "./pages/UserProfile.jsx";
 import CarDetail from "./pages/CarDetail.jsx";
+import LiftPage from "./pages/Lift.jsx";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/upload-car" element={<UploadCarPage />}></Route>
         <Route path="/userProfile" element={<UserProfile />}></Route>
         <Route path="/car/:carId" element={<CarDetail />}></Route>
+        <Route path="/booking/lifts" element={<LiftPage />}></Route>
       </Routes>
       <ToastContainer />
     </BrowserRouter>

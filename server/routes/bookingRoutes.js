@@ -29,8 +29,17 @@ const verifyToken = async (req, res, next) => {
 // POST route for booking
 bookingRouter.post("/book", verifyToken, async (req, res) => {
   try {
-    const { carId, startDate, endDate, pickUpLocation, dropOffLocation } =
-      req.body;
+    const {
+      carId,
+      startDate,
+      endDate,
+      pickUpLocation,
+      dropOffLocation,
+      rideSharePrice,
+      rideShareDestination,
+      isRideShareEnabled,
+    } = req.body;
+
     if (
       !carId ||
       !startDate ||
@@ -82,9 +91,9 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
     const rentalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     const totalAmount = rentalDays * pricePerDay;
 
-    // Insert booking data into database
-    await db.query(
-      "INSERT INTO booking (userId, carId, startDate, endDate, pickUpLocation, dropOffLocation, totalAmount) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    // Insert booking data into the database, including ride share details if enabled
+    const [bookingResult] = await db.query(
+      "INSERT INTO booking (userId, carId, startDate, endDate, pickUpLocation, dropOffLocation, totalAmount, rideSharePrice, rideShareDestination, isRideShareEnabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         req.userId,
         carId,
@@ -93,8 +102,12 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
         pickUpLocation,
         dropOffLocation,
         totalAmount,
+        isRideShareEnabled ? rideSharePrice : null, // Store price if ride-share is enabled
+        isRideShareEnabled ? rideShareDestination : null, // Store destination if ride-share is enabled
+        isRideShareEnabled ? 1 : 0, // Mark ride-share status
       ]
     );
+
     // Mark car as booked
     await db.query("UPDATE cars SET isBooked = 1 WHERE carId = ?", [carId]);
 
@@ -121,6 +134,36 @@ bookingRouter.get("/my-bookings", verifyToken, async (req, res) => {
     return res.status(200).json({ bookings });
   } catch (err) {
     console.error("Error in /my-bookings:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+bookingRouter.get("/lifts", async (req, res) => {
+  try {
+    const db = await connectToDataBase();
+
+    const [rides] = await db.query(`
+      SELECT 
+        b.bookingId, 
+        b.userId AS bookerId, 
+        b.carId, 
+        b.rideSharePrice, 
+        b.rideShareDestination, 
+        b.startDate, 
+        b.endDate, 
+        b.pickUpLocation, 
+        b.dropOffLocation, 
+        c.carName, 
+        c.fuelType, 
+        c.transmission 
+      FROM booking b
+      JOIN cars c ON b.carId = c.carId
+      WHERE b.isRideShareEnabled = 1
+    `);
+
+    return res.status(200).json({ rides });
+  } catch (err) {
+    console.error("Error fetching lift rides:", err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });

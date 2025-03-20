@@ -48,6 +48,7 @@ const Cars = () => {
       );
     });
     console.log("Cars Data:", cars);
+    console.log("Filtering by:", { vehicleType, company, maxPrice });
     console.log("Filtered Cars:", filtered);
     setFilteredCars(filtered);
   };
