@@ -47,10 +47,24 @@ rideShareRouter.post("/request-lift", verifyToken, async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    if (!booking[0].isRideShareEnabled) {
+    // Check if the user making the request is the one who booked the car
+    if (booking[0].userId === req.userId) {
       return res
-        .status(403)
-        .json({ message: "Ride-sharing is not enabled for this booking" });
+        .status(401)
+        .json({ message: "You cannot request a lift for a booking you made." });
+    }
+
+    const [existingRequest] = await db.query(
+      "SELECT * FROM lift WHERE passengerId = ? AND bookingId = ?",
+      [req.userId, bookingId]
+    );
+
+    if (existingRequest.length > 0) {
+      return res
+        .status(409)
+        .json({
+          message: "You have already sent a lift request for this booking.",
+        });
     }
 
     // Insert lift request into the database with pending status (0)

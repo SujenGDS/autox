@@ -127,7 +127,7 @@ bookingRouter.get("/my-bookings", verifyToken, async (req, res) => {
     // );
 
     const [bookings] = await db.query(
-      "SELECT booking.*, cars.isBooked FROM booking JOIN cars ON cars.carId = booking.carId WHERE booking.userId = ?",
+      "SELECT booking.*, cars.isBooked, cars.carName FROM booking JOIN cars ON cars.carId = booking.carId WHERE booking.userId = ?",
       [req.userId]
     );
 

@@ -61,7 +61,14 @@ const LiftPage = () => {
         toast.success("Ride request sent successfully!");
       } catch (err) {
         console.error("Error requesting ride:", err);
-        toast.error("Failed to request ride. Try again.");
+
+        if (err.response && err.response.status === 401) {
+          toast.error("You cannot request a lift for a booking you made.");
+        } else if (err.response && err.response.status === 409) {
+          toast.error("You have already sent a lift request for this booking.");
+        } else {
+          toast.error("Error booking car!");
+        }
       }
     }
   };
