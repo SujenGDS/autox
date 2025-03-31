@@ -12,6 +12,7 @@ import "./App.css";
 import UserProfile from "./pages/UserProfile.jsx";
 import CarDetail from "./pages/CarDetail.jsx";
 import LiftPage from "./pages/Lift.jsx";
+import ComparePage from "./pages/Compare.jsx";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/userProfile" element={<UserProfile />}></Route>
         <Route path="/car/:carId" element={<CarDetail />}></Route>
         <Route path="/booking/lifts" element={<LiftPage />}></Route>
+        <Route path="/Compare" element={<ComparePage />}></Route>
       </Routes>
       <ToastContainer />
     </BrowserRouter>

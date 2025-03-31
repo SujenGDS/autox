@@ -90,7 +90,7 @@ const NavBar = ({ setRefresh }) => {
               Lifts
             </Nav.Link>
 
-            <Nav.Link href="#compare" className="mx-3 fs-5">
+            <Nav.Link href="/Compare" className="mx-3 fs-5">
               Compare
             </Nav.Link>
           </Nav>

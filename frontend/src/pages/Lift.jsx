@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import NavBar from "../components/NavBar";
-
 import { Card, Button, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify"; // Importing toastify
+import "react-toastify/dist/ReactToastify.css"; // Import the styles
 
 const LiftPage = () => {
   const [rides, setRides] = useState([]);
@@ -23,7 +24,7 @@ const LiftPage = () => {
     };
 
     fetchRides();
-  }, []);
+  }, [refresh]);
 
   const handleBookNowClick = (ride) => {
     setSelectedRide(ride);
@@ -33,6 +34,36 @@ const LiftPage = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedRide(null);
+  };
+
+  const handleRequestRide = async () => {
+    if (selectedRide) {
+      try {
+        const token = localStorage.getItem("token");
+
+        await axios.post(
+          "http://localhost:3000/rideShare/request-lift",
+          {
+            bookingId: selectedRide.bookingId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setShowModal(false);
+        setSelectedRide(null);
+        setRefresh(!refresh);
+
+        // Show success toast
+        toast.success("Ride request sent successfully!");
+      } catch (err) {
+        console.error("Error requesting ride:", err);
+        toast.error("Failed to request ride. Try again.");
+      }
+    }
   };
 
   return (
@@ -54,7 +85,7 @@ const LiftPage = () => {
                   <Card.Body>
                     <Card.Title>{ride.carName}</Card.Title>
                     <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-                      <li>{ride.rideShareDestination} </li>
+                      <li>{ride.rideShareDestination}</li>
                       <li>Price: {ride.rideSharePrice}</li>
                     </ul>
                   </Card.Body>
@@ -72,7 +103,6 @@ const LiftPage = () => {
           </div>
         )}
 
-        {/* Modal for booking */}
         {selectedRide && (
           <Modal show={showModal} onHide={handleCloseModal} centered>
             <Modal.Header closeButton>
@@ -91,11 +121,16 @@ const LiftPage = () => {
               <Button variant="secondary" onClick={handleCloseModal}>
                 Cancel
               </Button>
-              <Button variant="outline-dark">Request</Button>
+              <Button variant="outline-dark" onClick={handleRequestRide}>
+                Request
+              </Button>
             </Modal.Footer>
           </Modal>
         )}
       </div>
+
+      {/* ToastContainer for displaying toasts */}
+      <ToastContainer />
     </>
   );
 };
