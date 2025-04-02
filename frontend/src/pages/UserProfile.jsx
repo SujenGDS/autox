@@ -6,15 +6,21 @@ import NavBar from "../components/NavBar";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [cars, setCars] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [bookedCars, setBookedCars] = useState([]);
+
   const [refresh, setRefresh] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [currentCar, setCurrentCar] = useState(null);
+
   const [editedCar, setEditedCar] = useState({
     carName: "",
     fuelType: "",
@@ -22,6 +28,8 @@ const UserProfile = () => {
     pricePerDay: "",
     company: "",
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,6 +109,10 @@ const UserProfile = () => {
     }
   };
 
+  const handleViewBookingDetail = (bookingId) => {
+    navigate(`/booking/${bookingId}`);
+  };
+
   return (
     <>
       <NavBar setRefresh={setRefresh} />
@@ -116,7 +128,10 @@ const UserProfile = () => {
           <Col md={6}>
             <section>
               <h3 className="mt-4">My Bookings</h3>
-              <div className="card shadow-lg border-0 rounded-lg mb-4">
+              <div
+                className="card shadow-lg border-0 rounded-lg mb-4"
+                style={{ cursor: "pointer" }}
+              >
                 <div className="card-body">
                   {bookings.length === 0 ? (
                     <p className="text-muted">No bookings found.</p>
@@ -126,6 +141,9 @@ const UserProfile = () => {
                         key={index}
                         className="card mb-3 border-0 rounded-lg shadow-sm"
                         style={{ transition: "all 0.3s ease" }}
+                        onClick={() =>
+                          handleViewBookingDetail(booking.bookingId)
+                        } // On click navigate to booking details
                       >
                         <div className="d-flex p-3">
                           {/* Car Image */}
@@ -140,10 +158,12 @@ const UserProfile = () => {
                               {booking.carName}
                             </h5>
                             <p className="card-text text-muted">
-                              <strong>From:</strong> {booking.startDate}
+                              <strong>From:</strong>{" "}
+                              {booking.startDate.split("T")[0]}
                             </p>
                             <p className="card-text text-muted">
-                              <strong>To:</strong> {booking.endDate}
+                              <strong>To:</strong>{" "}
+                              {booking.endDate.split("T")[0]}
                             </p>
                             <p className="card-text text-dark">
                               <strong>Total:</strong> {`${booking.totalAmount}`}
@@ -223,6 +243,21 @@ const UserProfile = () => {
                           <Button
                             variant="outline-danger"
                             onClick={() => {
+                              if (car.isBooked) {
+                                toast.error(
+                                  "You cannot delete this car as it is currently booked!",
+                                  {
+                                    position: "top-right",
+                                    autoClose: 3000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                  }
+                                );
+                                return;
+                              }
                               setCurrentCar(car);
                               setShowDeleteModal(true);
                             }}

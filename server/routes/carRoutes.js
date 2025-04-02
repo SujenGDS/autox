@@ -13,7 +13,6 @@ carRouter.post("/upload-car", async (req, res) => {
       return res.status(403).json({ error: "No token provided" });
     }
 
-    // Decode the token
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
     console.log("token", token);
     console.log(decoded, decoded.id);
@@ -173,26 +172,17 @@ carRouter.get("/booked-cars", async (req, res) => {
   try {
     const db = await connectToDataBase();
 
-    // Query to fetch all booked cars from the database (assuming you have an 'isBooked' column)
-    const query = "SELECT * FROM cars WHERE isBooked = 1";
+    // Fetch all booked cars
+    const [cars] = await db.query("SELECT * FROM cars WHERE isBooked = 1");
 
-    db.query(query, (err, result) => {
-      if (err) {
-        console.error("Database error:", err);
-        return res.status(500).json({ message: "Database error", error: err });
-      }
+    if (cars.length === 0) {
+      return res.status(404).json({ message: "No booked cars found" });
+    }
 
-      if (result.length === 0) {
-        return res.status(404).json({ message: "No booked cars found" });
-      }
-
-      return res.status(200).json({ cars: result });
-    });
-  } catch (error) {
-    console.error("Server error:", error);
-    return res
-      .status(500)
-      .json({ message: "Internal Server Error", error: error.message });
+    return res.status(200).json({ cars });
+  } catch (err) {
+    console.error("Error in /car/booked-cars:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

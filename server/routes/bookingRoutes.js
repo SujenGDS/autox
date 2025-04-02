@@ -121,10 +121,6 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
 bookingRouter.get("/my-bookings", verifyToken, async (req, res) => {
   try {
     const db = await connectToDataBase();
-    // const [bookings] = await db.query(
-    //   "SELECT * FROM booking JOIN cars ON cars.carId = booking.carId WHERE booking.userId = ?",
-    //   [req.userId]
-    // );
 
     const [bookings] = await db.query(
       "SELECT booking.*, cars.isBooked, cars.carName FROM booking JOIN cars ON cars.carId = booking.carId WHERE booking.userId = ?",
@@ -168,38 +164,54 @@ bookingRouter.get("/lifts", async (req, res) => {
   }
 });
 
-// bookingRouter.delete("/delete-booking/:id", async (req, res) => {
-//   try{
+bookingRouter.get("/:bookingId", async (req, res) => {
+  try {
+    const { bookingId } = req.params; // Extract bookingId from URL
+    const db = await connectToDataBase();
 
-//   }
-// });
+    // Query to fetch booking, car, and user details using JOIN
+    const [result] = await db.query(
+      `SELECT booking.*, cars.*, authentication.* 
+       FROM booking
+       JOIN cars ON booking.carId = cars.carId 
+       JOIN authentication ON cars.userId = authentication.userId 
+       WHERE booking.bookingId = ?`,
+      [bookingId]
+    );
 
-// bookingRouter.get("/my-rented-out-cars", verifyToken, async (req, res) => {
-//   try {
-//     const db = await connectToDataBase();
-//     const userId = req.userId; // Logged-in user ID
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Booking not found" });
+    }
 
-//     const query = `
-//       SELECT b.bookingId, b.userId AS renterId, b.carId, c.carName,
-//              c.fuelType, c.transmission, c.pricePerDay, u.firstName AS renterName
-//       FROM booking b
-//       JOIN cars c ON b.carId = c.carId
-//       JOIN authentication u ON b.userId = u.userId
-//       WHERE c.userId = ?;
-//     `;
+    // Merging booking, car, and user details
+    const bookingDetails = {
+      ...result[0], // Contains all the booking fields
+      car: {
+        // Adding car details under the 'car' object
+        carId: result[0].carId,
+        carName: result[0].carName,
+        company: result[0].company,
+        fuelType: result[0].fuelType,
+        transmission: result[0].transmission,
+        pricePerDay: result[0].pricePerDay,
+        // Add other car fields here as needed
+      },
+      user: {
+        // Adding user details under the 'user' object
+        userId: result[0].userId,
+        firstName: result[0].firstName,
+        lastName: result[0].lastName,
+        email: result[0].email,
+        phone: result[0].phoneNumber,
+        // Add other user fields here as needed
+      },
+    };
 
-//     db.query(query, [userId], (err, results) => {
-//       if (err) {
-//         console.error(err);
-//         return res.status(500).json({ error: "Failed to fetch rented cars" });
-//       }
-//       res.json({ rentedCars: results });
-//       console.log(results);
-//     });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: "Failed to fetch rented cars" });
-//   }
-// });
+    return res.status(200).json({ booking: bookingDetails });
+  } catch (err) {
+    console.error("Error in /booking/:bookingId:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 export default bookingRouter;
