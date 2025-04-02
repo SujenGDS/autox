@@ -276,7 +276,7 @@ const UserProfile = () => {
           {/* Profile Section */}
           <Col md={6}>
             <section>
-              <h3 className="mt-4">Your Profile</h3>
+              <h3 className="mt-4">Booked cars</h3>
               {/* Profile details can be added here */}
             </section>
           </Col>
