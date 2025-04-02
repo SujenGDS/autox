@@ -240,7 +240,7 @@ const BookNowModal = ({
           <p>
             {termsType === "rideShare"
               ? "Ride share users must comply with local laws. Pricing is non-refundable once booked."
-              : "By booking this car, you agree to follow all rental rules, including liability for damages."}
+              : "By proceeding with this car booking, you acknowledge and agree to adhere to all rental terms and conditions. You will be held fully responsible for any damages to the vehicle during the rental period and will be required to cover the cost of repairs. Please note that once the booking is confirmed, it is non-refundable, and cancellations are not permitted."}
           </p>
         </Modal.Body>
         <Modal.Footer>

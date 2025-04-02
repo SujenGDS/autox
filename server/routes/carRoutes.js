@@ -169,4 +169,31 @@ carRouter.delete("/delete-car/:id", async (req, res) => {
   }
 });
 
+carRouter.get("/booked-cars", async (req, res) => {
+  try {
+    const db = await connectToDataBase();
+
+    // Query to fetch all booked cars from the database (assuming you have an 'isBooked' column)
+    const query = "SELECT * FROM cars WHERE isBooked = 1";
+
+    db.query(query, (err, result) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ message: "Database error", error: err });
+      }
+
+      if (result.length === 0) {
+        return res.status(404).json({ message: "No booked cars found" });
+      }
+
+      return res.status(200).json({ cars: result });
+    });
+  } catch (error) {
+    console.error("Server error:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
+});
+
 export default carRouter;

@@ -11,7 +11,6 @@ const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [cars, setCars] = useState([]);
   const [bookings, setBookings] = useState([]);
-  // const [rentedOutCars, setRentedOutCars] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -43,18 +42,9 @@ const UserProfile = () => {
           }
         );
 
-        // const rentedOutRes = await axios.get(
-        //   `http://localhost:3000/booking/my-rented-out-cars`,
-        //   {
-        //     headers: { Authorization: `Bearer ${token}` },
-        //   }
-        // );
-
-        console.log(userBookings);
         setUser(res.data.user);
         setCars(userCars.data.cars);
         setBookings(userBookings.data.bookings);
-        // setRentedOutCars(rentedOutRes.data.rentedCars);
       } catch (err) {
         console.error("Failed to fetch data", err);
       }
@@ -115,106 +105,150 @@ const UserProfile = () => {
     <>
       <NavBar setRefresh={setRefresh} />
       <div className="p-4">
-        {user && <h2 className="text-xl">Welcome, {user.firstName}</h2>}
+        {user && (
+          <h2 className="text-xl text-center mb-4">
+            Welcome, {user.firstName}
+          </h2>
+        )}
 
         <Row>
+          {/* My Bookings Section */}
           <Col md={6}>
-            <h3 className="mt-4">My Bookings</h3>
-            <ul className="list-group list-group-flush">
-              {bookings.length === 0 ? (
-                <p>No bookings found.</p>
-              ) : (
-                bookings.map((booking, index) => (
-                  <li key={index} className="list-group-item p-2">
-                    <div className="d-flex align-items-center">
-                      <div className="flex-grow-1">
-                        <h5 className="mb-1">{booking.carName}</h5>
-                        <p className="mb-1">
-                          <strong>From:</strong> {booking.startDate}
-                        </p>
-                        <p className="mb-1">
-                          <strong>To:</strong> {booking.endDate}
-                        </p>
-                        <p>
-                          <strong>Total:</strong> {`${booking.totalAmount}`}
-                        </p>
+            <section>
+              <h3 className="mt-4">My Bookings</h3>
+              <div className="card shadow-lg border-0 rounded-lg mb-4">
+                <div className="card-body">
+                  {bookings.length === 0 ? (
+                    <p className="text-muted">No bookings found.</p>
+                  ) : (
+                    bookings.map((booking, index) => (
+                      <div
+                        key={index}
+                        className="card mb-3 border-0 rounded-lg shadow-sm"
+                        style={{ transition: "all 0.3s ease" }}
+                      >
+                        <div className="d-flex p-3">
+                          {/* Car Image */}
+                          <img
+                            src="https://imgcdn.zigwheels.ph/medium/gallery/exterior/115/1640/rolls-royce-phantom-full-front-view-950210.jpg"
+                            alt="Car"
+                            className="img-thumbnail rounded"
+                            style={{ width: "250px", height: "auto" }}
+                          />
+                          <div className="ms-3 flex-grow-1">
+                            <h5 className="card-title text-dark">
+                              {booking.carName}
+                            </h5>
+                            <p className="card-text text-muted">
+                              <strong>From:</strong> {booking.startDate}
+                            </p>
+                            <p className="card-text text-muted">
+                              <strong>To:</strong> {booking.endDate}
+                            </p>
+                            <p className="card-text text-dark">
+                              <strong>Total:</strong> {`${booking.totalAmount}`}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </section>
+          </Col>
+
+          {/* My Cars Section */}
+          <Col md={6}>
+            <section>
+              <h3 className="mt-4 ">My Cars</h3>
+              <div className="card shadow-lg border-0 rounded-lg mb-4">
+                <div className="card-body">
+                  {cars.map((car, index) => (
+                    <div
+                      key={index}
+                      className="card mb-3 border-0 rounded-lg shadow-sm"
+                      style={{ transition: "all 0.3s ease" }}
+                    >
+                      <div className="d-flex p-3">
+                        {/* Car Image */}
+                        <img
+                          src="https://i.insider.com/51364fb06bb3f74508000027?width=800&format=jpeg&auto=webp"
+                          alt={car.carName}
+                          className="img-thumbnail rounded me-3"
+                          style={{ width: "250px", height: "auto" }}
+                        />
+                        <div className="ms-3 flex-grow-1">
+                          <div className="d-flex align-items-center justify-content-between">
+                            <h5 className="card-title text-dark">
+                              {car.carName}
+                            </h5>
+                            {/* Badge for booking status */}
+                            <span
+                              className={`badge ${
+                                car.isBooked ? "bg-success" : "bg-warning"
+                              } text-dark`}
+                            >
+                              {car.isBooked ? "Booked" : "Available"}
+                            </span>
+                          </div>
+                          <p className="card-text text-muted">
+                            <strong>Fuel:</strong> {car.fuelType}
+                          </p>
+                          <p className="card-text text-muted">
+                            <strong>Transmission:</strong> {car.transmission}
+                          </p>
+                          <p className="card-text text-dark">
+                            <strong>Price:</strong> {`${car.pricePerDay}/day`}
+                          </p>
+                        </div>
+                        <div className="d-flex align-items-center">
+                          <Button
+                            variant="outline-warning"
+                            className="me-2 text-dark shadow-sm"
+                            onClick={() => {
+                              setCurrentCar(car);
+                              setEditedCar({
+                                carName: car.carName,
+                                fuelType: car.fuelType,
+                                transmission: car.transmission,
+                                pricePerDay: car.pricePerDay,
+                                company: car.company,
+                              });
+                              setShowEditModal(true);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            onClick={() => {
+                              setCurrentCar(car);
+                              setShowDeleteModal(true);
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </li>
-                ))
-              )}
-            </ul>
+                  ))}
+                </div>
+              </div>
+            </section>
           </Col>
 
+          {/* Profile Section */}
           <Col md={6}>
-            <h3 className="mt-4">My Cars</h3>
-            <ul className="list-group list-group-flush">
-              {cars.map((car, index) => (
-                <li key={index} className="list-group-item p-2">
-                  <div className="d-flex align-items-center">
-                    <img
-                      src="https://via.placeholder.com/50"
-                      alt={car.carName}
-                      className="img-thumbnail me-3"
-                    />
-                    <div className="flex-grow-1">
-                      <h5 className="mb-1">{car.carName}</h5>
-                      <p className="mb-1">
-                        <strong>Fuel:</strong> {car.fuelType}
-                      </p>
-                      <p className="mb-1">
-                        <strong>Transmission:</strong> {car.transmission}
-                      </p>
-                      <p>
-                        <strong>Price:</strong> {`${car.pricePerDay}/day`}
-                      </p>
-                    </div>
-                    <div>
-                      <Button
-                        variant="warning"
-                        className="me-2"
-                        onClick={function () {
-                          setCurrentCar(car);
-                          setEditedCar({
-                            carName: car.carName,
-                            fuelType: car.fuelType,
-                            transmission: car.transmission,
-                            pricePerDay: car.pricePerDay,
-                            company: car.company,
-                          });
-                          setShowEditModal(true);
-                        }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="danger"
-                        onClick={() => {
-                          setCurrentCar(car);
-                          setShowDeleteModal(true);
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </Col>
-
-          <Col md={6}>
-            <h3 className="mt-4">Your Profile</h3>
-            {/* <p>
-              Full name: {user.firstName} {user.lastName}
-            </p>
-            <p>Email: {user.email}</p>
-            <p>Phone number: {user.phoneNumber}</p>
-            <p>License number: {user.licenseNumber}</p> */}
+            <section>
+              <h3 className="mt-4">Your Profile</h3>
+              {/* Profile details can be added here */}
+            </section>
           </Col>
         </Row>
       </div>
 
+      {/* Edit Car Modal */}
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Edit Car</Modal.Title>
@@ -240,7 +274,7 @@ const UserProfile = () => {
                   setEditedCar({ ...editedCar, company: e.target.value })
                 }
               >
-                <option value="">Select a company</option>{" "}
+                <option value="">Select a company</option>
                 <option value="Toyota">Toyota</option>
                 <option value="Honda">Honda</option>
                 <option value="Ford">Ford</option>
@@ -250,7 +284,7 @@ const UserProfile = () => {
             </Form.Group>
 
             <Form.Group name="pricePerDay">
-              <Form.Label>price</Form.Label>
+              <Form.Label>Price</Form.Label>
               <Form.Control
                 type="text"
                 value={editedCar.pricePerDay}
@@ -269,7 +303,7 @@ const UserProfile = () => {
             variant="outline-dark"
             onClick={() => handleEditCar(currentCar.carId)}
           >
-            save changes
+            Save Changes
           </Button>
         </Modal.Footer>
       </Modal>
