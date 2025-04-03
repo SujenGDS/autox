@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -10,15 +10,15 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { UserCircle } from "lucide-react";
 import NotificationModal from "./Modal/NotificationModal"; // Import the notification modal
+import axios from "axios";
 
 const NavBar = ({ setRefresh }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [show, setShow] = useState(false); // For car posting modal
   const [showNotificationModal, setShowNotificationModal] = useState(false); // For notification modal
-  const [notifications, setNotifications] = useState([
-    { title: "Ride Request", message: "Your ride request has been accepted." },
-  ]);
+  const [notifications, setNotifications] = useState([]);
+
   const [isLoggedIn, setIsLoggedIn] = useState(
     Boolean(localStorage.getItem("token"))
   );
@@ -36,6 +36,24 @@ const NavBar = ({ setRefresh }) => {
       window.location.href = "/";
     }, 500);
   };
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/auth/notifications"
+        );
+        if (response.data.id) {
+          setNotifications((prev) => [...prev, response.data]);
+        }
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
+    const interval = setInterval(fetchNotifications, 20000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <>
@@ -107,12 +125,12 @@ const NavBar = ({ setRefresh }) => {
 
           {isLoggedIn && (
             <div
-              className="cursor-pointer flex items-center position-relative" // Ensure it's relative for modal positioning
+              className="cursor-pointer flex items-center position-relative mx-2" // Ensure it's relative for modal positioning
               onClick={handleOpenNotificationModal}
             >
               <Bell size={32} color="#800000" />
               {notifications.length > 0 && (
-                <span className="ms-2 text-sm font-medium">
+                <span className="text-sm font-medium text-white">
                   {notifications.length}
                 </span>
               )}

@@ -5,6 +5,66 @@ import jwt, { decode } from "jsonwebtoken";
 
 const router = express.Router();
 
+const checkForNewNotifications = async () => {
+  const db = await connectToDataBase();
+  try {
+    const [bookings] = await db.query(
+      `SELECT b.bookingID 
+       FROM booking b 
+       LEFT JOIN notification n ON b.bookingID = n.bookingID 
+       WHERE n.bookingID IS NULL 
+       ORDER BY b.bookingID DESC LIMIT 1`
+    );
+
+    if (bookings.length > 0) {
+      const sentAt = new Date().toISOString().slice(0, 19).replace("T", " "); // Get current timestamp
+      await db.query(
+        `INSERT INTO notification (bookingID, sentAt) VALUES (?, ?)`,
+        [bookings[0].bookingID, sentAt]
+      );
+      console.log("Booking notification sent for ID:", bookings[0].bookingID);
+      return { type: "booking", id: bookings[0].bookingID };
+    }
+
+    // Check for new rideshares (fixing query with LEFT JOIN)
+    const [rideshares] = await db.query(
+      `SELECT l.rideshareId 
+       FROM lift l 
+       LEFT JOIN notification n ON l.rideshareId = n.rideshareId 
+       WHERE n.rideshareId IS NULL 
+       ORDER BY l.rideshareId DESC LIMIT 1`
+    );
+
+    if (rideshares.length > 0) {
+      const sentAt = new Date().toISOString().slice(0, 19).replace("T", " "); // Get current timestamp
+      await db.query(
+        `INSERT INTO notification (rideshareId, sentAt) VALUES (?, ?)`,
+        [rideshares[0].rideshareId, sentAt]
+      );
+      console.log(
+        "Rideshare notification sent for ID:",
+        rideshares[0].rideshareId
+      );
+      return { type: "rideshare", id: rideshares[0].rideshareId };
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error checking for new notifications:", error);
+    return null;
+  }
+};
+
+// API Route
+router.post("/notifications", async (req, res) => {
+  const newNotification = await checkForNewNotifications();
+  if (newNotification) {
+    res.json(newNotification);
+  } else {
+    res.json({ message: "No new notifications" });
+  }
+});
+
 // Registration
 router.post("/register", async (req, res) => {
   // console.log(req);

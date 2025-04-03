@@ -11,13 +11,28 @@ const NotificationModal = ({ showModal, handleClose, notifications }) => {
         {notifications.length === 0 ? (
           <p>No new notifications</p>
         ) : (
-          <ul>
+          <div>
             {notifications.map((notification, index) => (
-              <li key={index}>
-                <strong>{notification.title}:</strong> {notification.message}
-              </li>
+              <div
+                key={index}
+                className="notification-item d-flex justify-content-between align-items-center p-2 mb-2 border rounded"
+                style={{ backgroundColor: "#f8f9fa" }} // Light gray background
+              >
+                <span>
+                  <strong>{notification.type}:</strong> {notification.id}
+                </span>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => handleView(notification.type, notification.id)}
+                >
+                  {notification.type === "rideshare"
+                    ? "View Rideshare"
+                    : "View Booking"}
+                </Button>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </Modal.Body>
       <Modal.Footer>
@@ -27,6 +42,15 @@ const NotificationModal = ({ showModal, handleClose, notifications }) => {
       </Modal.Footer>
     </Modal>
   );
+};
+
+// Example function to handle view click
+const handleView = (type, id) => {
+  if (type === "rideshare") {
+    window.location.href = `/rideshare/${id}`; // Redirect to rideshare details
+  } else if (type === "booking") {
+    window.location.href = `/booking/${id}`; // Redirect to booking details
+  }
 };
 
 export default NotificationModal;
