@@ -5,47 +5,108 @@ import jwt, { decode } from "jsonwebtoken";
 
 const router = express.Router();
 
-const checkForNewNotifications = async () => {
+const verifyToken = async (req, res, next) => {
+  try {
+    const token = req.headers["authorization"].split(" ")[1];
+    if (!token) {
+      return res.status(403).json({ message: "No token provided" });
+    }
+    const decodedToken = decodeToken(token);
+    const id = decodedToken.id;
+    const email = decodedToken.email;
+    req.userId = id;
+    req.email = email;
+    next();
+  } catch (err) {
+    return res.status(500).json({ message: "server error" });
+  }
+};
+
+export const decodeToken = (token) => {
+  try {
+    if (!token) {
+      throw new Error("Token is required");
+    }
+
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    return decoded;
+  } catch (err) {
+    console.error("Error in getUserIdFromToken:", err.message);
+    return null;
+  }
+};
+
+const checkForNewNotifications = async (userId) => {
   const db = await connectToDataBase();
   try {
+    // Check for new bookings (Notify Car Owner) - Only for the current user
     const [bookings] = await db.query(
-      `SELECT b.bookingID 
+      `SELECT b.bookingID, b.userId AS renterId, c.userId AS ownerId, u.firstName, u.lastName
        FROM booking b 
+       JOIN cars c ON b.carId = c.carId 
+       JOIN authentication u ON b.userId = u.userId 
        LEFT JOIN notification n ON b.bookingID = n.bookingID 
-       WHERE n.bookingID IS NULL 
-       ORDER BY b.bookingID DESC LIMIT 1`
+       WHERE n.bookingID IS NULL AND c.userId = ?  -- Filter by car owner's userId
+       ORDER BY b.bookingID DESC LIMIT 1`,
+      [userId] // Pass userId as a parameter to the query
     );
 
     if (bookings.length > 0) {
-      const sentAt = new Date().toISOString().slice(0, 19).replace("T", " "); // Get current timestamp
+      const { bookingID, ownerId, firstName, lastName } = bookings[0];
+      const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
+
       await db.query(
-        `INSERT INTO notification (bookingID, sentAt) VALUES (?, ?)`,
-        [bookings[0].bookingID, sentAt]
+        `INSERT INTO notification (bookingID, userID, sentAt, message) VALUES (?, ?, ?, ?)`,
+        [
+          bookingID,
+          ownerId, // Send to the car owner
+          sentAt,
+          `${firstName} ${lastName} has booked your car`,
+        ]
       );
-      console.log("Booking notification sent for ID:", bookings[0].bookingID);
-      return { type: "booking", id: bookings[0].bookingID };
+
+      console.log(`${firstName} ${lastName} has booked your car`);
+      return {
+        type: "booking",
+        id: bookingID,
+        userID: ownerId, // Send to the car owner
+        message: `${firstName} ${lastName} has booked your car`,
+      };
     }
 
-    // Check for new rideshares (fixing query with LEFT JOIN)
+    // Check for new rideshares (Notify the Driver) - Only for the current user
     const [rideshares] = await db.query(
-      `SELECT l.rideshareId 
+      `SELECT l.rideshareId, l.passengerId, b.userId AS driverId, u.firstName, u.lastName
        FROM lift l 
+       JOIN booking b ON l.bookingId = b.bookingID 
+       JOIN authentication u ON l.passengerId = u.userId
        LEFT JOIN notification n ON l.rideshareId = n.rideshareId 
-       WHERE n.rideshareId IS NULL 
-       ORDER BY l.rideshareId DESC LIMIT 1`
+       WHERE n.rideshareId IS NULL AND b.userId = ?  -- Filter by driver userId
+       ORDER BY l.rideshareId DESC LIMIT 1`,
+      [userId] // Pass userId as a parameter to the query
     );
 
     if (rideshares.length > 0) {
-      const sentAt = new Date().toISOString().slice(0, 19).replace("T", " "); // Get current timestamp
+      const { rideshareId, driverId, firstName, lastName } = rideshares[0];
+      const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
+
       await db.query(
-        `INSERT INTO notification (rideshareId, sentAt) VALUES (?, ?)`,
-        [rideshares[0].rideshareId, sentAt]
+        `INSERT INTO notification (rideshareId, userID, sentAt, message) VALUES (?, ?, ?, ?)`,
+        [
+          rideshareId,
+          driverId, // Send to the driver
+          sentAt,
+          `${firstName} ${lastName} has joined your rideshare`,
+        ]
       );
-      console.log(
-        "Rideshare notification sent for ID:",
-        rideshares[0].rideshareId
-      );
-      return { type: "rideshare", id: rideshares[0].rideshareId };
+
+      console.log(`${firstName} ${lastName} has joined your rideshare`);
+      return {
+        type: "rideshare",
+        id: rideshareId,
+        userID: driverId, // Send to the driver
+        message: `${firstName} ${lastName} has joined your rideshare`,
+      };
     }
 
     return null;
@@ -56,12 +117,22 @@ const checkForNewNotifications = async () => {
 };
 
 // API Route
-router.post("/notifications", async (req, res) => {
-  const newNotification = await checkForNewNotifications();
-  if (newNotification) {
-    res.json(newNotification);
-  } else {
-    res.json({ message: "No new notifications" });
+router.get("/notifications", async (req, res) => {
+  try {
+    const token = req.headers["authorization"]?.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    console.log("token", token);
+    console.log(decoded, decoded.id);
+    const userId = decoded.id;
+    const newNotification = await checkForNewNotifications(userId);
+    if (newNotification) {
+      res.json(newNotification);
+    } else {
+      res.json({ message: "No new notifications" });
+    }
+  } catch (error) {
+    console.error("Error fetching notifications:", error); // Log the error for more insight
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -151,37 +222,6 @@ router.post("/login", async (req, res) => {
     return res.status(500).json({ error: "Internal Server   Error" });
   }
 });
-
-const verifyToken = async (req, res, next) => {
-  try {
-    const token = req.headers["authorization"].split(" ")[1];
-    if (!token) {
-      return res.status(403).json({ message: "No token provided" });
-    }
-    const decodedToken = decodeToken(token);
-    const id = decodedToken.id;
-    const email = decodedToken.email;
-    req.userId = id;
-    req.email = email;
-    next();
-  } catch (err) {
-    return res.status(500).json({ message: "server error" });
-  }
-};
-
-export const decodeToken = (token) => {
-  try {
-    if (!token) {
-      throw new Error("Token is required");
-    }
-
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    return decoded;
-  } catch (err) {
-    console.error("Error in getUserIdFromToken:", err.message);
-    return null;
-  }
-};
 
 router.get("/home", verifyToken, async (req, res) => {
   console.log(req.userId);

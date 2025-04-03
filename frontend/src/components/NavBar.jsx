@@ -39,9 +39,15 @@ const NavBar = ({ setRefresh }) => {
 
   useEffect(() => {
     const fetchNotifications = async () => {
+      const token = localStorage.getItem("token");
       try {
-        const response = await axios.post(
-          "http://localhost:3000/auth/notifications"
+        const response = await axios.get(
+          "http://localhost:3000/auth/notifications",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         if (response.data.id) {
           setNotifications((prev) => [...prev, response.data]);
@@ -51,7 +57,7 @@ const NavBar = ({ setRefresh }) => {
       }
     };
 
-    const interval = setInterval(fetchNotifications, 20000);
+    const interval = setInterval(fetchNotifications, 2000);
     return () => clearInterval(interval);
   }, []);
 

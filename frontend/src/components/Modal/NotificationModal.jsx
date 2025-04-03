@@ -2,6 +2,15 @@ import React from "react";
 import { Modal, Button } from "react-bootstrap";
 
 const NotificationModal = ({ showModal, handleClose, notifications }) => {
+  // Function to handle the view button click
+  const handleView = (notification) => {
+    if (notification.type === "rideshare") {
+      window.location.href = `/rideshare/${notification.id}`; // Redirect to rideshare details
+    } else if (notification.type === "booking") {
+      window.location.href = `/booking/${notification.id}`; // Redirect to booking details
+    }
+  };
+
   return (
     <Modal show={showModal} onHide={handleClose} centered>
       <Modal.Header closeButton>
@@ -13,22 +22,17 @@ const NotificationModal = ({ showModal, handleClose, notifications }) => {
         ) : (
           <div>
             {notifications.map((notification, index) => (
-              <div
-                key={index}
-                className="notification-item d-flex justify-content-between align-items-center p-2 mb-2 border rounded"
-                style={{ backgroundColor: "#f8f9fa" }} // Light gray background
-              >
-                <span>
-                  <strong>{notification.type}:</strong> {notification.id}
-                </span>
+              <div key={index} className="notification-item">
+                <p>
+                  <strong>{notification.message}</strong>
+                </p>
                 <Button
                   variant="primary"
-                  size="sm"
-                  onClick={() => handleView(notification.type, notification.id)}
+                  onClick={() => handleView(notification)} // Pass the notification object
                 >
-                  {notification.type === "rideshare"
-                    ? "View Rideshare"
-                    : "View Booking"}
+                  {notification.type === "booking"
+                    ? "View Booking"
+                    : "View Rideshare"}
                 </Button>
               </div>
             ))}
@@ -42,15 +46,6 @@ const NotificationModal = ({ showModal, handleClose, notifications }) => {
       </Modal.Footer>
     </Modal>
   );
-};
-
-// Example function to handle view click
-const handleView = (type, id) => {
-  if (type === "rideshare") {
-    window.location.href = `/rideshare/${id}`; // Redirect to rideshare details
-  } else if (type === "booking") {
-    window.location.href = `/booking/${id}`; // Redirect to booking details
-  }
 };
 
 export default NotificationModal;
