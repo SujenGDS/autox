@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Col from "react-bootstrap/esm/Col";
-import Row from "react-bootstrap/esm/Row";
 import NavBar from "../components/NavBar";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
 const UserProfile = () => {
@@ -15,12 +11,10 @@ const UserProfile = () => {
   const [cars, setCars] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [bookedCars, setBookedCars] = useState([]);
-
   const [refresh, setRefresh] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [currentCar, setCurrentCar] = useState(null);
-
   const [editedCar, setEditedCar] = useState({
     carName: "",
     fuelType: "",
@@ -71,29 +65,12 @@ const UserProfile = () => {
   const handleEditCar = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("No authentication token found");
-        return;
-      }
-
-      if (!id) {
-        console.error("No car ID provided for editing");
-        return;
-      }
-
-      if (!editedCar || Object.keys(editedCar).length === 0) {
-        console.error("No car details provided for update");
-        return;
-      }
-
       await axios.put(`http://localhost:3000/car/edit-car/${id}`, editedCar, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
-
-      console.log("Car updated successfully!");
       setShowEditModal(false);
       setRefresh((prev) => !prev);
     } catch (err) {
@@ -106,7 +83,6 @@ const UserProfile = () => {
       const response = await axios.delete(
         `http://localhost:3000/car/delete-car/${Id}`
       );
-
       if (response.status === 200) {
         setRefresh((prev) => !prev);
         setShowDeleteModal(false);
@@ -128,214 +104,168 @@ const UserProfile = () => {
   return (
     <>
       <NavBar setRefresh={setRefresh} />
-      <div className="p-4">
+      <div className="container py-5">
         {user && (
-          <h2 className="text-xl text-center mb-4">
-            Welcome, {user.firstName}
-          </h2>
+          <h2 className="text-center  mb-4">Welcome, {user.firstName}</h2>
         )}
 
-        <Row>
-          {/* My Bookings Section */}
-          <Col md={6}>
-            <section>
-              <h3 className="mt-4">My Bookings</h3>
+        {/* My Bookings Section */}
+        <div className="mb-4">
+          <h4 className="text-secondary mb-4">My Bookings</h4>
+          {bookings.length === 0 ? (
+            <p>No bookings found.</p>
+          ) : (
+            bookings.map((booking, index) => (
               <div
-                className="card shadow-lg border-0 rounded-lg mb-4"
+                key={index}
+                className="card mb-4 p-4 border-0 shadow-sm rounded"
                 style={{ cursor: "pointer" }}
+                onClick={() => handleViewBookingDetail(booking.bookingId)}
               >
-                <div className="card-body">
-                  {bookings.length === 0 ? (
-                    <p className="text-muted">No bookings found.</p>
-                  ) : (
-                    bookings.map((booking, index) => (
-                      <div
-                        key={index}
-                        className="card mb-3 border-0 rounded-lg shadow-sm"
-                        style={{ transition: "all 0.3s ease" }}
-                        onClick={() =>
-                          handleViewBookingDetail(booking.bookingId)
-                        } // On click navigate to booking details
-                      >
-                        <div className="d-flex p-3">
-                          {/* Car Image */}
-                          <img
-                            src="https://imgcdn.zigwheels.ph/medium/gallery/exterior/115/1640/rolls-royce-phantom-full-front-view-950210.jpg"
-                            alt="Car"
-                            className="img-thumbnail rounded"
-                            style={{ width: "250px", height: "auto" }}
-                          />
-                          <div className="ms-3 flex-grow-1">
-                            <h5 className="card-title text-dark">
-                              {booking.carName}
-                            </h5>
-                            <p className="card-text text-muted">
-                              <strong>From:</strong>{" "}
-                              {booking.startDate.split("T")[0]}
-                            </p>
-                            <p className="card-text text-muted">
-                              <strong>To:</strong>{" "}
-                              {booking.endDate.split("T")[0]}
-                            </p>
-                            <p className="card-text text-dark">
-                              <strong>Total:</strong> {`${booking.totalAmount}`}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
+                <div className="d-flex">
+                  <img
+                    src="https://imgcdn.zigwheels.ph/medium/gallery/exterior/115/1640/rolls-royce-phantom-full-front-view-950210.jpg"
+                    alt="Car"
+                    className="img-thumbnail rounded"
+                    style={{ width: "200px", height: "auto" }}
+                  />
+                  <div className="ms-4 flex-grow-1">
+                    <h5>{booking.carName}</h5>
+                    <p className="text-muted">
+                      <strong>From:</strong> {booking.startDate.split("T")[0]}
+                    </p>
+                    <p className="text-muted">
+                      <strong>To:</strong> {booking.endDate.split("T")[0]}
+                    </p>
+                    <p className="text-dark">
+                      <strong>Total:</strong> {`${booking.totalAmount}`}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </section>
-          </Col>
+            ))
+          )}
+        </div>
 
-          {/* My Cars Section */}
-          <Col md={6}>
-            <section>
-              <h3 className="mt-4 ">My Cars</h3>
-              <div className="card shadow-lg border-0 rounded-lg mb-4">
-                <div className="card-body">
-                  {cars.map((car, index) => (
-                    <div
-                      key={index}
-                      className="card mb-3 border-0 rounded-lg shadow-sm"
-                      style={{ transition: "all 0.3s ease" }}
-                    >
-                      <div className="d-flex p-3">
-                        {/* Car Image */}
-                        <img
-                          src="https://i.insider.com/51364fb06bb3f74508000027?width=800&format=jpeg&auto=webp"
-                          alt={car.carName}
-                          className="img-thumbnail rounded me-3"
-                          style={{ width: "250px", height: "auto" }}
-                        />
-                        <div className="ms-3 flex-grow-1">
-                          <div className="d-flex align-items-center justify-content-between">
-                            <h5 className="card-title text-dark">
-                              {car.carName}
-                            </h5>
-                            {/* Badge for booking status */}
-                            <span
-                              className={`badge ${
-                                car.isBooked ? "bg-success" : "bg-warning"
-                              } text-dark`}
-                            >
-                              {car.isBooked ? "Booked" : "Available"}
-                            </span>
-                          </div>
-                          <p className="card-text text-muted">
-                            <strong>Fuel:</strong> {car.fuelType}
-                          </p>
-                          <p className="card-text text-muted">
-                            <strong>Transmission:</strong> {car.transmission}
-                          </p>
-                          <p className="card-text text-dark">
-                            <strong>Price:</strong> {`${car.pricePerDay}/day`}
-                          </p>
-                        </div>
-                        <div className="d-flex align-items-center">
-                          <Button
-                            variant="outline-warning"
-                            className="me-2 text-dark shadow-sm"
-                            onClick={() => {
-                              setCurrentCar(car);
-                              setEditedCar({
-                                carName: car.carName,
-                                fuelType: car.fuelType,
-                                transmission: car.transmission,
-                                pricePerDay: car.pricePerDay,
-                                company: car.company,
-                              });
-                              setShowEditModal(true);
-                            }}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="outline-danger"
-                            onClick={() => {
-                              if (car.isBooked) {
-                                toast.error(
-                                  "You cannot delete this car as it is currently booked!",
-                                  {
-                                    position: "top-right",
-                                    autoClose: 3000,
-                                    hideProgressBar: false,
-                                    closeOnClick: true,
-                                    pauseOnHover: true,
-                                    draggable: true,
-                                    progress: undefined,
-                                  }
-                                );
-                                return;
-                              }
-                              setCurrentCar(car);
-                              setShowDeleteModal(true);
-                            }}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </div>
+        {/* My Cars Section */}
+        <div className="mb-4">
+          <h4 className="text-secondary mb-4">My Cars</h4>
+          {cars.length === 0 ? (
+            <p>You have no cars listed yet.</p>
+          ) : (
+            cars.map((car, index) => (
+              <div
+                key={index}
+                className="card mb-4 p-4 border-0 shadow-sm rounded"
+              >
+                <div className="d-flex">
+                  <img
+                    src="https://i.insider.com/51364fb06bb3f74508000027?width=800&format=jpeg&auto=webp"
+                    alt={car.carName}
+                    className="img-thumbnail rounded me-4"
+                    style={{ width: "200px", height: "auto" }}
+                  />
+                  <div className="ms-4 flex-grow-1">
+                    <div className="d-flex justify-content-between">
+                      <h5>{car.carName}</h5>
+                      <span
+                        className={`badge ${
+                          car.isBooked ? "bg-success" : "bg-warning"
+                        } text-dark`}
+                      >
+                        {car.isBooked ? "Booked" : "Available"}
+                      </span>
                     </div>
-                  ))}
+                    <p className="text-muted">
+                      <strong>Fuel:</strong> {car.fuelType}
+                    </p>
+                    <p className="text-muted">
+                      <strong>Transmission:</strong> {car.transmission}
+                    </p>
+                    <p className="text-dark">
+                      <strong>Price:</strong> {`${car.pricePerDay}/day`}
+                    </p>
+                  </div>
+                  <div className="d-flex align-items-center">
+                    <Button
+                      variant="outline-warning"
+                      className="me-3"
+                      onClick={() => {
+                        setCurrentCar(car);
+                        setEditedCar({
+                          carName: car.carName,
+                          fuelType: car.fuelType,
+                          transmission: car.transmission,
+                          pricePerDay: car.pricePerDay,
+                          company: car.company,
+                        });
+                        setShowEditModal(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline-danger"
+                      onClick={() => {
+                        if (car.isBooked) {
+                          alert(
+                            "You cannot delete this car as it is currently booked!"
+                          );
+                          return;
+                        }
+                        setCurrentCar(car);
+                        setShowDeleteModal(true);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </section>
-          </Col>
+            ))
+          )}
+        </div>
 
-          {/* Profile Section */}
-          <Col md={6}>
-            <section>
-              <h3 className="mt-4">My Cars Booked by Others</h3>
-              <div className="card shadow-lg border-0 rounded-lg mb-4">
-                <div className="card-body">
-                  {bookedCars.length === 0 ? (
-                    <p className="text-muted">No cars booked by others yet.</p>
-                  ) : (
-                    bookedCars.map((car, index) => (
-                      <div
-                        key={index}
-                        className="card mb-3 border-0 rounded-lg shadow-sm"
-                        onClick={() => handleViewMyBookingDetail(car.carId)} // On click navigate to booking details
-                      >
-                        <div className="d-flex p-3">
-                          {/* Car Image */}
-                          <img
-                            src="https://imgcdn.zigwheels.ph/medium/gallery/exterior/115/1640/rolls-royce-phantom-full-front-view-950210.jpg"
-                            alt="Car"
-                            className="img-thumbnail rounded"
-                            style={{ width: "250px", height: "auto" }}
-                          />
-                          <div className="ms-3 flex-grow-1">
-                            <h5 className="card-title text-dark">
-                              {car.carName}
-                            </h5>
-                            <p className="card-text text-muted">
-                              <strong>Rented By:</strong> {car.renterFirstName}{" "}
-                              {car.renterLastName}
-                            </p>
-                            <p className="card-text text-muted">
-                              <strong>From:</strong>{" "}
-                              {car.startDate.split("T")[0]}
-                            </p>
-                            <p className="card-text text-muted">
-                              <strong>To:</strong> {car.endDate.split("T")[0]}
-                            </p>
-                            <p className="card-text text-dark">
-                              <strong>Price/Day:</strong> {car.pricePerDay}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
+        {/* Cars Booked by Others Section */}
+        <div>
+          <h4 className="text-secondary mb-4">Cars Booked by Others</h4>
+          {bookedCars.length === 0 ? (
+            <p>No cars booked by others yet.</p>
+          ) : (
+            bookedCars.map((car, index) => (
+              <div
+                key={index}
+                className="card mb-4 p-4 border-0 shadow-sm rounded"
+                onClick={() => handleViewMyBookingDetail(car.carId)}
+              >
+                <div className="d-flex">
+                  <img
+                    src="https://imgcdn.zigwheels.ph/medium/gallery/exterior/115/1640/rolls-royce-phantom-full-front-view-950210.jpg"
+                    alt="Car"
+                    className="img-thumbnail rounded"
+                    style={{ width: "200px", height: "auto" }}
+                  />
+                  <div className="ms-4 flex-grow-1">
+                    <h5>{car.carName}</h5>
+                    <p className="text-muted">
+                      <strong>Rented By:</strong> {car.renterFirstName}{" "}
+                      {car.renterLastName}
+                    </p>
+                    <p className="text-muted">
+                      <strong>From:</strong> {car.startDate.split("T")[0]}
+                    </p>
+                    <p className="text-muted">
+                      <strong>To:</strong> {car.endDate.split("T")[0]}
+                    </p>
+                    <p className="text-dark">
+                      <strong>Price/Day:</strong> {car.pricePerDay}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </section>
-          </Col>
-        </Row>
+            ))
+          )}
+        </div>
       </div>
 
       {/* Edit Car Modal */}
@@ -345,7 +275,7 @@ const UserProfile = () => {
         </Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Group name="carName">
+            <Form.Group controlId="carName">
               <Form.Label>Car Name</Form.Label>
               <Form.Control
                 type="text"
@@ -356,7 +286,7 @@ const UserProfile = () => {
               />
             </Form.Group>
 
-            <Form.Group name="company">
+            <Form.Group controlId="company">
               <Form.Label>Company</Form.Label>
               <Form.Select
                 value={editedCar.company || ""}
@@ -373,7 +303,7 @@ const UserProfile = () => {
               </Form.Select>
             </Form.Group>
 
-            <Form.Group name="pricePerDay">
+            <Form.Group controlId="pricePerDay">
               <Form.Label>Price</Form.Label>
               <Form.Control
                 type="text"
