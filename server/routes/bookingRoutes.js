@@ -214,4 +214,51 @@ bookingRouter.get("/:bookingId", async (req, res) => {
   }
 });
 
+bookingRouter.get("/my-booking/:carId", async (req, res) => {
+  try {
+    const { carId } = req.params;
+    const db = await connectToDataBase();
+
+    // Join booking with cars and renter (authentication linked with booking.userId)
+    const [result] = await db.query(
+      `SELECT booking.*, cars.*, renter.userId AS renterId, renter.firstName, renter.lastName, renter.email, renter.phoneNumber, renter.licenseNumber 
+       FROM booking
+       JOIN cars ON booking.carId = cars.carId 
+       JOIN authentication AS renter ON booking.userId = renter.userId
+       WHERE booking.carId = ?`,
+      [carId]
+    );
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Booking not found" });
+    }
+
+    const bookingDetails = {
+      ...result[0],
+      car: {
+        carId: result[0].carId,
+        carName: result[0].carName,
+        company: result[0].company,
+        fuelType: result[0].fuelType,
+        transmission: result[0].transmission,
+        pricePerDay: result[0].pricePerDay,
+        // Add more car fields if needed
+      },
+      renter: {
+        userId: result[0].renterId,
+        firstName: result[0].firstName,
+        lastName: result[0].lastName,
+        email: result[0].email,
+        phone: result[0].phoneNumber,
+        // Add more renter fields if needed
+      },
+    };
+
+    return res.status(200).json({ booking: bookingDetails });
+  } catch (err) {
+    console.error("Error in /my-booking/:bookingId:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 export default bookingRouter;

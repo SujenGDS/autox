@@ -45,10 +45,10 @@ const checkForNewNotifications = async (userId) => {
        FROM booking b 
        JOIN cars c ON b.carId = c.carId 
        JOIN authentication u ON b.userId = u.userId 
-       LEFT JOIN notification n ON b.bookingID = n.bookingID 
-       WHERE n.bookingID IS NULL AND c.userId = ?  -- Filter by car owner's userId
+       JOIN notification n ON b.bookingID = n.bookingID 
+       WHERE c.userId = ?  -- Filter by car owner's userId
        ORDER BY b.bookingID DESC LIMIT 1`,
-      [userId] // Pass userId as a parameter to the query
+      [userId]
     );
 
     if (bookings.length > 0) {
@@ -59,7 +59,7 @@ const checkForNewNotifications = async (userId) => {
         `INSERT INTO notification (bookingID, userID, sentAt, message) VALUES (?, ?, ?, ?)`,
         [
           bookingID,
-          ownerId, // Send to the car owner
+          ownerId,
           sentAt,
           `${firstName} ${lastName} has booked your car`,
         ]
@@ -69,7 +69,7 @@ const checkForNewNotifications = async (userId) => {
       return {
         type: "booking",
         id: bookingID,
-        userID: ownerId, // Send to the car owner
+        userID: ownerId,
         message: `${firstName} ${lastName} has booked your car`,
       };
     }
@@ -80,10 +80,10 @@ const checkForNewNotifications = async (userId) => {
        FROM lift l 
        JOIN booking b ON l.bookingId = b.bookingID 
        JOIN authentication u ON l.passengerId = u.userId
-       LEFT JOIN notification n ON l.rideshareId = n.rideshareId 
+        JOIN notification n ON l.rideshareId = n.rideshareId 
        WHERE n.rideshareId IS NULL AND b.userId = ?  -- Filter by driver userId
        ORDER BY l.rideshareId DESC LIMIT 1`,
-      [userId] // Pass userId as a parameter to the query
+      [userId]
     );
 
     if (rideshares.length > 0) {
@@ -94,7 +94,7 @@ const checkForNewNotifications = async (userId) => {
         `INSERT INTO notification (rideshareId, userID, sentAt, message) VALUES (?, ?, ?, ?)`,
         [
           rideshareId,
-          driverId, // Send to the driver
+          driverId,
           sentAt,
           `${firstName} ${lastName} has joined your rideshare`,
         ]
@@ -104,7 +104,7 @@ const checkForNewNotifications = async (userId) => {
       return {
         type: "rideshare",
         id: rideshareId,
-        userID: driverId, // Send to the driver
+        userID: driverId,
         message: `${firstName} ${lastName} has joined your rideshare`,
       };
     }
@@ -121,9 +121,8 @@ router.get("/notifications", async (req, res) => {
   try {
     const token = req.headers["authorization"]?.split(" ")[1];
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    console.log("token", token);
-    console.log(decoded, decoded.id);
     const userId = decoded.id;
+
     const newNotification = await checkForNewNotifications(userId);
     if (newNotification) {
       res.json(newNotification);
@@ -263,6 +262,39 @@ router.post("/logout", (req, res) => {
   } catch (err) {
     console.error("error in /logout", err);
     res.status(500).json({ error: "internal server error" });
+  }
+});
+
+router.get("/my-booked-cars", verifyToken, async (req, res) => {
+  try {
+    const db = await connectToDataBase();
+    const token = req.headers["authorization"]?.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const userId = decoded.id;
+
+    const [cars] = await db.query(
+      `SELECT 
+         b.bookingID,
+         b.userId AS renterId,
+         u.firstName AS renterFirstName,
+         u.lastName AS renterLastName,
+         c.carId,
+         c.carName,
+         c.pricePerDay,
+         b.startDate,
+         b.endDate
+       FROM booking b
+       JOIN cars c ON b.carId = c.carId
+       JOIN authentication u ON b.userId = u.userId
+       WHERE c.userId = ?
+       ORDER BY b.bookingID DESC`,
+      [userId]
+    );
+
+    return res.status(200).json({ cars });
+  } catch (err) {
+    console.error("error in /my-booked-cars:", err);
+    return res.status(500).json(err);
   }
 });
 

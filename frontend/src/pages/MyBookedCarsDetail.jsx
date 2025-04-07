@@ -4,24 +4,25 @@ import { useParams } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import { Card, Container, Row, Col, Table } from "react-bootstrap"; // Using Bootstrap components for better layout
 
-const BookedCarDetailsPage = () => {
-  const { bookingId } = useParams(); // Fetching the bookingId from URL params
+const MyBookedCarDetailsPage = () => {
+  const { carId } = useParams(); // Fetching the bookingId from URL params
   const [bookingDetails, setBookingDetails] = useState(null);
   const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
-    if (bookingId) {
+    if (carId) {
       const fetchBookingDetails = async () => {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get(
-            `http://localhost:3000/booking/${bookingId}`,
+            `http://localhost:3000/booking/my-booking/${carId}`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
           );
 
           setBookingDetails(response.data.booking);
+          console.log(response.data.booking);
         } catch (error) {
           console.error("Failed to fetch booking details", error);
         }
@@ -29,13 +30,13 @@ const BookedCarDetailsPage = () => {
 
       fetchBookingDetails();
     }
-  }, [bookingId]);
+  }, [carId]);
 
   return (
     <>
       <NavBar setRefresh={setRefresh} />
       <Container className="mt-4">
-        <h2 className="text-center mb-4">My Booking Details</h2>
+        <h2 className="text-center mb-4">Booking Details</h2>
 
         {bookingDetails ? (
           <div>
@@ -124,12 +125,6 @@ const BookedCarDetailsPage = () => {
                         </tr>
                         <tr>
                           <td>
-                            <strong>Ride Share Price</strong>
-                          </td>
-                          <td>{bookingDetails.rideSharePrice}</td>
-                        </tr>
-                        <tr>
-                          <td>
                             <strong>Ride Share Enabled</strong>
                           </td>
                           <td>
@@ -143,12 +138,13 @@ const BookedCarDetailsPage = () => {
               </Col>
             </Row>
 
-            <Row>
+            {/* ✅ New Section: Renter/Customer Info */}
+            <Row className="mt-4">
               <Col>
                 <Card className="shadow-sm">
                   <Card.Body>
                     <Card.Title className="text-center">
-                      Car Owner Information
+                      Renter Information
                     </Card.Title>
                     <Table striped bordered hover responsive>
                       <tbody>
@@ -157,22 +153,31 @@ const BookedCarDetailsPage = () => {
                             <strong>Name</strong>
                           </td>
                           <td>
-                            {bookingDetails.user.firstName}{" "}
-                            {bookingDetails.user.lastName}
+                            {bookingDetails.renter.firstName}{" "}
+                            {bookingDetails.renter.lastName}
                           </td>
                         </tr>
                         <tr>
                           <td>
                             <strong>Email</strong>
                           </td>
-                          <td>{bookingDetails.user.email}</td>
+                          <td>{bookingDetails.renter.email}</td>
                         </tr>
                         <tr>
                           <td>
                             <strong>Phone</strong>
                           </td>
-                          <td>{bookingDetails.user.phone}</td>
+                          <td>{bookingDetails.renter.phone}</td>
                         </tr>
+                        {/* Optional: Add licenseNumber only if it's available */}
+                        {bookingDetails.licenseNumber && (
+                          <tr>
+                            <td>
+                              <strong>License Number</strong>
+                            </td>
+                            <td>{bookingDetails.licenseNumber}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </Table>
                   </Card.Body>
@@ -188,4 +193,4 @@ const BookedCarDetailsPage = () => {
   );
 };
 
-export default BookedCarDetailsPage;
+export default MyBookedCarDetailsPage;

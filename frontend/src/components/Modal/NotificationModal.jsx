@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Card, Row, Col } from "react-bootstrap";
 
 const NotificationModal = ({ showModal, handleClose, notifications }) => {
   // Function to handle the view button click
@@ -12,29 +12,40 @@ const NotificationModal = ({ showModal, handleClose, notifications }) => {
   };
 
   return (
-    <Modal show={showModal} onHide={handleClose} centered>
+    <Modal show={showModal} onHide={handleClose} centered size="lg">
       <Modal.Header closeButton>
         <Modal.Title>Notifications</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {notifications.length === 0 ? (
-          <p>No new notifications</p>
+          <p className="text-center">No new notifications</p>
         ) : (
           <div>
             {notifications.map((notification, index) => (
-              <div key={index} className="notification-item">
-                <p>
-                  <strong>{notification.message}</strong>
-                </p>
-                <Button
-                  variant="primary"
-                  onClick={() => handleView(notification)} // Pass the notification object
-                >
-                  {notification.type === "booking"
-                    ? "View Booking"
-                    : "View Rideshare"}
-                </Button>
-              </div>
+              <Card key={index} className="mb-3 shadow-sm">
+                <Card.Body>
+                  <Row>
+                    <Col md={9}>
+                      <p className="notification-message">
+                        <strong>{notification.message}</strong>
+                      </p>
+                    </Col>
+                    <Col
+                      md={3}
+                      className="d-flex align-items-center justify-content-end"
+                    >
+                      <Button
+                        variant="primary"
+                        onClick={() => handleView(notification)} // Pass the notification object
+                      >
+                        {notification.type === "booking"
+                          ? "View Booking"
+                          : "View Rideshare"}
+                      </Button>
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
             ))}
           </div>
         )}

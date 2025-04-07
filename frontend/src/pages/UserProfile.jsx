@@ -50,6 +50,14 @@ const UserProfile = () => {
           }
         );
 
+        const bookedCarsByOthers = await axios.get(
+          `http://localhost:3000/auth/my-booked-cars`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        setBookedCars(bookedCarsByOthers.data.cars);
         setUser(res.data.user);
         setCars(userCars.data.cars);
         setBookings(userBookings.data.bookings);
@@ -111,6 +119,10 @@ const UserProfile = () => {
 
   const handleViewBookingDetail = (bookingId) => {
     navigate(`/booking/${bookingId}`);
+  };
+
+  const handleViewMyBookingDetail = (bookingId) => {
+    navigate(`/booking/my-booking/${bookingId}`);
   };
 
   return (
@@ -276,8 +288,51 @@ const UserProfile = () => {
           {/* Profile Section */}
           <Col md={6}>
             <section>
-              <h3 className="mt-4">Booked cars</h3>
-              {/* Profile details can be added here */}
+              <h3 className="mt-4">My Cars Booked by Others</h3>
+              <div className="card shadow-lg border-0 rounded-lg mb-4">
+                <div className="card-body">
+                  {bookedCars.length === 0 ? (
+                    <p className="text-muted">No cars booked by others yet.</p>
+                  ) : (
+                    bookedCars.map((car, index) => (
+                      <div
+                        key={index}
+                        className="card mb-3 border-0 rounded-lg shadow-sm"
+                        onClick={() => handleViewMyBookingDetail(car.carId)} // On click navigate to booking details
+                      >
+                        <div className="d-flex p-3">
+                          {/* Car Image */}
+                          <img
+                            src="https://imgcdn.zigwheels.ph/medium/gallery/exterior/115/1640/rolls-royce-phantom-full-front-view-950210.jpg"
+                            alt="Car"
+                            className="img-thumbnail rounded"
+                            style={{ width: "250px", height: "auto" }}
+                          />
+                          <div className="ms-3 flex-grow-1">
+                            <h5 className="card-title text-dark">
+                              {car.carName}
+                            </h5>
+                            <p className="card-text text-muted">
+                              <strong>Rented By:</strong> {car.renterFirstName}{" "}
+                              {car.renterLastName}
+                            </p>
+                            <p className="card-text text-muted">
+                              <strong>From:</strong>{" "}
+                              {car.startDate.split("T")[0]}
+                            </p>
+                            <p className="card-text text-muted">
+                              <strong>To:</strong> {car.endDate.split("T")[0]}
+                            </p>
+                            <p className="card-text text-dark">
+                              <strong>Price/Day:</strong> {car.pricePerDay}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
             </section>
           </Col>
         </Row>

@@ -49,6 +49,7 @@ const NavBar = ({ setRefresh }) => {
             },
           }
         );
+        console.log(response.data);
         if (response.data.id) {
           setNotifications((prev) => [...prev, response.data]);
         }
@@ -57,7 +58,7 @@ const NavBar = ({ setRefresh }) => {
       }
     };
 
-    const interval = setInterval(fetchNotifications, 2000);
+    const interval = setInterval(fetchNotifications, 200000000);
     return () => clearInterval(interval);
   }, []);
 
