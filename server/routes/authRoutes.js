@@ -80,8 +80,8 @@ const checkForNewNotifications = async (userId) => {
        FROM lift l 
        JOIN booking b ON l.bookingId = b.bookingID 
        JOIN authentication u ON l.passengerId = u.userId
-        JOIN notification n ON l.rideshareId = n.rideshareId 
-       WHERE n.rideshareId IS NULL AND b.userId = ?  -- Filter by driver userId
+       LEFT JOIN notification n ON l.rideshareId = n.rideshareId 
+       WHERE n.rideshareId IS NULL AND b.userId = ?
        ORDER BY l.rideshareId DESC LIMIT 1`,
       [userId]
     );
@@ -294,6 +294,47 @@ router.get("/my-booked-cars", verifyToken, async (req, res) => {
     return res.status(200).json({ cars });
   } catch (err) {
     console.error("error in /my-booked-cars:", err);
+    return res.status(500).json(err);
+  }
+});
+
+router.get("/my-ride-share", verifyToken, async (req, res) => {
+  try {
+    const db = await connectToDataBase();
+    const token = req.headers["authorization"]?.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const userId = decoded.id;
+
+    const [rideshare] = await db.query(
+      `SELECT 
+         r.rideshareId,
+         r.driverId,
+         d.firstName AS driverFirstName,
+         d.lastName AS driverLastName,
+         r.passengerId,
+         p.firstName AS passengerFirstName,
+         p.lastName AS passengerLastName,
+         r.route,
+         r.startTime,
+         r.endTime,
+         r.isAccepted
+       FROM rideshare r
+       JOIN users d ON r.driverId = d.userId  -- Assuming 'users' table for driver
+       JOIN users p ON r.passengerId = p.userId -- Assuming 'users' table for passenger
+       WHERE r.driverId = ? OR r.passengerId = ?
+       ORDER BY r.rideshareId DESC`,
+      [userId, userId]
+    );
+
+    // Map isAccepted to show "Pending" or "Accepted"
+    const rideDetails = rideshare.map((ride) => ({
+      ...ride,
+      status: ride.isAccepted ? "Accepted" : "Pending",
+    }));
+
+    return res.status(200).json({ rideDetails });
+  } catch (err) {
+    console.error("error in /my-ride-share:", err);
     return res.status(500).json(err);
   }
 });

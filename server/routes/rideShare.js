@@ -60,11 +60,9 @@ rideShareRouter.post("/request-lift", verifyToken, async (req, res) => {
     );
 
     if (existingRequest.length > 0) {
-      return res
-        .status(409)
-        .json({
-          message: "You have already sent a lift request for this booking.",
-        });
+      return res.status(409).json({
+        message: "You have already sent a lift request for this booking.",
+      });
     }
 
     // Insert lift request into the database with pending status (0)
@@ -77,6 +75,69 @@ rideShareRouter.post("/request-lift", verifyToken, async (req, res) => {
   } catch (err) {
     console.error("Error in /request-lift:", err);
     return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+rideShareRouter.post("/respond", async (req, res) => {
+  const db = await connectToDataBase();
+  const { rideshareId, isAccepted } = req.body;
+
+  try {
+    if (isAccepted) {
+      // Accept = Update lift and notify passenger
+      await db.query(`UPDATE lift SET isAccepted = 1 WHERE rideshareId = ?`, [
+        rideshareId,
+      ]);
+
+      // Fetch the passengerId
+      const [[liftRow]] = await db.query(
+        `SELECT passengerId FROM lift WHERE rideshareId = ?`,
+        [rideshareId]
+      );
+
+      const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
+      await db.query(
+        `INSERT INTO notification (rideshareId, userID, sentAt, message)
+         VALUES (?, ?, ?, ?)`,
+        [
+          rideshareId,
+          liftRow.passengerId, // Notifying the passenger
+          sentAt,
+          "Your rideshare request has been accepted.",
+        ]
+      );
+
+      return res.json({
+        message: "Ride request accepted and passenger notified.",
+      });
+    } else {
+      // Reject = delete from lift and notify passenger
+      const [[liftRow]] = await db.query(
+        `SELECT passengerId FROM lift WHERE rideshareId = ?`,
+        [rideshareId]
+      );
+
+      const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
+      await db.query(
+        `INSERT INTO notification (rideshareId, userID, sentAt, message)
+         VALUES (?, ?, ?, ?)`,
+
+        [
+          rideshareId,
+          liftRow.passengerId, // Notifying the passenger
+          sentAt,
+          "Your rideshare request was rejected.",
+        ]
+      );
+
+      // Optionally delete the row or mark it as rejected
+      await db.query(`DELETE FROM lift WHERE rideshareId = ?`, [rideshareId]);
+
+      return res.json({ message: "Ride request rejected and user notified." });
+    }
+  } catch (err) {
+    console.error("Error handling rideshare action:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

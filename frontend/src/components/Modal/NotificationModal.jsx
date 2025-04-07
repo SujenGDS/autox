@@ -1,13 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { Modal, Button, Card, Row, Col } from "react-bootstrap";
 
 const NotificationModal = ({ showModal, handleClose, notifications }) => {
-  // Function to handle the view button click
+  const [acceptedRideshares, setAcceptedRideshares] = useState([]);
+
   const handleView = (notification) => {
     if (notification.type === "rideshare") {
-      window.location.href = `/rideshare/${notification.id}`; // Redirect to rideshare details
+      window.location.href = `/rideshare/${notification.id}`;
     } else if (notification.type === "booking") {
-      window.location.href = `/booking/${notification.id}`; // Redirect to booking details
+      window.location.href = `/booking/${notification.id}`;
+    }
+  };
+
+  const handleRideShareAction = async (rideshareId, isAccepted) => {
+    try {
+      const res = await fetch("http://localhost:3000/rideShare/respond", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ rideshareId, isAccepted }),
+      });
+
+      const result = await res.json();
+      alert(result.message);
+
+      // If accepted, track in local state to show View button
+      if (isAccepted) {
+        setAcceptedRideshares((prev) => [...prev, rideshareId]);
+      }
+    } catch (error) {
+      console.error("Failed to respond to rideshare:", error);
+      alert("Something went wrong");
     }
   };
 
@@ -32,16 +57,50 @@ const NotificationModal = ({ showModal, handleClose, notifications }) => {
                     </Col>
                     <Col
                       md={3}
-                      className="d-flex align-items-center justify-content-end"
+                      className="d-flex align-items-center justify-content-end gap-2"
                     >
-                      <Button
-                        variant="primary"
-                        onClick={() => handleView(notification)} // Pass the notification object
-                      >
-                        {notification.type === "booking"
-                          ? "View Booking"
-                          : "View Rideshare"}
-                      </Button>
+                      {notification.type === "booking" && (
+                        <Button
+                          variant="primary"
+                          onClick={() => handleView(notification)}
+                        >
+                          View Booking
+                        </Button>
+                      )}
+
+                      {notification.type === "rideshare" &&
+                        !acceptedRideshares.includes(notification.id) && (
+                          <>
+                            <Button
+                              variant="success"
+                              size="sm"
+                              onClick={() =>
+                                handleRideShareAction(notification.id, true)
+                              }
+                            >
+                              Accept
+                            </Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() =>
+                                handleRideShareAction(notification.id, false)
+                              }
+                            >
+                              Reject
+                            </Button>
+                          </>
+                        )}
+
+                      {notification.type === "rideshare" &&
+                        acceptedRideshares.includes(notification.id) && (
+                          <Button
+                            variant="primary"
+                            onClick={() => handleView(notification)}
+                          >
+                            View Rideshare
+                          </Button>
+                        )}
                     </Col>
                   </Row>
                 </Card.Body>

@@ -166,16 +166,19 @@ const UserProfile = () => {
                     style={{ width: "200px", height: "auto" }}
                   />
                   <div className="ms-4 flex-grow-1">
-                    <div className="d-flex justify-content-between">
-                      <h5>{car.carName}</h5>
-                      <span
-                        className={`badge ${
-                          car.isBooked ? "bg-success" : "bg-warning"
-                        } text-dark`}
-                      >
-                        {car.isBooked ? "Booked" : "Available"}
-                      </span>
+                    <div className="d-flex justify-content-between align-items-center">
+                      <h5>
+                        {car.carName}{" "}
+                        <span
+                          className={`badge ${
+                            car.isBooked ? "bg-success" : "bg-warning"
+                          } text-dark ms-2`}
+                        >
+                          {car.isBooked ? "Booked" : "Available"}
+                        </span>
+                      </h5>
                     </div>
+
                     <p className="text-muted">
                       <strong>Fuel:</strong> {car.fuelType}
                     </p>

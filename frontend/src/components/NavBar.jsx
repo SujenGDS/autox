@@ -58,7 +58,7 @@ const NavBar = ({ setRefresh }) => {
       }
     };
 
-    const interval = setInterval(fetchNotifications, 200000000);
+    const interval = setInterval(fetchNotifications, 2000);
     return () => clearInterval(interval);
   }, []);
 
