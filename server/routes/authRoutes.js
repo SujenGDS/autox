@@ -39,80 +39,14 @@ export const decodeToken = (token) => {
 const checkForNewNotifications = async (userId) => {
   const db = await connectToDataBase();
   try {
-    // Check for new bookings (Notify Car Owner) - Only for the current user
-    const [bookings] = await db.query(
-      `SELECT b.bookingID, b.userId AS renterId, c.userId AS ownerId, u.firstName, u.lastName
-       FROM booking b 
-       JOIN cars c ON b.carId = c.carId 
-       JOIN authentication u ON b.userId = u.userId 
-       JOIN notification n ON b.bookingID = n.bookingID 
-       WHERE c.userId = ?  -- Filter by car owner's userId
-       ORDER BY b.bookingID DESC LIMIT 1`,
+    const [notifications] = await db.query(
+      "SELECT * FROM notification WHERE userId = ? ",
       [userId]
     );
-
-    if (bookings.length > 0) {
-      const { bookingID, ownerId, firstName, lastName } = bookings[0];
-      const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
-
-      await db.query(
-        `INSERT INTO notification (bookingID, userID, sentAt, message) VALUES (?, ?, ?, ?)`,
-        [
-          bookingID,
-          ownerId,
-          sentAt,
-          `${firstName} ${lastName} has booked your car`,
-        ]
-      );
-
-      console.log(`${firstName} ${lastName} has booked your car`);
-      return {
-        type: "booking",
-        id: bookingID,
-        userID: ownerId,
-        message: `${firstName} ${lastName} has booked your car`,
-      };
-    }
-
-    // Check for new rideshares (Notify the Driver) - Only for the current user
-    const [rideshares] = await db.query(
-      `SELECT l.rideshareId, l.passengerId, b.userId AS driverId, u.firstName, u.lastName
-       FROM lift l 
-       JOIN booking b ON l.bookingId = b.bookingID 
-       JOIN authentication u ON l.passengerId = u.userId
-       LEFT JOIN notification n ON l.rideshareId = n.rideshareId 
-       WHERE n.rideshareId IS NULL AND b.userId = ?
-       ORDER BY l.rideshareId DESC LIMIT 1`,
-      [userId]
-    );
-
-    if (rideshares.length > 0) {
-      const { rideshareId, driverId, firstName, lastName } = rideshares[0];
-      const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
-
-      await db.query(
-        `INSERT INTO notification (rideshareId, userID, sentAt, message) VALUES (?, ?, ?, ?)`,
-        [
-          rideshareId,
-          driverId,
-          sentAt,
-          `${firstName} ${lastName} has joined your rideshare`,
-        ]
-      );
-
-      console.log(`${firstName} ${lastName} has joined your rideshare`);
-      return {
-        type: "rideshare",
-        id: rideshareId,
-        userID: driverId,
-        message: `${firstName} ${lastName} has joined your rideshare`,
-      };
-    }
-
-    return null;
-  } catch (error) {
-    console.error("Error checking for new notifications:", error);
-    return null;
+    return notifications;
+  } catch (err) {
+    console.error("Error fetching notifications:", err);
+    return [];
   }
 };
 
@@ -124,7 +58,7 @@ router.get("/notifications", async (req, res) => {
     const userId = decoded.id;
 
     const newNotification = await checkForNewNotifications(userId);
-    if (newNotification) {
+    if (newNotification.length > 0) {
       res.json(newNotification);
     } else {
       res.json({ message: "No new notifications" });

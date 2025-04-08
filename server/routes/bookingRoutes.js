@@ -108,6 +108,32 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
       ]
     );
 
+    const bookingId = bookingResult.insertId;
+
+    const [[carOwnerId]] = await db.query(
+      "SELECT userId FROM cars where carid = ?",
+      [carId]
+    );
+
+    const [userRows] = await db.query(
+      "SELECT firstName, lastName FROM authentication WHERE userId = ?",
+      [req.userId]
+    );
+    const { firstName, lastName } = userRows[0] || {};
+
+    const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
+
+    await db.query(
+      "INSERT INTO notification (bookingId, rideShareId, sentAt, message, userId) VALUES (?,?,?,?,?)",
+      [
+        bookingId,
+        null,
+        sentAt,
+        `${firstName} ${lastName} has booked your car`,
+        carOwnerId.userId,
+      ]
+    );
+
     // Mark car as booked
     await db.query("UPDATE cars SET isBooked = 1 WHERE carId = ?", [carId]);
 
@@ -221,9 +247,9 @@ bookingRouter.get("/my-booking/:carId", async (req, res) => {
 
     // Join booking with cars and renter (authentication linked with booking.userId)
     const [result] = await db.query(
-      `SELECT booking.*, cars.*, renter.userId AS renterId, renter.firstName, renter.lastName, renter.email, renter.phoneNumber, renter.licenseNumber 
+      `SELECT booking.*, cars.*, renter.userId AS renterId, renter.firstName, renter.lastName, renter.email, renter.phoneNumber, renter.licenseNumber
        FROM booking
-       JOIN cars ON booking.carId = cars.carId 
+       JOIN cars ON booking.carId = cars.carId
        JOIN authentication AS renter ON booking.userId = renter.userId
        WHERE booking.carId = ?`,
       [carId]
@@ -242,7 +268,6 @@ bookingRouter.get("/my-booking/:carId", async (req, res) => {
         fuelType: result[0].fuelType,
         transmission: result[0].transmission,
         pricePerDay: result[0].pricePerDay,
-        // Add more car fields if needed
       },
       renter: {
         userId: result[0].renterId,
@@ -250,7 +275,50 @@ bookingRouter.get("/my-booking/:carId", async (req, res) => {
         lastName: result[0].lastName,
         email: result[0].email,
         phone: result[0].phoneNumber,
-        // Add more renter fields if needed
+      },
+    };
+
+    return res.status(200).json({ booking: bookingDetails });
+  } catch (err) {
+    console.error("Error in /my-booking/:bookingId:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+bookingRouter.get("/owner/:bookingId", async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const db = await connectToDataBase();
+
+    const [result] = await db.query(
+      `SELECT booking.*, cars.*, renter.userId AS renterId, renter.firstName, renter.lastName, renter.email, renter.phoneNumber, renter.licenseNumber
+       FROM booking
+       JOIN cars ON booking.carId = cars.carId
+       JOIN authentication AS renter ON booking.userId = renter.userId
+       WHERE booking.bookingId = ?`,
+      [bookingId]
+    );
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Booking not found" });
+    }
+
+    const bookingDetails = {
+      ...result[0],
+      car: {
+        carId: result[0].carId,
+        carName: result[0].carName,
+        company: result[0].company,
+        fuelType: result[0].fuelType,
+        transmission: result[0].transmission,
+        pricePerDay: result[0].pricePerDay,
+      },
+      renter: {
+        userId: result[0].renterId,
+        firstName: result[0].firstName,
+        lastName: result[0].lastName,
+        email: result[0].email,
+        phone: result[0].phoneNumber,
       },
     };
 

@@ -38,22 +38,23 @@ rideShareRouter.post("/request-lift", verifyToken, async (req, res) => {
     const db = await connectToDataBase();
 
     // Check if the booking exists and ride-sharing is enabled
-    const [booking] = await db.query(
-      "SELECT userId, isRideShareEnabled FROM booking WHERE bookingId = ?",
+    const [[booking]] = await db.query(
+      "SELECT userId, carId, isRideShareEnabled FROM booking WHERE bookingId = ?",
       [bookingId]
     );
 
-    if (booking.length === 0) {
+    if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    // Check if the user making the request is the one who booked the car
-    if (booking[0].userId === req.userId) {
+    // Prevent requester from requesting their own ride
+    if (booking.userId === req.userId) {
       return res
         .status(401)
         .json({ message: "You cannot request a lift for a booking you made." });
     }
 
+    // Check for existing request
     const [existingRequest] = await db.query(
       "SELECT * FROM lift WHERE passengerId = ? AND bookingId = ?",
       [req.userId, bookingId]
@@ -65,10 +66,33 @@ rideShareRouter.post("/request-lift", verifyToken, async (req, res) => {
       });
     }
 
-    // Insert lift request into the database with pending status (0)
-    await db.query(
+    // Insert new lift request
+    const [liftInsert] = await db.query(
       "INSERT INTO lift (passengerId, bookingId, isAccepted) VALUES (?, ?, 0)",
       [req.userId, bookingId]
+    );
+
+    const rideShareId = liftInsert.insertId;
+
+    // Get requester's name
+    const [[user]] = await db.query(
+      "SELECT firstName, lastName FROM authentication WHERE userId = ?",
+      [req.userId]
+    );
+
+    const passengerName = `${user.firstName} ${user.lastName}`;
+    const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
+
+    // Send notification to the ride owner
+    await db.query(
+      "INSERT INTO notification (bookingId, rideShareId, sentAt, message, userId) VALUES (?, ?, ?, ?, ?)",
+      [
+        null,
+        rideShareId,
+        sentAt,
+        `${passengerName} has requested a ride in your car booking.`,
+        booking.userId,
+      ]
     );
 
     return res.status(201).json({ message: "Lift request sent successfully" });
@@ -77,6 +101,8 @@ rideShareRouter.post("/request-lift", verifyToken, async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 rideShareRouter.post("/respond", async (req, res) => {
   const db = await connectToDataBase();
@@ -94,6 +120,8 @@ rideShareRouter.post("/respond", async (req, res) => {
         `SELECT passengerId FROM lift WHERE rideshareId = ?`,
         [rideshareId]
       );
+
+      console.log(liftRow);
 
       const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
       await db.query(
@@ -138,6 +166,68 @@ rideShareRouter.post("/respond", async (req, res) => {
   } catch (err) {
     console.error("Error handling rideshare action:", err);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+rideShareRouter.get("/:rideshareId", async (req, res) => {
+  try {
+    const { rideshareId } = req.params;
+    const db = await connectToDataBase();
+
+    // Join lift → booking → cars → authentication (as driver)
+    const [result] = await db.query(
+      `SELECT lift.*, 
+              booking.carId, booking.rideShareDestination, booking.pickUpLocation, booking.dropOffLocation, 
+              booking.startDate, booking.endDate, booking.rideSharePrice,
+              cars.carName, cars.company, cars.transmission, cars.seatCapacity, cars.fuelType, cars.pricePerDay,
+              driver.userId AS driverId, driver.firstName, driver.lastName, driver.email, driver.phoneNumber, driver.licenseNumber
+       FROM lift
+       JOIN booking ON lift.bookingId = booking.bookingId
+       JOIN cars ON booking.carId = cars.carId
+       JOIN authentication AS driver ON booking.userId = driver.userId
+       WHERE lift.rideshareId = ?`,
+      [rideshareId]
+    );
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Ride-share not found" });
+    }
+
+    const rideShareDetails = {
+      rideshareId: result[0].rideshareId,
+      rideSharePrice: result[0].rideSharePrice,
+      bookingId: result[0].bookingId,
+      isAccepted: result[0].isAccepted,
+      car: {
+        carId: result[0].carId,
+        carName: result[0].carName,
+        company: result[0].company,
+        transmission: result[0].transmission,
+        seatCapacity: result[0].seatCapacity,
+        fuelType: result[0].fuelType,
+        pricePerDay: result[0].pricePerDay,
+      },
+      liftDetails: {
+        pickUpLocation: result[0].pickUpLocation,
+        dropOffLocation: result[0].dropOffLocation,
+        destination: result[0].rideShareDestination,
+        startDate: result[0].startDate,
+        endDate: result[0].endDate,
+      },
+      driver: {
+        userId: result[0].driverId,
+        firstName: result[0].firstName,
+        lastName: result[0].lastName,
+        email: result[0].email,
+        phone: result[0].phoneNumber,
+        licenseNumber: result[0].licenseNumber,
+      },
+    };
+
+    return res.status(200).json({ rideShare: rideShareDetails });
+  } catch (err) {
+    console.error("Error in /rideshare/:rideshareId:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

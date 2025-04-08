@@ -50,8 +50,8 @@ const NavBar = ({ setRefresh }) => {
           }
         );
         console.log(response.data);
-        if (response.data.id) {
-          setNotifications((prev) => [...prev, response.data]);
+        if (response.data) {
+          setNotifications(response.data);
         }
       } catch (error) {
         console.error("Error fetching notifications:", error);

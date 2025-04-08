@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { Modal, Button, Card, Row, Col } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const NotificationModal = ({ showModal, handleClose, notifications }) => {
-  const [acceptedRideshares, setAcceptedRideshares] = useState([]);
-
+  const navigate = useNavigate();
   const handleView = (notification) => {
-    if (notification.type === "rideshare") {
-      window.location.href = `/rideshare/${notification.id}`;
-    } else if (notification.type === "booking") {
-      window.location.href = `/booking/${notification.id}`;
+    if (notification.rideshareId != null) {
+      navigate(`/rideshare/${notification.rideshareId}`);
+      //window.location.href = `/rideshare/${notification.rideshareId}`;
+    } else if (notification.bookingId != null) {
+      navigate(`/booking/owner/${notification.bookingId}`);
+      //window.location.href = `/booking/${notification.bookingId}`;
     }
   };
 
@@ -25,16 +27,13 @@ const NotificationModal = ({ showModal, handleClose, notifications }) => {
 
       const result = await res.json();
       alert(result.message);
-
-      // If accepted, track in local state to show View button
-      if (isAccepted) {
-        setAcceptedRideshares((prev) => [...prev, rideshareId]);
-      }
     } catch (error) {
       console.error("Failed to respond to rideshare:", error);
       alert("Something went wrong");
     }
   };
+
+  console.log("Notifs", notifications);
 
   return (
     <Modal show={showModal} onHide={handleClose} centered size="lg">
@@ -42,7 +41,7 @@ const NotificationModal = ({ showModal, handleClose, notifications }) => {
         <Modal.Title>Notifications</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {notifications.length === 0 ? (
+        {!Array.isArray(notifications) && notifications.message != null ? (
           <p className="text-center">No new notifications</p>
         ) : (
           <div>
@@ -59,7 +58,7 @@ const NotificationModal = ({ showModal, handleClose, notifications }) => {
                       md={3}
                       className="d-flex align-items-center justify-content-end gap-2"
                     >
-                      {notification.type === "booking" && (
+                      {notification.bookingId != null && (
                         <Button
                           variant="primary"
                           onClick={() => handleView(notification)}
@@ -68,39 +67,43 @@ const NotificationModal = ({ showModal, handleClose, notifications }) => {
                         </Button>
                       )}
 
-                      {notification.type === "rideshare" &&
-                        !acceptedRideshares.includes(notification.id) && (
-                          <>
-                            <Button
-                              variant="success"
-                              size="sm"
-                              onClick={() =>
-                                handleRideShareAction(notification.id, true)
-                              }
-                            >
-                              Accept
-                            </Button>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() =>
-                                handleRideShareAction(notification.id, false)
-                              }
-                            >
-                              Reject
-                            </Button>
-                          </>
-                        )}
-
-                      {notification.type === "rideshare" &&
-                        acceptedRideshares.includes(notification.id) && (
+                      {notification.rideshareId != null && (
+                        <>
                           <Button
-                            variant="primary"
-                            onClick={() => handleView(notification)}
+                            variant="success"
+                            size="sm"
+                            onClick={() =>
+                              handleRideShareAction(
+                                notification.rideshareId,
+                                true
+                              )
+                            }
                           >
-                            View Rideshare
+                            Accept
                           </Button>
-                        )}
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() =>
+                              handleRideShareAction(
+                                notification.rideshareId,
+                                false
+                              )
+                            }
+                          >
+                            Reject
+                          </Button>
+                        </>
+                      )}
+
+                      {notification.rideshareId != null && (
+                        <Button
+                          variant="primary"
+                          onClick={() => handleView(notification)}
+                        >
+                          View Rideshare
+                        </Button>
+                      )}
                     </Col>
                   </Row>
                 </Card.Body>

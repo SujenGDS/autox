@@ -15,6 +15,7 @@ import LiftPage from "./pages/Lift.jsx";
 import ComparePage from "./pages/Compare.jsx";
 import BookedCarDetail from "./pages/BookedCarDetail.jsx";
 import MyBookedCarDetailsPage from "./pages/MyBookedCarsDetail.jsx";
+import ViewRideShare from "./pages/ViewRideShare.jsx";
 
 function App() {
   return (
@@ -29,6 +30,11 @@ function App() {
         <Route path="/userProfile" element={<UserProfile />}></Route>
         <Route path="/car/:carId" element={<CarDetail />}></Route>
         <Route path="/booking/:bookingId" element={<BookedCarDetail />}></Route>
+        <Route
+          path="/booking/owner/:bookingId"
+          element={<BookedCarDetail />}
+        ></Route>
+        <Route path="/rideshare/:rideShareId" element={<ViewRideShare />} />
         <Route
           path="/booking/my-booking/:carId"
           element={<MyBookedCarDetailsPage />}
