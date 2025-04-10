@@ -251,6 +251,7 @@ router.get("/my-ride-share", verifyToken, async (req, res) => {
          driver.phoneNumber AS driverPhoneNumber,
          passenger.firstName AS passengerFirstName,
          passenger.lastName AS passengerLastName,
+         passenger.phoneNumber AS passengerPhoneNumber,
          b.startDate,
          b.endDate,
          b.rideShareDestination,

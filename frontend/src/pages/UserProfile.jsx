@@ -291,52 +291,70 @@ const UserProfile = () => {
           ) : (
             myRideShares
               .filter((ride) => ride.status !== "Rejected")
-              .map((ride, index) => (
-                <div
-                  key={index}
-                  className="card mb-4 p-4 border-0 shadow-sm rounded"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => handleViewBookingDetail(ride.bookingId)}
-                >
-                  <div className="d-flex">
-                    <img
-                      src="https://imgcdn.zigwheels.ph/medium/gallery/exterior/115/1640/rolls-royce-phantom-full-front-view-950210.jpg"
-                      alt="Shared Ride Car"
-                      className="img-thumbnail rounded"
-                      style={{ width: "200px", height: "auto" }}
-                    />
-                    <div className="ms-4 flex-grow-1">
-                      <h5>{ride.carName}</h5>
-                      <p className="text-muted">
-                        <strong>Destination:</strong>{" "}
-                        {ride.rideShareDestination}
-                      </p>
+              .map((ride, index) => {
+                const isDriver = ride.driverId === user.userId; // compare IDs
+                return (
+                  <div
+                    key={index}
+                    className="card mb-4 p-4 border-0 shadow-sm rounded"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleViewBookingDetail(ride.bookingId)}
+                  >
+                    <div className="d-flex">
+                      <img
+                        src="https://imgcdn.zigwheels.ph/medium/gallery/exterior/115/1640/rolls-royce-phantom-full-front-view-950210.jpg"
+                        alt="Shared Ride Car"
+                        className="img-thumbnail rounded"
+                        style={{ width: "200px", height: "auto" }}
+                      />
+                      <div className="ms-4 flex-grow-1">
+                        <h5>{ride.carName}</h5>
+                        <p className="text-muted">
+                          <strong>Destination:</strong>{" "}
+                          {ride.rideShareDestination}
+                        </p>
 
-                      <p className="text-muted">
-                        <strong>Driver:</strong> {ride.driverFirstName}
-                      </p>
+                        {isDriver ? (
+                          <>
+                            <p className="text-muted">
+                              <strong>Passenger:</strong>{" "}
+                              {ride.passengerFirstName}
+                            </p>
+                            <p className="text-muted">
+                              <strong>Passenger Phone:</strong>{" "}
+                              {ride.passengerPhoneNumber}
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-muted">
+                              <strong>Driver:</strong> {ride.driverFirstName}
+                            </p>
+                            <p className="text-muted">
+                              <strong>Driver Phone:</strong>{" "}
+                              {ride.driverPhoneNumber}
+                            </p>
+                          </>
+                        )}
 
-                      <p className="text-muted">
-                        <strong>Phone Number:</strong> {ride.driverPhoneNumber}
-                      </p>
+                        <p className="text-muted">
+                          <strong>Request status:</strong> {ride.status}
+                        </p>
 
-                      <p className="text-muted">
-                        <strong>Request status:</strong> {ride.status}
-                      </p>
-
-                      <p className="text-muted">
-                        <strong>From:</strong> {ride.startDate.split("T")[0]}
-                      </p>
-                      <p className="text-muted">
-                        <strong>To:</strong> {ride.endDate.split("T")[0]}
-                      </p>
-                      <p className="text-dark">
-                        <strong>Ride Price:</strong> {ride.rideSharePrice}
-                      </p>
+                        <p className="text-muted">
+                          <strong>From:</strong> {ride.startDate.split("T")[0]}
+                        </p>
+                        <p className="text-muted">
+                          <strong>To:</strong> {ride.endDate.split("T")[0]}
+                        </p>
+                        <p className="text-dark">
+                          <strong>Ride Price:</strong> {ride.rideSharePrice}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
           )}
         </div>
       </div>
