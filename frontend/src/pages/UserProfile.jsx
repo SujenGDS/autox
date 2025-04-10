@@ -11,6 +11,8 @@ const UserProfile = () => {
   const [cars, setCars] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [bookedCars, setBookedCars] = useState([]);
+  const [myRideShares, setMyRideShares] = useState([]);
+
   const [refresh, setRefresh] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -50,6 +52,15 @@ const UserProfile = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
+
+        const rideShares = await axios.get(
+          `http://localhost:3000/auth/my-ride-share`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        setMyRideShares(rideShares.data.rideDetails);
 
         setBookedCars(bookedCarsByOthers.data.cars);
         setUser(res.data.user);
@@ -267,6 +278,65 @@ const UserProfile = () => {
                 </div>
               </div>
             ))
+          )}
+        </div>
+
+        {/* My Ride Shares Section */}
+        <div>
+          <h4 className="text-secondary mb-4">My Ride Shares</h4>
+          {myRideShares.length === 0 ||
+          myRideShares.filter((ride) => ride.status !== "Rejected").length ===
+            0 ? (
+            <p>You haven't shared any rides yet.</p>
+          ) : (
+            myRideShares
+              .filter((ride) => ride.status !== "Rejected")
+              .map((ride, index) => (
+                <div
+                  key={index}
+                  className="card mb-4 p-4 border-0 shadow-sm rounded"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handleViewBookingDetail(ride.bookingId)}
+                >
+                  <div className="d-flex">
+                    <img
+                      src="https://imgcdn.zigwheels.ph/medium/gallery/exterior/115/1640/rolls-royce-phantom-full-front-view-950210.jpg"
+                      alt="Shared Ride Car"
+                      className="img-thumbnail rounded"
+                      style={{ width: "200px", height: "auto" }}
+                    />
+                    <div className="ms-4 flex-grow-1">
+                      <h5>{ride.carName}</h5>
+                      <p className="text-muted">
+                        <strong>Destination:</strong>{" "}
+                        {ride.rideShareDestination}
+                      </p>
+
+                      <p className="text-muted">
+                        <strong>Driver:</strong> {ride.driverFirstName}
+                      </p>
+
+                      <p className="text-muted">
+                        <strong>Phone Number:</strong> {ride.driverPhoneNumber}
+                      </p>
+
+                      <p className="text-muted">
+                        <strong>Request status:</strong> {ride.status}
+                      </p>
+
+                      <p className="text-muted">
+                        <strong>From:</strong> {ride.startDate.split("T")[0]}
+                      </p>
+                      <p className="text-muted">
+                        <strong>To:</strong> {ride.endDate.split("T")[0]}
+                      </p>
+                      <p className="text-dark">
+                        <strong>Ride Price:</strong> {ride.rideSharePrice}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))
           )}
         </div>
       </div>

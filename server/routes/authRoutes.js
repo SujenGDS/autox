@@ -241,26 +241,31 @@ router.get("/my-ride-share", verifyToken, async (req, res) => {
 
     const [rideshare] = await db.query(
       `SELECT 
-         r.rideshareId,
-         r.driverId,
-         d.firstName AS driverFirstName,
-         d.lastName AS driverLastName,
-         r.passengerId,
-         p.firstName AS passengerFirstName,
-         p.lastName AS passengerLastName,
-         r.route,
-         r.startTime,
-         r.endTime,
-         r.isAccepted
-       FROM rideshare r
-       JOIN users d ON r.driverId = d.userId  -- Assuming 'users' table for driver
-       JOIN users p ON r.passengerId = p.userId -- Assuming 'users' table for passenger
-       WHERE r.driverId = ? OR r.passengerId = ?
-       ORDER BY r.rideshareId DESC`,
+         l.rideshareId,
+         l.passengerId,
+         l.bookingId,
+         l.isAccepted,
+         b.userId AS driverId,
+         driver.firstName AS driverFirstName,
+         driver.lastName AS driverLastName,
+         driver.phoneNumber AS driverPhoneNumber,
+         passenger.firstName AS passengerFirstName,
+         passenger.lastName AS passengerLastName,
+         b.startDate,
+         b.endDate,
+         b.rideShareDestination,
+         b.rideSharePrice,
+         c.carName
+       FROM lift l
+       JOIN booking b ON l.bookingId = b.bookingId
+       JOIN authentication driver ON b.userId = driver.userId
+       JOIN authentication passenger ON l.passengerId = passenger.userId
+       JOIN cars c ON b.carId = c.carId
+       WHERE b.userId = ? OR l.passengerId = ?
+       ORDER BY l.rideshareId DESC`,
       [userId, userId]
     );
 
-    // Map isAccepted to show "Pending" or "Accepted"
     const rideDetails = rideshare.map((ride) => ({
       ...ride,
       status: ride.isAccepted ? "Accepted" : "Pending",
