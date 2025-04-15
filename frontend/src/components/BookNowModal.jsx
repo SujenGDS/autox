@@ -5,6 +5,8 @@ import Form from "react-bootstrap/Form";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import EsewaPayButton from "./PayButton";
+import { v4 as uuidv4 } from "uuid";
 
 const BookNowModal = ({
   showModal,
@@ -24,7 +26,8 @@ const BookNowModal = ({
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [agreeToRideShareTerms, setAgreeToRideShareTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
-  const [termsType, setTermsType] = useState(""); // "general" or "rideShare"
+  const [termsType, setTermsType] = useState("");
+  const [showEsewa, setshowEsewa] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,15 +67,34 @@ const BookNowModal = ({
       };
 
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:3000/booking/book", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // await axios.post("http://localhost:3000/booking/book", payload, {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      // });
 
-      toast.success("Car booked successfully");
-      setRefresh((prev) => !prev);
-      setShowModal(false);
+      // toast.success("Car booked successfully");
+      // setRefresh((prev) => !prev);
+      // setShowModal(false);
+
+      const res = await axios.post(
+        "http://localhost:3000/booking/book",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.data.redirectUrl) {
+        setshowEsewa(true);
+      } else {
+        toast.success("Car booked successfully (but no redirect URL)");
+        setRefresh((prev) => !prev);
+
+        setShowModal(false);
+      }
     } catch (err) {
       if (err.response) {
         toast.error(
@@ -92,126 +114,136 @@ const BookNowModal = ({
           <Modal.Title>Book {title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={handleSubmit} method="POST">
-            <Form.Group className="mb-3">
-              <Form.Label>Pick-up Date</Form.Label>
-              <Form.Control
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Drop-off Date</Form.Label>
-              <Form.Control
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Pick up location</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter location"
-                value={pickUpLocation}
-                onChange={(e) => setPickUpLocation(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Drop off location</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter location"
-                value={dropOffLocation}
-                onChange={(e) => setDropOffLocation(e.target.value)}
-              />
-            </Form.Group>
+          {showEsewa ? (
+            <EsewaPayButton
+              amount={100}
+              taxAmount={0}
+              transactionUUID={uuidv4()}
+            ></EsewaPayButton>
+          ) : (
+            <Form onSubmit={handleSubmit} method="POST">
+              <Form.Group className="mb-3">
+                <Form.Label>Pick-up Date</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Drop-off Date</Form.Label>
+                <Form.Control
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Pick up location</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter location"
+                  value={pickUpLocation}
+                  onChange={(e) => setPickUpLocation(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Drop off location</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Enter location"
+                  value={dropOffLocation}
+                  onChange={(e) => setDropOffLocation(e.target.value)}
+                />
+              </Form.Group>
 
-            {/* Enable Ride Share Checkbox */}
-            <Form.Group className="mb-3">
-              <Form.Check
-                type="checkbox"
-                label="Enable Ride Share"
-                checked={isRideShareEnabled}
-                onChange={(e) => setisRideShareEnabled(e.target.checked)}
-              />
-            </Form.Group>
+              {/* Enable Ride Share Checkbox */}
+              <Form.Group className="mb-3">
+                <Form.Check
+                  type="checkbox"
+                  label="Enable Ride Share"
+                  checked={isRideShareEnabled}
+                  onChange={(e) => setisRideShareEnabled(e.target.checked)}
+                />
+              </Form.Group>
 
-            {/* Ride Share Form */}
-            {isRideShareEnabled && (
-              <>
-                <Form.Group className="mb-3">
-                  <Form.Label>Ride Share Price</Form.Label>
-                  <Form.Control
-                    type="number"
-                    placeholder="Enter ride share price"
-                    value={rideSharePrice}
-                    onChange={(e) => setRideSharePrice(e.target.value)}
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Destination Location</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter destination"
-                    value={rideShareDestination}
-                    onChange={(e) => setRideShareDestination(e.target.value)}
-                  />
-                </Form.Group>
+              {/* Ride Share Form */}
+              {isRideShareEnabled && (
+                <>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Ride Share Price</Form.Label>
+                    <Form.Control
+                      type="number"
+                      placeholder="Enter ride share price"
+                      value={rideSharePrice}
+                      onChange={(e) => setRideSharePrice(e.target.value)}
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Destination Location</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter destination"
+                      value={rideShareDestination}
+                      onChange={(e) => setRideShareDestination(e.target.value)}
+                    />
+                  </Form.Group>
 
-                {/* Ride Share Terms and Conditions */}
-                <Form.Group className="mb-3">
-                  <Form.Check
-                    type="checkbox"
-                    label={
-                      <>
-                        I agree to the{" "}
-                        <span
-                          style={{ color: "blue", cursor: "pointer" }}
-                          onClick={() => {
-                            setTermsType("rideShare");
-                            setShowTermsModal(true);
-                          }}
-                        >
-                          ride share terms and conditions
-                        </span>
-                      </>
-                    }
-                    checked={agreeToRideShareTerms}
-                    onChange={(e) => setAgreeToRideShareTerms(e.target.checked)}
-                  />
-                </Form.Group>
-              </>
-            )}
+                  {/* Ride Share Terms and Conditions */}
+                  <Form.Group className="mb-3">
+                    <Form.Check
+                      type="checkbox"
+                      label={
+                        <>
+                          I agree to the{" "}
+                          <span
+                            style={{ color: "blue", cursor: "pointer" }}
+                            onClick={() => {
+                              setTermsType("rideShare");
+                              setShowTermsModal(true);
+                            }}
+                          >
+                            ride share terms and conditions
+                          </span>
+                        </>
+                      }
+                      checked={agreeToRideShareTerms}
+                      onChange={(e) =>
+                        setAgreeToRideShareTerms(e.target.checked)
+                      }
+                    />
+                  </Form.Group>
+                </>
+              )}
 
-            {/* General Terms and Conditions */}
-            <Form.Group className="mb-3">
-              <Form.Check
-                type="checkbox"
-                label={
-                  <>
-                    I agree to the{" "}
-                    <span
-                      style={{ color: "blue", cursor: "pointer" }}
-                      onClick={() => {
-                        setTermsType("general");
-                        setShowTermsModal(true);
-                      }}
-                    >
-                      terms and conditions
-                    </span>
-                  </>
-                }
-                checked={agreeToTerms}
-                onChange={(e) => setAgreeToTerms(e.target.checked)}
-              />
-            </Form.Group>
+              {/* General Terms and Conditions */}
+              <Form.Group className="mb-3">
+                <Form.Check
+                  type="checkbox"
+                  label={
+                    <>
+                      I agree to the{" "}
+                      <span
+                        style={{ color: "blue", cursor: "pointer" }}
+                        onClick={() => {
+                          setTermsType("general");
+                          setShowTermsModal(true);
+                        }}
+                      >
+                        terms and conditions
+                      </span>
+                    </>
+                  }
+                  checked={agreeToTerms}
+                  onChange={(e) => setAgreeToTerms(e.target.checked)}
+                />
+              </Form.Group>
 
-            <Button variant="outline-dark" type="submit" className="w-100">
-              Proceed to Payment
-            </Button>
-          </Form>
+              <Button variant="outline-dark" type="submit" className="w-100">
+                Proceed to Payment
+              </Button>
+            </Form>
+          )}
         </Modal.Body>
         <Modal.Footer className="d-flex justify-content-between">
           <div>Total: {price}</div>

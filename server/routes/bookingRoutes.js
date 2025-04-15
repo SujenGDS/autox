@@ -27,6 +27,124 @@ const verifyToken = async (req, res, next) => {
 };
 
 // POST route for booking
+// bookingRouter.post("/book", verifyToken, async (req, res) => {
+//   try {
+//     const {
+//       carId,
+//       startDate,
+//       endDate,
+//       pickUpLocation,
+//       dropOffLocation,
+//       rideSharePrice,
+//       rideShareDestination,
+//       isRideShareEnabled,
+//     } = req.body;
+
+//     if (
+//       !carId ||
+//       !startDate ||
+//       !endDate ||
+//       !pickUpLocation ||
+//       !dropOffLocation
+//     ) {
+//       return res.status(400).json({ message: "Missing required fields" });
+//     }
+
+//     const db = await connectToDataBase();
+
+//     // Check if the user is trying to book their own car
+//     const [owner] = await db.query("SELECT userId FROM cars WHERE carId = ?", [
+//       carId,
+//     ]);
+//     if (owner.length === 0) {
+//       return res.status(404).json({ message: "Car not found" });
+//     }
+//     if (owner[0].userId === req.userId) {
+//       return res.status(403).json({ message: "You cannot book your own car" });
+//     }
+
+//     // Check if the car is already booked for the selected dates
+//     const [existingBookings] = await db.query(
+//       "SELECT * FROM booking WHERE carId = ? AND ((startDate BETWEEN ? AND ?) OR (endDate BETWEEN ? AND ?))",
+//       [carId, startDate, endDate, startDate, endDate]
+//     );
+
+//     if (existingBookings.length > 0) {
+//       return res
+//         .status(409)
+//         .json({ message: "Car is unavailable for the selected dates" });
+//     }
+
+//     // Get the price per day of the car
+//     const [car] = await db.query(
+//       "SELECT pricePerDay FROM cars WHERE carId = ?",
+//       [carId]
+//     );
+//     if (car.length === 0) {
+//       return res.status(404).json({ message: "Car not found" });
+//     }
+//     const pricePerDay = car[0].pricePerDay;
+
+//     // Calculate total amount
+//     const start = new Date(startDate);
+//     const end = new Date(endDate);
+//     const rentalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+//     const totalAmount = rentalDays * pricePerDay;
+
+//     // Insert booking data into the database, including ride share details if enabled
+//     const [bookingResult] = await db.query(
+//       "INSERT INTO booking (userId, carId, startDate, endDate, pickUpLocation, dropOffLocation, totalAmount, rideSharePrice, rideShareDestination, isRideShareEnabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+//       [
+//         req.userId,
+//         carId,
+//         startDate,
+//         endDate,
+//         pickUpLocation,
+//         dropOffLocation,
+//         totalAmount,
+//         isRideShareEnabled ? rideSharePrice : null, // Store price if ride-share is enabled
+//         isRideShareEnabled ? rideShareDestination : null, // Store destination if ride-share is enabled
+//         isRideShareEnabled ? 1 : 0, // Mark ride-share status
+//       ]
+//     );
+
+//     const bookingId = bookingResult.insertId;
+
+//     const [[carOwnerId]] = await db.query(
+//       "SELECT userId FROM cars where carid = ?",
+//       [carId]
+//     );
+
+//     const [userRows] = await db.query(
+//       "SELECT firstName, lastName FROM authentication WHERE userId = ?",
+//       [req.userId]
+//     );
+//     const { firstName, lastName } = userRows[0] || {};
+
+//     const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
+
+//     await db.query(
+//       "INSERT INTO notification (bookingId, rideShareId, sentAt, message, userId) VALUES (?,?,?,?,?)",
+//       [
+//         bookingId,
+//         null,
+//         sentAt,
+//         `${firstName} ${lastName} has booked your car`,
+//         carOwnerId.userId,
+//       ]
+//     );
+
+//     // Mark car as booked
+//     await db.query("UPDATE cars SET isBooked = 1 WHERE carId = ?", [carId]);
+
+//     return res.status(201).json({ message: "Booking successful", totalAmount });
+//   } catch (err) {
+//     console.error("Error in /book:", err);
+//     return res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
+
+////////////////////////////////////////////////////////
 bookingRouter.post("/book", verifyToken, async (req, res) => {
   try {
     const {
@@ -52,7 +170,6 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
 
     const db = await connectToDataBase();
 
-    // Check if the user is trying to book their own car
     const [owner] = await db.query("SELECT userId FROM cars WHERE carId = ?", [
       carId,
     ]);
@@ -63,19 +180,16 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
       return res.status(403).json({ message: "You cannot book your own car" });
     }
 
-    // Check if the car is already booked for the selected dates
     const [existingBookings] = await db.query(
       "SELECT * FROM booking WHERE carId = ? AND ((startDate BETWEEN ? AND ?) OR (endDate BETWEEN ? AND ?))",
       [carId, startDate, endDate, startDate, endDate]
     );
-
     if (existingBookings.length > 0) {
       return res
         .status(409)
         .json({ message: "Car is unavailable for the selected dates" });
     }
 
-    // Get the price per day of the car
     const [car] = await db.query(
       "SELECT pricePerDay FROM cars WHERE carId = ?",
       [carId]
@@ -83,15 +197,13 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
     if (car.length === 0) {
       return res.status(404).json({ message: "Car not found" });
     }
-    const pricePerDay = car[0].pricePerDay;
 
-    // Calculate total amount
+    const pricePerDay = car[0].pricePerDay;
     const start = new Date(startDate);
     const end = new Date(endDate);
     const rentalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     const totalAmount = rentalDays * pricePerDay;
 
-    // Insert booking data into the database, including ride share details if enabled
     const [bookingResult] = await db.query(
       "INSERT INTO booking (userId, carId, startDate, endDate, pickUpLocation, dropOffLocation, totalAmount, rideSharePrice, rideShareDestination, isRideShareEnabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
@@ -102,16 +214,16 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
         pickUpLocation,
         dropOffLocation,
         totalAmount,
-        isRideShareEnabled ? rideSharePrice : null, // Store price if ride-share is enabled
-        isRideShareEnabled ? rideShareDestination : null, // Store destination if ride-share is enabled
-        isRideShareEnabled ? 1 : 0, // Mark ride-share status
+        isRideShareEnabled ? rideSharePrice : null,
+        isRideShareEnabled ? rideShareDestination : null,
+        isRideShareEnabled ? 1 : 0,
       ]
     );
 
     const bookingId = bookingResult.insertId;
 
     const [[carOwnerId]] = await db.query(
-      "SELECT userId FROM cars where carid = ?",
+      "SELECT userId FROM cars WHERE carId = ?",
       [carId]
     );
 
@@ -134,15 +246,21 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
       ]
     );
 
-    // Mark car as booked
     await db.query("UPDATE cars SET isBooked = 1 WHERE carId = ?", [carId]);
 
-    return res.status(201).json({ message: "Booking successful", totalAmount });
+    // ✅ Now finally, generate and return redirect URL
+    const successUrl = "http://localhost:3000/payment-success";
+    const failureUrl = "http://localhost:3000/payment/fail";
+    const redirectUrl = `https://esewa.com.np/epay/main?amt=${totalAmount}&pdc=0&psc=0&txAmt=0&tAmt=${totalAmount}&pid=${bookingId}&scd=EPAYTEST&su=${successUrl}&fu=${failureUrl}`;
+
+    return res.status(200).json({ redirectUrl });
   } catch (err) {
     console.error("Error in /book:", err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+//////////////////////////////////////////////////////////////////////////////
 
 bookingRouter.get("/my-bookings", verifyToken, async (req, res) => {
   try {

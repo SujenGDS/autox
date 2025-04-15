@@ -16,12 +16,14 @@ import ComparePage from "./pages/Compare.jsx";
 import BookedCarDetail from "./pages/BookedCarDetail.jsx";
 import MyBookedCarDetailsPage from "./pages/MyBookedCarsDetail.jsx";
 import ViewRideShare from "./pages/ViewRideShare.jsx";
+import Success from "./pages/Success.jsx";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />}></Route>
+        <Route path="/payment-success" element={<Success />} />
         <Route path="/sujen-home" element={<Home />}></Route>
         <Route path="/sujen-register" element={<Register />}></Route>
         <Route path="/sujen-login" element={<Login />}></Route>
