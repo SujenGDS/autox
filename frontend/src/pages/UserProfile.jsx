@@ -62,7 +62,6 @@ const UserProfile = () => {
         );
 
         setMyRideShares(rideShares.data.rideDetails);
-
         setBookedCars(bookedCarsByOthers.data.cars);
         setUser(res.data.user);
         setCars(userCars.data.cars);
@@ -127,6 +126,32 @@ const UserProfile = () => {
 
   const handleViewMyBookingDetail = (bookingId) => {
     navigate(`/booking/my-booking/${bookingId}`);
+  };
+
+  const handleReturnCar = async (carId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/booking/return/${carId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        alert(response.data.message);
+        // Refresh the list or remove the returned car from the UI
+        setBookedCars(bookedCars.filter((car) => car.bookingId !== bookingId));
+      } else {
+        alert(response.data.message); // Show the error message like "Car cannot be returned until the booking end date has passed"
+      }
+    } catch (error) {
+      console.error("Error returning car:", error);
+      alert("Error returning car");
+    }
   };
 
   return (
@@ -304,6 +329,15 @@ const UserProfile = () => {
                     <p className="text-dark">
                       <strong>Price/Day:</strong> {car.pricePerDay}
                     </p>
+
+                    {new Date(car.endDate) < new Date() && (
+                      <button
+                        className="btn btn-danger mt-2"
+                        onClick={() => handleReturnCar(car.carId)}
+                      >
+                        Returned Car
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

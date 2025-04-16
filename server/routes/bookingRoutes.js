@@ -1,4 +1,4 @@
-import express from "express";
+import express, { request } from "express";
 import { connectToDataBase } from "../lib/db.js";
 import jwt from "jsonwebtoken";
 
@@ -512,6 +512,58 @@ bookingRouter.get("/owner/:bookingId", async (req, res) => {
   } catch (err) {
     console.error("Error in /my-booking/:bookingId:", err);
     return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+bookingRouter.put("/return/:carId", async (req, res) => {
+  const token = req.headers["authorization"]?.split(" ")[1];
+  const decoded = jwt.verify(token, process.env.SECRET_KEY);
+  const requesterId = decoded.id;
+  try {
+    const db = await connectToDataBase();
+    const carId = parseInt(req.params.carId);
+
+    if (isNaN(carId)) {
+      return res.status(400).json({ message: "Invalid car ID" });
+    }
+
+    // Query to get the booking details for the car
+    const [bookingRows] = await db.query(
+      "SELECT bookingId, userId, endDate, isReturned FROM booking WHERE carId = ? AND isReturned = 0",
+      [carId]
+    );
+
+    if (bookingRows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Booking not found or already returned" });
+    }
+
+    const { bookingId, userId, endDate, isReturned } = bookingRows[0];
+
+    const currentDate = new Date();
+    const bookingEndDate = new Date(endDate);
+
+    if (currentDate < bookingEndDate) {
+      return res.status(400).json({
+        message: "Car cannot be returned until the booking end date has passed",
+      });
+    }
+
+    // Mark the booking as returned
+    await db.query("UPDATE booking SET isReturned = 1 WHERE bookingId = ?", [
+      bookingId,
+    ]);
+
+    // Free the car by setting isBooked to 0
+    await db.query("UPDATE cars SET isBooked = 0 WHERE carId = ?", [carId]);
+
+    res.status(200).json({ message: "Car returned successfully" });
+  } catch (error) {
+    console.error("Error returning car:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 });
 

@@ -220,7 +220,7 @@ router.get("/my-booked-cars", verifyToken, async (req, res) => {
        FROM booking b
        JOIN cars c ON b.carId = c.carId
        JOIN authentication u ON b.userId = u.userId
-       WHERE c.userId = ?
+       WHERE c.userId = ? AND c.isBooked = 1 AND b.isCancelled = 0
        ORDER BY b.bookingID DESC`,
       [userId]
     );
