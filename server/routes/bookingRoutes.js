@@ -142,7 +142,7 @@ const verifyToken = async (req, res, next) => {
 //     console.error("Error in /book:", err);
 //     return res.status(500).json({ error: "Internal Server Error" });
 //   }
-// });
+// });i
 
 ////////////////////////////////////////////////////////
 bookingRouter.post("/book", verifyToken, async (req, res) => {
@@ -236,7 +236,7 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
     const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
 
     await db.query(
-      "INSERT INTO notification (bookingId, rideShareId, sentAt, message, userId) VALUES (?,?,?,?,?)",
+      "INSERT  INTO notification (bookingId, rideShareId, sentAt, message, userId) VALUES (?,?,?,?,?)",
       [
         bookingId,
         null,
@@ -267,7 +267,7 @@ bookingRouter.get("/my-bookings", verifyToken, async (req, res) => {
     const db = await connectToDataBase();
 
     const [bookings] = await db.query(
-      "SELECT booking.*, cars.isBooked, cars.carName FROM booking JOIN cars ON cars.carId = booking.carId WHERE booking.userId = ?",
+      "SELECT booking.*, cars.isBooked, cars.carName FROM booking JOIN cars ON cars.carId = booking.carId WHERE booking.userId = ? AND booking.isCancelled = 0",
       [req.userId]
     );
 
@@ -277,6 +277,74 @@ bookingRouter.get("/my-bookings", verifyToken, async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+//////////////////////////////////////////
+
+bookingRouter.delete("/cancel/:bookingId", async (req, res) => {
+  try {
+    const db = await connectToDataBase();
+    const bookingId = parseInt(req.params.bookingId);
+
+    if (isNaN(bookingId)) {
+      return res.status(400).json({ message: "Invalid booking ID" });
+    }
+
+    // Get booking info to validate
+    const [bookingRows] = await db.query(
+      "SELECT carId, userId FROM booking WHERE bookingId = ? AND isCancelled = 0",
+      [bookingId]
+    );
+
+    if (bookingRows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Booking not found or already cancelled" });
+    }
+
+    const { carId, userId } = bookingRows[0];
+
+    // Optional: Check if the user is the owner of the booking (use auth middleware if needed)
+
+    // Cancel the booking
+    await db.query("UPDATE booking SET isCancelled = 1 WHERE bookingId = ?", [
+      bookingId,
+    ]);
+
+    // Free the car
+    await db.query("UPDATE cars SET isBooked = 0 WHERE carId = ?", [carId]);
+
+    // Get user's name for the notification
+    const [[userRow]] = await db.query(
+      "SELECT firstName, lastName FROM authentication WHERE userId = ?",
+      [userId]
+    );
+    const { firstName, lastName } = userRow || {};
+
+    // Get car owner's userId
+    const [[carOwner]] = await db.query(
+      "SELECT userId FROM cars WHERE carId = ?",
+      [carId]
+    );
+
+    // Insert into notification table
+    const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
+    const message = `${firstName} ${lastName} cancelled their booking.`;
+
+    await db.query(
+      "INSERT  INTO notification (bookingId, rideShareId, sentAt, message, userId) VALUES (?, ?, ?, ?, ?)",
+      [bookingId, null, sentAt, message, carOwner.userId]
+    );
+
+    res.status(200).json({ message: "Booking cancelled successfully" });
+  } catch (error) {
+    console.error("Error cancelling booking:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+});
+
+//////////////////////////////////////////
 
 bookingRouter.get("/lifts", async (req, res) => {
   try {

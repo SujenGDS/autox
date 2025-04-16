@@ -85,7 +85,7 @@ rideShareRouter.post("/request-lift", verifyToken, async (req, res) => {
 
     // Send notification to the ride owner
     await db.query(
-      "INSERT INTO notification (bookingId, rideShareId, sentAt, message, userId) VALUES (?, ?, ?, ?, ?)",
+      "INSERT  INTO notification (bookingId, rideShareId, sentAt, message, userId) VALUES (?, ?, ?, ?, ?)",
       [
         null,
         rideShareId,
@@ -125,7 +125,7 @@ rideShareRouter.post("/respond", async (req, res) => {
 
       const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
       await db.query(
-        `INSERT INTO notification (rideshareId, userID, sentAt, message)
+        `INSERT  INTO notification (rideshareId, userID, sentAt, message)
          VALUES (?, ?, ?, ?)`,
         [
           rideshareId,
@@ -147,7 +147,7 @@ rideShareRouter.post("/respond", async (req, res) => {
 
       const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
       await db.query(
-        `INSERT INTO notification (rideshareId, userID, sentAt, message)
+        `INSERT  INTO notification (rideshareId, userID, sentAt, message)
          VALUES (?, ?, ?, ?)`,
 
         [

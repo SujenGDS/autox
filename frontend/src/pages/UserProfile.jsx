@@ -12,7 +12,8 @@ const UserProfile = () => {
   const [bookings, setBookings] = useState([]);
   const [bookedCars, setBookedCars] = useState([]);
   const [myRideShares, setMyRideShares] = useState([]);
-
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [currentBooking, setCurrentBooking] = useState(null);
   const [refresh, setRefresh] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -89,6 +90,22 @@ const UserProfile = () => {
     }
   };
 
+  const handleCancelBooking = async (bookingId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`http://localhost:3000/booking/cancel/${bookingId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setShowCancelModal(false);
+      setRefresh((prev) => !prev); // Refresh bookings
+    } catch (error) {
+      console.error("Failed to cancel booking:", error);
+      alert("Could not cancel booking.");
+    }
+  };
+
   const handleDeleteCar = async (Id) => {
     try {
       const response = await axios.delete(
@@ -151,6 +168,19 @@ const UserProfile = () => {
                     <p className="text-dark">
                       <strong>Total:</strong> {`${booking.totalAmount}`}
                     </p>
+                    {/* Cancel Booking Button */}
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      className="mt-2"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent card's onClick from triggering
+                        setCurrentBooking(booking);
+                        setShowCancelModal(true); // Show Cancel Modal
+                      }}
+                    >
+                      Cancel Booking
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -415,6 +445,25 @@ const UserProfile = () => {
             onClick={() => handleEditCar(currentCar.carId)}
           >
             Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* cancel booking modal*/}
+      <Modal show={showCancelModal} onHide={() => setShowCancelModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Cancel Booking</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to cancel this booking?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowCancelModal(false)}>
+            Close
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => handleCancelBooking(currentBooking.bookingId)}
+          >
+            Cancel Booking
           </Button>
         </Modal.Footer>
       </Modal>
