@@ -144,7 +144,6 @@ const UserProfile = () => {
       if (response.status === 200) {
         alert(response.data.message);
         // Refresh the list or remove the returned car from the UI
-        setBookedCars(bookedCars.filter((car) => car.bookingId !== bookingId));
       } else {
         alert(response.data.message); // Show the error message like "Car cannot be returned until the booking end date has passed"
       }

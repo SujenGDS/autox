@@ -27,7 +27,7 @@ const NotificationModal = ({
     if (notification.rideshareId != null) {
       navigate(`/rideshare/${notification.rideshareId}`);
     } else if (notification.bookingId != null) {
-      navigate(`/booking/owner/${notification.bookingId}`);
+      navigate(`/booking/my-booking/${notification.carId}`);
     }
   };
 
@@ -101,46 +101,44 @@ const NotificationModal = ({
                         </Button>
                       )}
 
-                      {notification.rideshareId != null &&
-                        notification.responseStatus == null &&
-                        !NOTIFICATION_MESSAGE.includes(
-                          notification.message
-                        ) && (
-                          <>
-                            <Button
-                              variant="success"
-                              size="sm"
-                              onClick={() =>
-                                handleRideShareAction(
-                                  notification.rideshareId,
-                                  true
-                                )
-                              }
-                            >
-                              Accept
-                            </Button>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() =>
-                                handleRideShareAction(
-                                  notification.rideshareId,
-                                  false
-                                )
-                              }
-                            >
-                              Reject
-                            </Button>
-                          </>
-                        )}
-
                       {notification.rideshareId != null && (
-                        <Button
-                          variant="primary"
-                          onClick={() => handleView(notification)}
-                        >
-                          View Rideshare
-                        </Button>
+                        <>
+                          {notification.isAccepted ? (
+                            <Button
+                              variant="primary"
+                              onClick={() => handleView(notification)}
+                            >
+                              View Rideshare
+                            </Button>
+                          ) : (
+                            <>
+                              <Button
+                                variant="success"
+                                size="sm"
+                                onClick={() =>
+                                  handleRideShareAction(
+                                    notification.rideshareId,
+                                    true
+                                  )
+                                }
+                              >
+                                Accept
+                              </Button>
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() =>
+                                  handleRideShareAction(
+                                    notification.rideshareId,
+                                    false
+                                  )
+                                }
+                              >
+                                Reject
+                              </Button>
+                            </>
+                          )}
+                        </>
                       )}
                     </Col>
                   </Row>

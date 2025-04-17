@@ -81,6 +81,49 @@ const ViewRideShare = () => {
               <Col md={6}>
                 <Card className="shadow-sm">
                   <Card.Body>
+                    <Card.Title className="text-center">
+                      Passenger Info
+                    </Card.Title>
+                    <Table striped bordered hover responsive>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <strong>Name</strong>
+                          </td>
+                          <td>
+                            {rideShareDetails.passenger.firstName}{" "}
+                            {rideShareDetails.passenger.lastName}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <strong>Phone</strong>
+                          </td>
+                          <td>{rideShareDetails.passenger.phone}</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <strong>License</strong>
+                          </td>
+                          <td>{rideShareDetails.passenger.licenseNumber}</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <strong>Email</strong>
+                          </td>
+                          <td>{rideShareDetails.passenger.email}</td>
+                        </tr>
+                      </tbody>
+                    </Table>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+
+            <Row className="mb-4">
+              <Col md={6}>
+                <Card className="shadow-sm">
+                  <Card.Body>
                     <Card.Title className="text-center">Ride Info</Card.Title>
                     <Table striped bordered hover responsive>
                       <tbody>
@@ -149,10 +192,8 @@ const ViewRideShare = () => {
                   </Card.Body>
                 </Card>
               </Col>
-            </Row>
 
-            <Row>
-              <Col>
+              <Col md={6}>
                 <Card className="shadow-sm">
                   <Card.Body>
                     <Card.Title className="text-center">Car Details</Card.Title>

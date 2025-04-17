@@ -135,6 +135,11 @@ rideShareRouter.post("/respond", async (req, res) => {
         ]
       );
 
+      await db.query(
+        `UPDATE notification SET isAccepted = 1 WHERE rideshareId = ?`,
+        [rideshareId]
+      );
+
       return res.json({
         message: "Ride request accepted and passenger notified.",
       });
@@ -180,11 +185,20 @@ rideShareRouter.get("/:rideshareId", async (req, res) => {
               booking.carId, booking.rideShareDestination, booking.pickUpLocation, booking.dropOffLocation, 
               booking.startDate, booking.endDate, booking.rideSharePrice,
               cars.carName, cars.company, cars.transmission, cars.seatCapacity, cars.fuelType, cars.pricePerDay,
-              driver.userId AS driverId, driver.firstName, driver.lastName, driver.email, driver.phoneNumber, driver.licenseNumber
+              
+              -- Driver details
+              driver.userId AS driverId, driver.firstName AS driverFirstName, driver.lastName AS driverLastName, 
+              driver.email AS driverEmail, driver.phoneNumber AS driverPhone, driver.licenseNumber AS driverLicense,
+    
+              -- Passenger details
+              passenger.userId AS passengerId, passenger.firstName AS passengerFirstName, passenger.lastName AS passengerLastName, 
+              passenger.email AS passengerEmail, passenger.phoneNumber AS passengerPhone, passenger.licenseNumber AS passengerLicense
+    
        FROM lift
        JOIN booking ON lift.bookingId = booking.bookingId
        JOIN cars ON booking.carId = cars.carId
        JOIN authentication AS driver ON booking.userId = driver.userId
+       JOIN authentication AS passenger ON lift.passengerId = passenger.userId
        WHERE lift.rideshareId = ?`,
       [rideshareId]
     );
@@ -216,11 +230,20 @@ rideShareRouter.get("/:rideshareId", async (req, res) => {
       },
       driver: {
         userId: result[0].driverId,
-        firstName: result[0].firstName,
-        lastName: result[0].lastName,
-        email: result[0].email,
-        phone: result[0].phoneNumber,
-        licenseNumber: result[0].licenseNumber,
+        firstName: result[0].driverFirstName,
+        lastName: result[0].driverLastName,
+        email: result[0].driverEmail,
+        phone: result[0].driverPhone,
+        licenseNumber: result[0].driverLicense,
+      },
+
+      passenger: {
+        userId: result[0].passengerId,
+        firstName: result[0].passengerFirstName,
+        lastName: result[0].passengerLastName,
+        email: result[0].passengerEmail,
+        phone: result[0].passengerPhone,
+        licenseNumber: result[0].passengerLicense,
       },
     };
 

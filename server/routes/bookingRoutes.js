@@ -181,7 +181,7 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
     }
 
     const [existingBookings] = await db.query(
-      "SELECT * FROM booking WHERE carId = ? AND ((startDate BETWEEN ? AND ?) OR (endDate BETWEEN ? AND ?))",
+      "SELECT * FROM booking WHERE carId = ? AND ((startDate BETWEEN ? AND ?) OR (endDate BETWEEN ? AND ?)) AND isCancelled = 0",
       [carId, startDate, endDate, startDate, endDate]
     );
     if (existingBookings.length > 0) {
@@ -236,10 +236,11 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
     const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
 
     await db.query(
-      "INSERT  INTO notification (bookingId, rideShareId, sentAt, message, userId) VALUES (?,?,?,?,?)",
+      "INSERT  INTO notification (bookingId, rideShareId, carId, sentAt, message, userId) VALUES (?,?,?,?,?,?)",
       [
         bookingId,
         null,
+        carId,
         sentAt,
         `${firstName} ${lastName} has booked your car`,
         carOwnerId.userId,
@@ -267,7 +268,7 @@ bookingRouter.get("/my-bookings", verifyToken, async (req, res) => {
     const db = await connectToDataBase();
 
     const [bookings] = await db.query(
-      "SELECT booking.*, cars.isBooked, cars.carName FROM booking JOIN cars ON cars.carId = booking.carId WHERE booking.userId = ? AND booking.isCancelled = 0",
+      "SELECT booking.*, cars.isBooked, cars.carName FROM booking JOIN cars ON cars.carId = booking.carId WHERE booking.userId = ? AND booking.isCancelled = 0 AND booking.isReturned = 0",
       [req.userId]
     );
 
@@ -312,6 +313,8 @@ bookingRouter.delete("/cancel/:bookingId", async (req, res) => {
 
     // Free the car
     await db.query("UPDATE cars SET isBooked = 0 WHERE carId = ?", [carId]);
+
+    await db.query("DELETE FROM lift WHERE bookingId = ?", [bookingId]);
 
     // Get user's name for the notification
     const [[userRow]] = await db.query(
@@ -471,50 +474,6 @@ bookingRouter.get("/my-booking/:carId", async (req, res) => {
   }
 });
 
-bookingRouter.get("/owner/:bookingId", async (req, res) => {
-  try {
-    const { bookingId } = req.params;
-    const db = await connectToDataBase();
-
-    const [result] = await db.query(
-      `SELECT booking.*, cars.*, renter.userId AS renterId, renter.firstName, renter.lastName, renter.email, renter.phoneNumber, renter.licenseNumber
-       FROM booking
-       JOIN cars ON booking.carId = cars.carId
-       JOIN authentication AS renter ON booking.userId = renter.userId
-       WHERE booking.bookingId = ?`,
-      [bookingId]
-    );
-
-    if (result.length === 0) {
-      return res.status(404).json({ error: "Booking not found" });
-    }
-
-    const bookingDetails = {
-      ...result[0],
-      car: {
-        carId: result[0].carId,
-        carName: result[0].carName,
-        company: result[0].company,
-        fuelType: result[0].fuelType,
-        transmission: result[0].transmission,
-        pricePerDay: result[0].pricePerDay,
-      },
-      renter: {
-        userId: result[0].renterId,
-        firstName: result[0].firstName,
-        lastName: result[0].lastName,
-        email: result[0].email,
-        phone: result[0].phoneNumber,
-      },
-    };
-
-    return res.status(200).json({ booking: bookingDetails });
-  } catch (err) {
-    console.error("Error in /my-booking/:bookingId:", err);
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
 bookingRouter.put("/return/:carId", async (req, res) => {
   const token = req.headers["authorization"]?.split(" ")[1];
   const decoded = jwt.verify(token, process.env.SECRET_KEY);
@@ -527,7 +486,6 @@ bookingRouter.put("/return/:carId", async (req, res) => {
       return res.status(400).json({ message: "Invalid car ID" });
     }
 
-    // Query to get the booking details for the car
     const [bookingRows] = await db.query(
       "SELECT bookingId, userId, endDate, isReturned FROM booking WHERE carId = ? AND isReturned = 0",
       [carId]
@@ -549,15 +507,12 @@ bookingRouter.put("/return/:carId", async (req, res) => {
         message: "Car cannot be returned until the booking end date has passed",
       });
     }
-
     // Mark the booking as returned
     await db.query("UPDATE booking SET isReturned = 1 WHERE bookingId = ?", [
       bookingId,
     ]);
-
     // Free the car by setting isBooked to 0
     await db.query("UPDATE cars SET isBooked = 0 WHERE carId = ?", [carId]);
-
     res.status(200).json({ message: "Car returned successfully" });
   } catch (error) {
     console.error("Error returning car:", error);
