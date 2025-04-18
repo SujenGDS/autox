@@ -36,6 +36,9 @@ const Login = () => {
         values
       );
       if (response.status === 201) {
+        if (values.email == "admin@gmail.com") {
+          localStorage.setItem("isAdmin", "true");
+        }
         localStorage.setItem("token", response.data.token);
         navigate("/sujen-home");
         toast.success("Logged In");

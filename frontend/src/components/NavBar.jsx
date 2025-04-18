@@ -58,6 +58,11 @@ const NavBar = ({ setRefresh }) => {
       }
     };
 
+    // const test = async () => {
+    //   await axios.get("/admin/all-listed-cars");
+    // };
+
+    // test();
     const interval = setInterval(fetchNotifications, 2000);
     return () => clearInterval(interval);
   }, []);

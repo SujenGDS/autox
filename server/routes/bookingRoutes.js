@@ -26,7 +26,6 @@ const verifyToken = async (req, res, next) => {
   }
 };
 
-// POST route for booking
 // bookingRouter.post("/book", verifyToken, async (req, res) => {
 //   try {
 //     const {

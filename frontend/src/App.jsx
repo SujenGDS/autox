@@ -17,19 +17,23 @@ import BookedCarDetail from "./pages/BookedCarDetail.jsx";
 import MyBookedCarDetailsPage from "./pages/MyBookedCarsDetail.jsx";
 import ViewRideShare from "./pages/ViewRideShare.jsx";
 import Success from "./pages/Success.jsx";
+import AdminDashboard from "./pages/AdminDash.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />}></Route>
+        <Route path="/" element={<Dashboard />}></Route>
         <Route path="/payment-success" element={<Success />} />
-        <Route path="/sujen-home" element={<Home />}></Route>
+        <Route path="/sujen-home" element={<Dashboard />}></Route>
         <Route path="/sujen-register" element={<Register />}></Route>
         <Route path="/sujen-login" element={<Login />}></Route>
         <Route path="/Cars" element={<Cars />}></Route>
         <Route path="/upload-car" element={<UploadCarPage />}></Route>
         <Route path="/userProfile" element={<UserProfile />}></Route>
+        <Route path="/admin" element={<AdminDashboard />}></Route>
+
         <Route path="/car/:carId" element={<CarDetail />}></Route>
         <Route path="/booking/:bookingId" element={<BookedCarDetail />}></Route>
         <Route
