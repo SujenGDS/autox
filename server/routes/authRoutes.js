@@ -262,7 +262,7 @@ router.get("/my-ride-share", verifyToken, async (req, res) => {
        JOIN authentication driver ON b.userId = driver.userId
        JOIN authentication passenger ON l.passengerId = passenger.userId
        JOIN cars c ON b.carId = c.carId
-       WHERE b.userId = ? OR l.passengerId = ?
+       WHERE (b.userId = ? OR l.passengerId = ?) AND b.isCancelled = 0
        ORDER BY l.rideshareId DESC`,
       [userId, userId]
     );

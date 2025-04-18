@@ -289,9 +289,8 @@ bookingRouter.delete("/cancel/:bookingId", async (req, res) => {
       return res.status(400).json({ message: "Invalid booking ID" });
     }
 
-    // Get booking info to validate
     const [bookingRows] = await db.query(
-      "SELECT carId, userId FROM booking WHERE bookingId = ? AND isCancelled = 0",
+      "SELECT carId, userId, isRideShareEnabled FROM booking WHERE bookingId = ? AND isCancelled = 0",
       [bookingId]
     );
 
@@ -301,9 +300,7 @@ bookingRouter.delete("/cancel/:bookingId", async (req, res) => {
         .json({ message: "Booking not found or already cancelled" });
     }
 
-    const { carId, userId } = bookingRows[0];
-
-    // Optional: Check if the user is the owner of the booking (use auth middleware if needed)
+    const { carId, userId, isRideShareEnabled } = bookingRows[0];
 
     // Cancel the booking
     await db.query("UPDATE booking SET isCancelled = 1 WHERE bookingId = ?", [
@@ -313,9 +310,10 @@ bookingRouter.delete("/cancel/:bookingId", async (req, res) => {
     // Free the car
     await db.query("UPDATE cars SET isBooked = 0 WHERE carId = ?", [carId]);
 
+    // Delete from lift table
     await db.query("DELETE FROM lift WHERE bookingId = ?", [bookingId]);
 
-    // Get user's name for the notification
+    // Get user's name for notification
     const [[userRow]] = await db.query(
       "SELECT firstName, lastName FROM authentication WHERE userId = ?",
       [userId]
@@ -328,14 +326,23 @@ bookingRouter.delete("/cancel/:bookingId", async (req, res) => {
       [carId]
     );
 
-    // Insert into notification table
     const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
-    const message = `${firstName} ${lastName} cancelled their booking.`;
+    const ownerMessage = `${firstName} ${lastName} cancelled the ride you shared.`;
 
+    // Notify the car owner
     await db.query(
-      "INSERT  INTO notification (bookingId, rideShareId, sentAt, message, userId) VALUES (?, ?, ?, ?, ?)",
-      [bookingId, null, sentAt, message, carOwner.userId]
+      "INSERT INTO notification (bookingId, rideShareId, sentAt, message, userId) VALUES (?, ?, ?, ?, ?)",
+      [bookingId, null, sentAt, ownerMessage, carOwner.userId]
     );
+
+    // --- Ride Share Handling ---
+    if (isRideShareEnabled) {
+      // Delete any existing ride share notifications
+      await db.query(
+        "DELETE FROM notification WHERE bookingId = ? AND rideShareId IS NOT NULL",
+        [bookingId]
+      );
+    }
 
     res.status(200).json({ message: "Booking cancelled successfully" });
   } catch (error) {
@@ -368,7 +375,7 @@ bookingRouter.get("/lifts", async (req, res) => {
         c.transmission 
       FROM booking b
       JOIN cars c ON b.carId = c.carId
-      WHERE b.isRideShareEnabled = 1
+      WHERE b.isRideShareEnabled = 1 AND c.isBooked = 1
     `);
 
     return res.status(200).json({ rides });
