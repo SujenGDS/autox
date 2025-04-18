@@ -67,15 +67,6 @@ const BookNowModal = ({
       };
 
       const token = localStorage.getItem("token");
-      // await axios.post("http://localhost:3000/booking/book", payload, {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // });
-
-      // toast.success("Car booked successfully");
-      // setRefresh((prev) => !prev);
-      // setShowModal(false);
 
       const res = await axios.post(
         "http://localhost:3000/booking/book",
@@ -128,16 +119,20 @@ const BookNowModal = ({
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
+                  min={new Date().toISOString().split("T")[0]} // 👈 sets today as minimum
                 />
               </Form.Group>
+
               <Form.Group className="mb-3">
                 <Form.Label>Drop-off Date</Form.Label>
                 <Form.Control
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
+                  min={startDate || new Date().toISOString().split("T")[0]} // 👈 can't be before pick-up
                 />
               </Form.Group>
+
               <Form.Group className="mb-3">
                 <Form.Label>Pick up location</Form.Label>
                 <Form.Control

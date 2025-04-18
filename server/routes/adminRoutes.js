@@ -33,6 +33,7 @@ adminRouter.get("/all-bookings", async (req, res) => {
           renter.firstName AS renterFirstName, 
           renter.lastName AS renterLastName, 
           renter.email AS renterEmail, 
+          owner.userId AS ownerId,
           owner.firstName AS ownerFirstName, 
           owner.lastName AS ownerLastName, 
           owner.email AS ownerEmail
@@ -42,6 +43,7 @@ adminRouter.get("/all-bookings", async (req, res) => {
         JOIN authentication owner ON c.userId = owner.userId
         WHERE b.isCancelled = 0
       `);
+
     return res.status(200).json({ bookings });
   } catch (err) {
     console.error("Error in /admin/all-bookings:", err);
