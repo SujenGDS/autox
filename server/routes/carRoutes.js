@@ -186,4 +186,25 @@ carRouter.get("/booked-cars", async (req, res) => {
   }
 });
 
+carRouter.get("/get-cars/all", async (req, res) => {
+  try {
+    const db = await connectToDataBase();
+    if (!db) {
+      console.error("Database connection failed");
+      return res.status(500).json({ error: "Database connection failed" });
+    }
+
+    // Fetch all cars from the database
+    // const [cars] = await db.query("SELECT * FROM cars");
+    const [cars] = await db.query(
+      "SELECT carId, carName, company, makeYear, seatCapacity, mileage, currentKm, featuresArray, type, fuelType, transmission, pricePerDay, isBooked FROM cars where isBooked = 0"
+    );
+
+    return res.status(200).json({ cars });
+  } catch (err) {
+    console.error("Error in /get-cars/all:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 export default carRouter;

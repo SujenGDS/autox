@@ -139,10 +139,6 @@ rideShareRouter.post("/respond", async (req, res) => {
         `UPDATE notification SET isAccepted = 1 WHERE rideshareId = ?`,
         [rideshareId]
       );
-
-      return res.json({
-        message: "Ride request accepted and passenger notified.",
-      });
     } else {
       // Reject = delete from lift and notify passenger
       const [[liftRow]] = await db.query(

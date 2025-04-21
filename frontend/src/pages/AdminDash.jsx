@@ -214,7 +214,7 @@ const AdminDashboard = () => {
               />
             </Tab>
 
-            {/* Cancelled Bookings */}
+            {/* Cancelled Bookings
             <Tab
               eventKey="cancelled"
               title={
@@ -236,7 +236,7 @@ const AdminDashboard = () => {
                   </>
                 )}
               />
-            </Tab>
+            </Tab> */}
 
             {/* Active Bookings */}
             <Tab

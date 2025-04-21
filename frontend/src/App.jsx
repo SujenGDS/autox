@@ -33,7 +33,6 @@ function App() {
         <Route path="/upload-car" element={<UploadCarPage />}></Route>
         <Route path="/userProfile" element={<UserProfile />}></Route>
         <Route path="/admin" element={<AdminDashboard />}></Route>
-
         <Route path="/car/:carId" element={<CarDetail />}></Route>
         <Route path="/booking/:bookingId" element={<BookedCarDetail />}></Route>
         <Route
