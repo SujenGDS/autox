@@ -215,6 +215,7 @@ router.get("/my-booked-cars", verifyToken, async (req, res) => {
          c.carId,
          c.carName,
          c.pricePerDay,
+         c.images,
          b.startDate,
          b.endDate
        FROM booking b

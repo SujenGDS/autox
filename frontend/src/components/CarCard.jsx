@@ -42,12 +42,7 @@ const CarCard = ({
         onClick={handleNavigate}
         style={{ cursor: "pointer" }}
       >
-        {/* <Card.Img variant="top" src={imgLink} alt={title} /> */}
-        <Card.Img
-          variant="top"
-          src="https://i.insider.com/51364fb06bb3f74508000027?width=800&format=jpeg&auto=webp"
-          alt={title}
-        />
+        <Card.Img variant="top" src={imgLink} alt={title} />
 
         <Card.Body>
           <Card.Title>{title}</Card.Title>

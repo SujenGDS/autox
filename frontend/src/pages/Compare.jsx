@@ -20,6 +20,45 @@ const CompareCars = () => {
   const [car1, setCar1] = useState(null);
   const [car2, setCar2] = useState(null);
 
+  const carFeatures = {
+    air_conditioning: {
+      id: 1,
+      feature: "Air Conditioning",
+      ariaLabel: "Checkbox for Air Conditioning",
+      name: "air_conditioning",
+    },
+    gps_navigation: {
+      id: 2,
+      feature: "GPS Navigation",
+      ariaLabel: "Checkbox for GPS Navigation",
+      name: "gps_navigation",
+    },
+    bluetooth_audio: {
+      id: 3,
+      feature: "Bluetooth Audio",
+      ariaLabel: "Checkbox for Bluetooth Audio",
+      name: "bluetooth_audio",
+    },
+    heated_seats: {
+      id: 4,
+      feature: "Heated Seats",
+      ariaLabel: "Checkbox for Heated Seats",
+      name: "heated_seats",
+    },
+    sunroof: {
+      id: 5,
+      feature: "Sunroof",
+      ariaLabel: "Checkbox for Sunroof",
+      name: "sunroof",
+    },
+    all_wheel_drive: {
+      id: 6,
+      feature: "All Wheel Drive",
+      ariaLabel: "Checkbox for All Wheel Drive",
+      name: "all_wheel_drive",
+    },
+  };
+
   useEffect(() => {
     axios
       .get("http://localhost:3000/car/get-cars/all")
@@ -84,10 +123,23 @@ const CompareCars = () => {
   const renderCarCard = (car) => {
     // const imageUrl = `https://pixelz.cc/wp-content/uploads/2018/08/audi-r8-white-uhd-4k-wallpaper.jpg`;
 
+    let firstImage = "";
+    try {
+      const imagesArray = JSON.parse(car.images.replace(/&quot;/g, '"'));
+      if (Array.isArray(imagesArray) && imagesArray.length > 0) {
+        firstImage = imagesArray[0];
+      }
+      console.log(car);
+    } catch (error) {
+      console.error("Error parsing car images:", error);
+      // Optionally set a default image URL here if parsing fails
+      // firstImage = 'path/to/default-image.jpg';
+    }
+
     return (
       <Card className="shadow-sm mb-3 border-0 rounded-4">
         <Image
-          src="https://baycitymitsubishi.co.nz/wp-content/uploads/2023/11/2021-Mitsubishi-Pajero-Sport-VRX-NGR177-1.jpg"
+          src={firstImage}
           alt={car.carName}
           fluid
           className="rounded-top-4"
@@ -121,7 +173,15 @@ const CompareCars = () => {
             </li>
             <li>
               <strong>Features:</strong>{" "}
-              {JSON.parse(car.featuresArray || "[]").join(", ") || "None"}
+              {car?.featuresArray && car.featuresArray.length > 0 ? (
+                <ul>
+                  {JSON.parse(car.featuresArray).map((feature, index) => (
+                    <li key={index}>{carFeatures[feature]["feature"]}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No features available</p>
+              )}
             </li>
           </ul>
         </Card.Body>

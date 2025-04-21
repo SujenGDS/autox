@@ -16,11 +16,51 @@ const CarDetail = () => {
   const [price, setPrice] = useState(0);
   const [title, setTitle] = useState("Car");
 
+  const carFeatures = {
+    air_conditioning: {
+      id: 1,
+      feature: "Air Conditioning",
+      ariaLabel: "Checkbox for Air Conditioning",
+      name: "air_conditioning",
+    },
+    gps_navigation: {
+      id: 2,
+      feature: "GPS Navigation",
+      ariaLabel: "Checkbox for GPS Navigation",
+      name: "gps_navigation",
+    },
+    bluetooth_audio: {
+      id: 3,
+      feature: "Bluetooth Audio",
+      ariaLabel: "Checkbox for Bluetooth Audio",
+      name: "bluetooth_audio",
+    },
+    heated_seats: {
+      id: 4,
+      feature: "Heated Seats",
+      ariaLabel: "Checkbox for Heated Seats",
+      name: "heated_seats",
+    },
+    sunroof: {
+      id: 5,
+      feature: "Sunroof",
+      ariaLabel: "Checkbox for Sunroof",
+      name: "sunroof",
+    },
+    all_wheel_drive: {
+      id: 6,
+      feature: "All Wheel Drive",
+      ariaLabel: "Checkbox for All Wheel Drive",
+      name: "all_wheel_drive",
+    },
+  };
+
   useEffect(() => {
     const fetchCarDetail = async () => {
       try {
         const response = await axios.get(`http://localhost:3000/car/${carId}`);
         let car_res = response.data.car;
+        car_res.imagesArray = JSON.parse(car_res.images);
         car_res.featuresArray = JSON.parse(car_res.featuresArray);
         setCar(car_res);
         console.log(car);
@@ -64,32 +104,16 @@ const CarDetail = () => {
       <Row className="d-flex align-items-center m-4">
         <Col md={6}>
           <Carousel>
-            <Carousel.Item>
-              <img
-                className="d-block w-100"
-                src="https://static0.carbuzzimages.com/wordpress/wp-content/uploads/gallery-images/original/1076000/700/1076745.jpg"
-                alt="First slide"
-                style={{ height: "400px", objectFit: "cover" }}
-              />
-            </Carousel.Item>
-
-            <Carousel.Item>
-              <img
-                className="d-block w-100"
-                src="https://www.topgear.com/sites/default/files/images/news-article/carousel/2020/11/9e57369ebfc2c3e6348095465ba6a95f/20c0535_007.jpg"
-                alt="Second slide"
-                style={{ height: "400px", objectFit: "cover" }}
-              />
-            </Carousel.Item>
-
-            <Carousel.Item>
-              <img
-                className="d-block w-100"
-                src="https://hips.hearstapps.com/hmg-prod/images/2025-mercedes-maybach-101-66fac5ed3185a.jpg"
-                alt="Third slide"
-                style={{ height: "400px", objectFit: "cover" }}
-              />
-            </Carousel.Item>
+            {car?.imagesArray?.map((image, index) => (
+              <Carousel.Item key={index}>
+                <img
+                  className="d-block w-100"
+                  src={image}
+                  alt={`Slide ${index + 1}`}
+                  style={{ height: "400px", objectFit: "cover" }}
+                />
+              </Carousel.Item>
+            ))}
           </Carousel>
         </Col>
 
@@ -143,7 +167,7 @@ const CarDetail = () => {
               car.featuresArray.length > 0 ? (
                 <ul>
                   {car.featuresArray.map((feature, index) => (
-                    <li key={index}>{feature}</li>
+                    <li key={index}>{carFeatures[feature]["feature"]}</li>
                   ))}
                 </ul>
               ) : (

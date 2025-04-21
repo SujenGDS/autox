@@ -73,6 +73,18 @@ const UserProfile = () => {
     fetchData();
   }, [refresh]);
 
+  const getFirstImage = (imagesString) => {
+    try {
+      const imagesArray = JSON.parse(
+        imagesString?.replace(/&quot;/g, '"') || "[]"
+      );
+      return imagesArray[0] || "https://via.placeholder.com/150"; // Default placeholder if no image
+    } catch (error) {
+      console.error("Error parsing images:", error);
+      return "https://via.placeholder.com/150"; // Default placeholder on error
+    }
+  };
+
   const handleEditCar = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -162,6 +174,7 @@ const UserProfile = () => {
         )}
 
         {/* My Bookings Section */}
+        {/* My Bookings Section */}
         <div className="mb-4">
           <h4 className="text-secondary mb-4">My Bookings</h4>
           {bookings.length === 0 ? (
@@ -176,7 +189,7 @@ const UserProfile = () => {
               >
                 <div className="d-flex">
                   <img
-                    src="https://imgcdn.zigwheels.ph/medium/gallery/exterior/115/1640/rolls-royce-phantom-full-front-view-950210.jpg"
+                    src={getFirstImage(booking.images)}
                     alt="Car"
                     className="img-thumbnail rounded"
                     style={{ width: "200px", height: "auto" }}
@@ -213,6 +226,7 @@ const UserProfile = () => {
         </div>
 
         {/* My Cars Section */}
+        {/* My Cars Section */}
         <div className="mb-4">
           <h4 className="text-secondary mb-4">My Cars</h4>
           {cars.length === 0 ? (
@@ -225,7 +239,7 @@ const UserProfile = () => {
               >
                 <div className="d-flex">
                   <img
-                    src="https://i.insider.com/51364fb06bb3f74508000027?width=800&format=jpeg&auto=webp"
+                    src={getFirstImage(car.images)}
                     alt={car.carName}
                     className="img-thumbnail rounded me-4"
                     style={{ width: "200px", height: "auto" }}
@@ -293,7 +307,6 @@ const UserProfile = () => {
             ))
           )}
         </div>
-
         {/* Cars Booked by Others Section */}
         <div>
           <h4 className="text-secondary mb-4">Cars Booked by Others</h4>
@@ -308,7 +321,7 @@ const UserProfile = () => {
               >
                 <div className="d-flex">
                   <img
-                    src="https://imgcdn.zigwheels.ph/medium/gallery/exterior/115/1640/rolls-royce-phantom-full-front-view-950210.jpg"
+                    src={getFirstImage(car.images)}
                     alt="Car"
                     className="img-thumbnail rounded"
                     style={{ width: "200px", height: "auto" }}
@@ -343,7 +356,6 @@ const UserProfile = () => {
             ))
           )}
         </div>
-
         {/* My Ride Shares Section */}
         <div>
           <h4 className="text-secondary mb-4">My Ride Shares</h4>

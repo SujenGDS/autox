@@ -31,6 +31,7 @@ carRouter.post("/upload-car", async (req, res) => {
       transmission,
       fuelType,
       featuresArray,
+      imageLinks,
       terms,
     } = req.body;
 
@@ -43,7 +44,7 @@ carRouter.post("/upload-car", async (req, res) => {
     const db = await connectToDataBase();
 
     await db.query(
-      "INSERT INTO cars (carName, company, makeYear, type, seatCapacity, carPlateNumber, pricePerDay, mileage, currentKm, transmission, fuelType, featuresArray, userId) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO cars (carName, company, makeYear, type, seatCapacity, carPlateNumber, pricePerDay, mileage, currentKm, transmission, fuelType, featuresArray, images, userId) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         carName,
         company,
@@ -57,6 +58,7 @@ carRouter.post("/upload-car", async (req, res) => {
         transmission,
         fuelType,
         JSON.stringify(featuresArray),
+        JSON.stringify(imageLinks),
         userId,
       ]
     );
@@ -81,7 +83,7 @@ carRouter.get("/get-cars", async (req, res) => {
     // Fetch all cars from the database
     // const [cars] = await db.query("SELECT * FROM cars");
     const [cars] = await db.query(
-      "SELECT carId, carName, fuelType, transmission, pricePerDay, isBooked FROM cars WHERE isBooked = 0"
+      "SELECT carId, carName, fuelType, transmission, pricePerDay, isBooked, images FROM cars WHERE isBooked = 0"
     );
 
     return res.status(200).json({ cars });
@@ -197,7 +199,7 @@ carRouter.get("/get-cars/all", async (req, res) => {
     // Fetch all cars from the database
     // const [cars] = await db.query("SELECT * FROM cars");
     const [cars] = await db.query(
-      "SELECT carId, carName, company, makeYear, seatCapacity, mileage, currentKm, featuresArray, type, fuelType, transmission, pricePerDay, isBooked FROM cars where isBooked = 0"
+      "SELECT carId, carName, company, makeYear, seatCapacity, mileage, currentKm, featuresArray, images, type, fuelType, transmission, pricePerDay, isBooked FROM cars where isBooked = 0"
     );
 
     return res.status(200).json({ cars });

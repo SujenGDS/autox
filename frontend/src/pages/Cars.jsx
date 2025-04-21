@@ -164,21 +164,36 @@ const Cars = () => {
           <Col md={9} className="ps-5">
             <div className="row">
               {filteredCars.length > 0 ? (
-                filteredCars.map((car, index) => (
-                  <Col md={4} xxl={3} className="mb-3">
-                    <CarCard
-                      key={index}
-                      title={car.carName}
-                      fuel={car.fuelType}
-                      transmission={car.transmission}
-                      carId={car.carId}
-                      price={`${car.pricePerDay}/day`}
-                      imgLink="https://via.placeholder.com/150" // Replace with a real image
-                      isBooked={car.isBooked} // Pass isBooked here
-                      setRefresh={setRefresh}
-                    />
-                  </Col>
-                ))
+                filteredCars.map((car, index) => {
+                  let firstImage = "";
+                  try {
+                    const imagesArray = JSON.parse(
+                      car.images.replace(/&quot;/g, '"')
+                    );
+                    if (Array.isArray(imagesArray) && imagesArray.length > 0) {
+                      firstImage = imagesArray[0];
+                    }
+                  } catch (error) {
+                    console.error("Error parsing car images:", error);
+                    // Optionally set a default image URL here
+                    firstImage = "path/to/default-image.jpg";
+                  }
+                  return (
+                    <Col md={4} xxl={3} className="mb-3">
+                      <CarCard
+                        key={index}
+                        title={car.carName}
+                        fuel={car.fuelType}
+                        transmission={car.transmission}
+                        carId={car.carId}
+                        price={`${car.pricePerDay}/day`}
+                        imgLink={firstImage} // Replace with a real image
+                        isBooked={car.isBooked} // Pass isBooked here
+                        setRefresh={setRefresh}
+                      />
+                    </Col>
+                  );
+                })
               ) : (
                 <p>No cars match the selected filters.</p>
               )}
