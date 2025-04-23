@@ -72,7 +72,7 @@ const NotificationModal = ({
       );
 
       const result = await res.json();
-      alert(result.message);
+      // alert(result.message);
     } catch (error) {
       console.error("Failed to dismiss notification:", error);
       alert("Something went wrong");
@@ -161,7 +161,6 @@ const NotificationModal = ({
                         </>
                       )}
 
-                      {/* 🔘 Add this Dismiss button here */}
                       <Button
                         variant="outline-secondary"
                         size="sm"

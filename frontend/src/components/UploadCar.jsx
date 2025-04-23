@@ -8,7 +8,7 @@ import * as yup from "yup";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { ListGroup } from "react-bootstrap"; // Import ListGroup
+import { ListGroup, Modal } from "react-bootstrap"; // Import ListGroup
 
 const carFeatures = [
   // ... (keep carFeatures array as is)
@@ -56,8 +56,7 @@ const MAX_IMAGE_LINKS = 5;
 
 const UploadCar = ({ setShow, setRefresh }) => {
   const { Formik } = formik;
-
-  // State to hold the current URL being typed
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const [currentImageUrl, setCurrentImageUrl] = useState("");
 
   const schema = yup.object().shape({
@@ -226,7 +225,6 @@ const UploadCar = ({ setShow, setRefresh }) => {
 
         return (
           <Form noValidate className="m-3" onSubmit={handleSubmit}>
-            {/* --- Car Detail Fields (Add validation feedback) --- */}
             <Row className="mb-3 g-3">
               <Form.Group as={Col} md="6" controlId="validationFormikCarName">
                 <Form.Label>Car Name</Form.Label>
@@ -389,7 +387,6 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
-
             {/* --- More Car Detail Fields (Add validation feedback) --- */}
             <Row className="mb-3 g-3">
               <Form.Group
@@ -494,7 +491,6 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
-
             {/* --- Image URL Input Section --- */}
             <Form.Group
               as={Col}
@@ -539,7 +535,9 @@ const UploadCar = ({ setShow, setRefresh }) => {
               </InputGroup>
               <Form.Text className="text-muted">
                 Enter the full web address (URL) for each image. Ensure links
-                point to publicly accessible images (jpg, png, webp etc.).
+                point to publicly accessible images (jpg, png, webp, etc.).
+                <br />
+                Car photos must clearly display a valid number plate.
               </Form.Text>
 
               {/* Display Added URLs and Previews */}
@@ -605,7 +603,6 @@ const UploadCar = ({ setShow, setRefresh }) => {
                   </div>
                 )}
             </Form.Group>
-
             <Form.Group className="mb-3">
               <Form.Label>Bluebook URL</Form.Label>
               <Form.Control
@@ -620,7 +617,6 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 {errors.bluebookUrl}
               </Form.Control.Feedback>
             </Form.Group>
-
             <hr />
             <h3>Features</h3>
             <Row className="mb-3">
@@ -638,21 +634,29 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 </Col>
               ))}
             </Row>
-
             <hr />
-
-            <Form.Group className="position-relative mb-3">
+            <Form.Group className="mb-3">
               <Form.Check
-                required // HTML5 required
+                type="checkbox"
+                label={
+                  <>
+                    I agree to the{" "}
+                    <span
+                      style={{ color: "blue", cursor: "pointer" }}
+                      onClick={() => setShowTermsModal(true)}
+                    >
+                      terms and conditions
+                    </span>
+                  </>
+                }
                 name="terms"
-                label="Agree to terms and conditions"
+                checked={values.terms}
                 onChange={handleChange}
                 isInvalid={touched.terms && !!errors.terms}
-                checked={values.terms} // Control checked state
-                feedback={errors.terms}
-                feedbackType="invalid"
-                id="validationFormikTerms" // Specific ID
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.terms}
+              </Form.Control.Feedback>
             </Form.Group>
             <Button
               type="submit"
@@ -668,6 +672,26 @@ const UploadCar = ({ setShow, setRefresh }) => {
             >
               Upload Car Details
             </Button>
+            <Modal
+              show={showTermsModal}
+              onHide={() => setShowTermsModal(false)}
+              centered
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Terms and Conditions</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <p>Terms and conditions content goes here.</p>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowTermsModal(false)}
+                >
+                  Close
+                </Button>
+              </Modal.Footer>
+            </Modal>
           </Form>
         );
       }}

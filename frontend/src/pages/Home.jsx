@@ -68,7 +68,7 @@ const Home = () => {
 
       {/* Hero Banner */}
       <img
-        src="/images/bg-6.jpg"
+        src="/images/bg1331.jpg"
         alt="Luxury Car"
         style={{ width: "100%", height: "80vh", objectFit: "cover" }}
       />
