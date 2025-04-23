@@ -92,17 +92,25 @@ const LiftPage = () => {
                   <Card.Body>
                     <Card.Title>{ride.carName}</Card.Title>
                     <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-                      <li>{ride.rideShareDestination}</li>
+                      <li>
+                        <strong>{ride.startDestination}</strong> ➝{" "}
+                        <strong>{ride.rideShareDestination}</strong>
+                      </li>
+                      <li>Description: {ride.rideShareDescription}</li>
                       <li>Price: {ride.rideSharePrice}</li>
                     </ul>
                   </Card.Body>
                   <Card.Footer className="d-flex justify-content-between align-items-center">
-                    <Button
-                      variant="outline-dark"
-                      onClick={() => handleBookNowClick(ride)}
-                    >
-                      Send request
-                    </Button>
+                    {new Date(ride.startDate) > new Date() ? (
+                      <Button
+                        variant="outline-dark"
+                        onClick={() => handleBookNowClick(ride)}
+                      >
+                        Send request
+                      </Button>
+                    ) : (
+                      <span className="text-muted">Ride Started</span>
+                    )}
                   </Card.Footer>
                 </Card>
               </div>
@@ -120,6 +128,7 @@ const LiftPage = () => {
                 <strong>Destination:</strong>{" "}
                 {selectedRide.rideShareDestination}
               </p>
+
               <p>
                 <strong>Price:</strong> {selectedRide.rideSharePrice}
               </p>

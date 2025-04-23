@@ -23,6 +23,8 @@ const BookNowModal = ({
   const [isRideShareEnabled, setisRideShareEnabled] = useState(false);
   const [rideSharePrice, setRideSharePrice] = useState("");
   const [rideShareDestination, setRideShareDestination] = useState("");
+  const [rideShareDescription, setRideShareDescription] = useState("");
+  const [startDestination, setStartDestination] = useState("");
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [agreeToRideShareTerms, setAgreeToRideShareTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
@@ -63,6 +65,8 @@ const BookNowModal = ({
         ...(isRideShareEnabled && {
           rideSharePrice: rideSharePrice,
           rideShareDestination: rideShareDestination,
+          rideShareDescription: rideShareDescription,
+          startDestination: startDestination,
         }),
       };
 
@@ -119,7 +123,9 @@ const BookNowModal = ({
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  min={new Date().toISOString().split("T")[0]} // 👈 sets today as minimum
+                  min={
+                    new Date(Date.now() + 86400000).toISOString().split("T")[0]
+                  }
                 />
               </Form.Group>
 
@@ -166,21 +172,42 @@ const BookNowModal = ({
               {isRideShareEnabled && (
                 <>
                   <Form.Group className="mb-3">
-                    <Form.Label>Ride Share Price</Form.Label>
-                    <Form.Control
-                      type="number"
-                      placeholder="Enter ride share price"
-                      value={rideSharePrice}
-                      onChange={(e) => setRideSharePrice(e.target.value)}
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
                     <Form.Label>Destination Location</Form.Label>
                     <Form.Control
                       type="text"
                       placeholder="Enter destination"
                       value={rideShareDestination}
                       onChange={(e) => setRideShareDestination(e.target.value)}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>From</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter destination"
+                      value={startDestination}
+                      onChange={(e) => setStartDestination(e.target.value)}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Description</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter description"
+                      value={rideShareDescription}
+                      onChange={(e) => setRideShareDescription(e.target.value)}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Ride Share Price</Form.Label>
+                    <Form.Control
+                      type="number"
+                      placeholder="Enter ride share price"
+                      value={rideSharePrice}
+                      onChange={(e) => setRideSharePrice(e.target.value)}
                     />
                   </Form.Group>
 

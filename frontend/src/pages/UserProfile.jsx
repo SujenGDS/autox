@@ -192,7 +192,11 @@ const UserProfile = () => {
                     src={getFirstImage(booking.images)}
                     alt="Car"
                     className="img-thumbnail rounded"
-                    style={{ width: "200px", height: "auto" }}
+                    style={{
+                      width: "200px",
+                      height: "fit-content",
+                      objectFit: "contain",
+                    }}
                   />
                   <div className="ms-4 flex-grow-1">
                     <h5>{booking.carName}</h5>
@@ -226,7 +230,6 @@ const UserProfile = () => {
         </div>
 
         {/* My Cars Section */}
-        {/* My Cars Section */}
         <div className="mb-4">
           <h4 className="text-secondary mb-4">My Cars</h4>
           {cars.length === 0 ? (
@@ -242,19 +245,25 @@ const UserProfile = () => {
                     src={getFirstImage(car.images)}
                     alt={car.carName}
                     className="img-thumbnail rounded me-4"
-                    style={{ width: "200px", height: "auto" }}
+                    style={{
+                      width: "200px",
+                      height: "fit-content",
+                      objectFit: "contain",
+                    }}
                   />
                   <div className="ms-4 flex-grow-1">
                     <div className="d-flex justify-content-between align-items-center">
                       <h5>
                         {car.carName}{" "}
-                        <span
-                          className={`badge ${
-                            car.isBooked ? "bg-success" : "bg-warning"
-                          } text-dark ms-2`}
-                        >
-                          {car.isBooked ? "Booked" : "Available"}
-                        </span>
+                        {car.approvalStatus === "accepted" && (
+                          <span
+                            className={`badge ${
+                              car.isBooked ? "bg-success" : "bg-warning"
+                            } text-dark ms-2`}
+                          >
+                            {car.isBooked ? "Booked" : "Available"}
+                          </span>
+                        )}
                       </h5>
                     </div>
 
@@ -266,6 +275,9 @@ const UserProfile = () => {
                     </p>
                     <p className="text-dark">
                       <strong>Price:</strong> {`${car.pricePerDay}/day`}
+                    </p>
+                    <p className="text-dark">
+                      <strong>Status:</strong> {car.approvalStatus}
                     </p>
                   </div>
                   <div className="d-flex align-items-center">
@@ -307,6 +319,7 @@ const UserProfile = () => {
             ))
           )}
         </div>
+
         {/* Cars Booked by Others Section */}
         <div>
           <h4 className="text-secondary mb-4">Cars Booked by Others</h4>
@@ -324,7 +337,11 @@ const UserProfile = () => {
                     src={getFirstImage(car.images)}
                     alt="Car"
                     className="img-thumbnail rounded"
-                    style={{ width: "200px", height: "auto" }}
+                    style={{
+                      width: "200px",
+                      height: "fit-content",
+                      objectFit: "contain",
+                    }}
                   />
                   <div className="ms-4 flex-grow-1">
                     <h5>{car.carName}</h5>
@@ -377,10 +394,14 @@ const UserProfile = () => {
                   >
                     <div className="d-flex">
                       <img
-                        src="https://imgcdn.zigwheels.ph/medium/gallery/exterior/115/1640/rolls-royce-phantom-full-front-view-950210.jpg"
+                        src={getFirstImage(car.images)}
                         alt="Shared Ride Car"
                         className="img-thumbnail rounded"
-                        style={{ width: "200px", height: "auto" }}
+                        style={{
+                          width: "200px",
+                          height: "fit-content",
+                          objectFit: "contain",
+                        }}
                       />
                       <div className="ms-4 flex-grow-1">
                         <h5>{ride.carName}</h5>
@@ -465,7 +486,52 @@ const UserProfile = () => {
                 <option value="Honda">Honda</option>
                 <option value="Ford">Ford</option>
                 <option value="BMW">BMW</option>
-                <option value="RollsRoyce">Rolls Royce</option>
+                <option value="Rolls Royce">Rolls Royce</option>
+                <option value="Hyundai">Hyundai</option>
+                <option value="Kia">Kia</option>
+                <option value="Chevrolet">Chevrolet</option>
+                <option value="Nissan">Nissan</option>
+                <option value="Volkswagen">Volkswagen</option>
+                <option value="Audi">Audi</option>
+                <option value="Mercedes-Benz">Mercedes-Benz</option>
+                <option value="Lexus">Lexus</option>
+                <option value="Mazda">Mazda</option>
+                <option value="Subaru">Subaru</option>
+                <option value="Jeep">Jeep</option>
+                <option value="Porsche">Porsche</option>
+                <option value="Jaguar">Jaguar</option>
+                <option value="Land Rover">Land Rover</option>
+                <option value="Tata">Tata</option>
+                <option value="Mahindra">Mahindra</option>
+                <option value="Skoda">Skoda</option>
+                <option value="Renault">Renault</option>
+                <option value="Peugeot">Peugeot</option>
+                <option value="Mini">Mini</option>
+                <option value="Volvo">Volvo</option>
+                <option value="Ferrari">Ferrari</option>
+                <option value="Lamborghini">Lamborghini</option>
+                <option value="Bugatti">Bugatti</option>
+                <option value="Mitsubishi">Mitsubishi</option>
+                <option value="Buick">Buick</option>
+                <option value="Dodge">Dodge</option>
+                <option value="Chrysler">Chrysler</option>
+                <option value="GMC">GMC</option>
+                <option value="Lincoln">Lincoln</option>
+                <option value="Genesis">Genesis</option>
+                <option value="Infiniti">Infiniti</option>
+                <option value="Acura">Acura</option>
+                <option value="Alfa Romeo">Alfa Romeo</option>
+                <option value="Bentley">Bentley</option>
+                <option value="Maserati">Maserati</option>
+                <option value="Suzuki">Suzuki</option>
+                <option value="Isuzu">Isuzu</option>
+                <option value="Hummer">Hummer</option>
+                <option value="SEAT">SEAT</option>
+                <option value="Daihatsu">Daihatsu</option>
+                <option value="Proton">Proton</option>
+                <option value="Saab">Saab</option>
+                <option value="Smart">Smart</option>
+                <option value="Tesla">Tesla</option>
               </Form.Select>
             </Form.Group>
 

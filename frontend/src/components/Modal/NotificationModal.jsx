@@ -59,6 +59,26 @@ const NotificationModal = ({
     }
   };
 
+  const handleDismissNotification = async (notificationId) => {
+    try {
+      const res = await fetch(
+        `http://localhost:3000/auth/cancel-notification/${notificationId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      const result = await res.json();
+      alert(result.message);
+    } catch (error) {
+      console.error("Failed to dismiss notification:", error);
+      alert("Something went wrong");
+    }
+  };
+
   return (
     <Modal show={showModal} onHide={handleClose} centered size="lg">
       <Modal.Header closeButton>
@@ -90,7 +110,7 @@ const NotificationModal = ({
                     </Col>
                     <Col
                       md={3}
-                      className="d-flex align-items-center justify-content-end gap-2"
+                      className="d-flex align-items-center justify-content-end flex-wrap gap-2"
                     >
                       {notification.bookingId != null && (
                         <Button
@@ -140,6 +160,17 @@ const NotificationModal = ({
                           )}
                         </>
                       )}
+
+                      {/* 🔘 Add this Dismiss button here */}
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() =>
+                          handleDismissNotification(notification.notificationId)
+                        }
+                      >
+                        Dismiss
+                      </Button>
                     </Col>
                   </Row>
                 </Card.Body>

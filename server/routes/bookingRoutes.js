@@ -38,6 +38,8 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
       rideSharePrice,
       rideShareDestination,
       isRideShareEnabled,
+      rideShareDescription,
+      startDestination,
     } = req.body;
 
     if (
@@ -87,7 +89,7 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
     const totalAmount = rentalDays * pricePerDay;
 
     const [bookingResult] = await db.query(
-      "INSERT INTO booking (userId, carId, startDate, endDate, pickUpLocation, dropOffLocation, totalAmount, rideSharePrice, rideShareDestination, isRideShareEnabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO booking (userId, carId, startDate, endDate, pickUpLocation, dropOffLocation, totalAmount, rideSharePrice, rideShareDestination, isRideShareEnabled, rideShareDescription, startDestination) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         req.userId,
         carId,
@@ -99,6 +101,8 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
         isRideShareEnabled ? rideSharePrice : null,
         isRideShareEnabled ? rideShareDestination : null,
         isRideShareEnabled ? 1 : 0,
+        isRideShareEnabled ? rideShareDescription : null,
+        isRideShareEnabled ? startDestination : null,
       ]
     );
 
@@ -167,6 +171,7 @@ bookingRouter.delete("/cancel/:bookingId", async (req, res) => {
   try {
     const db = await connectToDataBase();
     const bookingId = parseInt(req.params.bookingId);
+    const cancelledAt = new Date().toISOString().slice(0, 19).replace("T", " ");
 
     if (isNaN(bookingId)) {
       return res.status(400).json({ message: "Invalid booking ID" });
@@ -186,9 +191,10 @@ bookingRouter.delete("/cancel/:bookingId", async (req, res) => {
     const { carId, userId, isRideShareEnabled } = bookingRows[0];
 
     // Cancel the booking
-    await db.query("UPDATE booking SET isCancelled = 1 WHERE bookingId = ?", [
-      bookingId,
-    ]);
+    await db.query(
+      "UPDATE booking SET isCancelled = 1, cancelledAt = ? WHERE bookingId = ?",
+      [cancelledAt, bookingId]
+    );
 
     // Free the car
     await db.query("UPDATE cars SET isBooked = 0 WHERE carId = ?", [carId]);
@@ -249,6 +255,8 @@ bookingRouter.get("/lifts", async (req, res) => {
         b.carId, 
         b.rideSharePrice, 
         b.rideShareDestination, 
+        b.rideShareDescription,
+        b.startDestination,
         b.startDate, 
         b.endDate, 
         b.pickUpLocation, 
@@ -388,14 +396,6 @@ bookingRouter.put("/return/:carId", async (req, res) => {
 
     const { bookingId, userId, endDate, isReturned } = bookingRows[0];
 
-    const currentDate = new Date();
-    const bookingEndDate = new Date(endDate);
-
-    if (currentDate < bookingEndDate) {
-      return res.status(400).json({
-        message: "Car cannot be returned until the booking end date has passed",
-      });
-    }
     // Mark the booking as returned
     await db.query("UPDATE booking SET isReturned = 1 WHERE bookingId = ?", [
       bookingId,

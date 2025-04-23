@@ -6,7 +6,6 @@ const carRouter = express.Router();
 
 carRouter.post("/upload-car", async (req, res) => {
   try {
-    // Extract token from request headers
     const token = req.headers["authorization"]?.split(" ")[1];
 
     if (!token) {
@@ -14,8 +13,6 @@ carRouter.post("/upload-car", async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    console.log("token", token);
-    console.log(decoded, decoded.id);
     const userId = decoded.id;
 
     const {
@@ -33,6 +30,7 @@ carRouter.post("/upload-car", async (req, res) => {
       featuresArray,
       imageLinks,
       terms,
+      blueBookUrl, // Add blueBookUrl to the destructuring
     } = req.body;
 
     if (!terms) {
@@ -43,8 +41,9 @@ carRouter.post("/upload-car", async (req, res) => {
 
     const db = await connectToDataBase();
 
+    // Include blueBookUrl in the query
     await db.query(
-      "INSERT INTO cars (carName, company, makeYear, type, seatCapacity, carPlateNumber, pricePerDay, mileage, currentKm, transmission, fuelType, featuresArray, images, userId) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO cars (carName, company, makeYear, type, seatCapacity, carPlateNumber, pricePerDay, mileage, currentKm, transmission, fuelType, featuresArray, images, blueBookUrl, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         carName,
         company,
@@ -59,6 +58,7 @@ carRouter.post("/upload-car", async (req, res) => {
         fuelType,
         JSON.stringify(featuresArray),
         JSON.stringify(imageLinks),
+        blueBookUrl, // Insert blueBookUrl here
         userId,
       ]
     );
@@ -66,7 +66,6 @@ carRouter.post("/upload-car", async (req, res) => {
     return res.status(201).json({ message: "Car uploaded successfully" });
   } catch (err) {
     console.error("Error in /upload-car:", err);
-
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -83,7 +82,7 @@ carRouter.get("/get-cars", async (req, res) => {
     // Fetch all cars from the database
     // const [cars] = await db.query("SELECT * FROM cars");
     const [cars] = await db.query(
-      "SELECT carId, carName, fuelType, transmission, pricePerDay, isBooked, images FROM cars WHERE isBooked = 0"
+      "SELECT carId, carName, fuelType, transmission, pricePerDay, isBooked, images FROM cars WHERE isBooked = 0 AND approvalStatus = 'accepted'"
     );
 
     return res.status(200).json({ cars });

@@ -40,7 +40,7 @@ const checkForNewNotifications = async (userId) => {
   const db = await connectToDataBase();
   try {
     const [notifications] = await db.query(
-      "SELECT * FROM notification WHERE userId = ? ",
+      "SELECT * FROM notification WHERE userId = ? AND isCancelled = 0",
       [userId]
     );
     return notifications;
@@ -72,8 +72,18 @@ router.get("/notifications", async (req, res) => {
 // Registration
 router.post("/register", async (req, res) => {
   // console.log(req);
-  const { firstName, lastName, email, phoneNumber, licenseNumber, password } =
-    req.body;
+  const {
+    firstName,
+    lastName,
+    email,
+    phoneNumber,
+    licenseNumber,
+    password,
+    citizenshipFrontUrl,
+    citizenshipBackUrl,
+    licenseFrontUrl,
+    licenseBackUrl,
+  } = req.body;
 
   // Validate input
   if (
@@ -82,11 +92,14 @@ router.post("/register", async (req, res) => {
     !email ||
     !phoneNumber ||
     !licenseNumber ||
-    !password
+    !password ||
+    !citizenshipFrontUrl ||
+    !citizenshipBackUrl ||
+    !licenseFrontUrl ||
+    !licenseBackUrl
   ) {
     return res.status(400).json({ message: "Missing required fields" });
   }
-
   try {
     const db = await connectToDataBase();
 
@@ -106,9 +119,21 @@ router.post("/register", async (req, res) => {
 
     // Insert user data into database
     await db.query(
-      "INSERT INTO authentication (firstName, lastName, email, phoneNumber, licenseNumber, password) VALUES (?, ?, ?, ?, ?, ?)",
-      [firstName, lastName, email, phoneNumber, licenseNumber, hashPassword]
+      "INSERT INTO authentication (firstName, lastName, email, phoneNumber, licenseNumber, password, citizenshipFrontUrl, citizenshipBackUrl, licenseFrontUrl, licenseBackUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        licenseNumber,
+        hashPassword,
+        citizenshipFrontUrl,
+        citizenshipBackUrl,
+        licenseFrontUrl,
+        licenseBackUrl,
+      ]
     );
+
     return res.status(201).json({ message: "User created successfully" });
   } catch (err) {
     console.error("Error in /register:", err);
@@ -257,7 +282,8 @@ router.get("/my-ride-share", verifyToken, async (req, res) => {
          b.endDate,
          b.rideShareDestination,
          b.rideSharePrice,
-         c.carName
+         c.carName,
+         c.images
        FROM lift l
        JOIN booking b ON l.bookingId = b.bookingId
        JOIN authentication driver ON b.userId = driver.userId
@@ -268,15 +294,34 @@ router.get("/my-ride-share", verifyToken, async (req, res) => {
       [userId, userId]
     );
 
+    console.log("Rideshare data:", rideshare);
     const rideDetails = rideshare.map((ride) => ({
       ...ride,
-      status: ride.isAccepted ? "Accepted" : "Pending",
+      status: ride.isAccepted == "accepted" ? "Accepted" : "Pending",
     }));
 
     return res.status(200).json({ rideDetails });
   } catch (err) {
     console.error("error in /my-ride-share:", err);
     return res.status(500).json(err);
+  }
+});
+
+router.post("/cancel-notification/:notificationId", async (req, res) => {
+  const { notificationId } = req.params;
+
+  try {
+    const db = await connectToDataBase();
+
+    await db.query(
+      "UPDATE notification SET isCancelled = 1 WHERE notificationId = ?",
+      [notificationId]
+    );
+
+    res.status(200).json({ message: "Notification cancelled" });
+  } catch (err) {
+    console.error("Error cancelling notification:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

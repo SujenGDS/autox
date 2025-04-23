@@ -9,6 +9,7 @@ import {
   Navbar,
   Container,
   Nav,
+  Modal,
 } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +19,7 @@ import {
   FaShareAlt,
   FaBan,
   FaCheckCircle,
+  FaUsers, // Add FaUsers icon for User tab
 } from "react-icons/fa";
 
 const AdminDashboard = () => {
@@ -26,6 +28,10 @@ const AdminDashboard = () => {
   const [rideShares, setRideShares] = useState([]);
   const [cancelled, setCancelled] = useState([]);
   const [activeBookings, setActiveBookings] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedCarId, setSelectedCarId] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,6 +40,7 @@ const AdminDashboard = () => {
         const carsRes = await axios.get(
           "http://localhost:3000/admin/all-listed-cars"
         );
+        console.log(carsRes.data.cars); // Add this line to log the cars data
         setCars(carsRes.data.cars);
 
         const bookingsRes = await axios.get(
@@ -55,6 +62,12 @@ const AdminDashboard = () => {
           "http://localhost:3000/admin/active-bookings"
         );
         setActiveBookings(activeRes.data.activeBookings);
+
+        const usersRes = await axios.get(
+          // Fetch users data
+          "http://localhost:3000/admin/all-users"
+        );
+        setUsers(usersRes.data.users);
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error("Failed to fetch admin data");
@@ -68,6 +81,57 @@ const AdminDashboard = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("isAdmin");
     navigate("/");
+  };
+
+  const handleAccept = async (carId) => {
+    try {
+      await axios.post(`http://localhost:3000/admin/accept-car/${carId}`);
+      toast.success("Car approved successfully");
+      setCars((prevCars) =>
+        prevCars.map((car) =>
+          car.carId === carId ? { ...car, approvalStatus: "accepted" } : car
+        )
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to approve car");
+    }
+  };
+
+  const handleReject = async (carId) => {
+    try {
+      await axios.post(`http://localhost:3000/admin/reject-car/${carId}`);
+      toast.info("Car rejected");
+      setCars((prevCars) =>
+        prevCars.map((car) =>
+          car.carId === carId ? { ...car, approvalStatus: "rejected" } : car
+        )
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to reject car");
+    }
+  };
+
+  const handleDeleteClick = (carId) => {
+    setSelectedCarId(carId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:3000/admin/delete/${selectedCarId}`);
+      toast.success("Car deleted successfully");
+      setCars((prevCars) =>
+        prevCars.filter((car) => car.carId !== selectedCarId)
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete car");
+    } finally {
+      setShowDeleteModal(false);
+      setSelectedCarId(null);
+    }
   };
 
   return (
@@ -87,6 +151,79 @@ const AdminDashboard = () => {
       <Container>
         <Card className="shadow p-4">
           <Tabs defaultActiveKey="cars" className="mb-3" fill>
+            {/* Users Section */}
+            <Tab
+              eventKey="users"
+              title={
+                <>
+                  <FaUsers /> Users
+                </>
+              }
+            >
+              <Section
+                title="All Users"
+                data={users}
+                columns={[
+                  "User ID",
+                  "First Name",
+                  "Last Name",
+                  "Email",
+                  "Phone Number",
+                  "License Number",
+                  "License Front",
+                  "License Back",
+                  "Citizenship front",
+                  "Citizenship back",
+                ]}
+                renderRow={(user) => (
+                  <>
+                    <td>{user.userId}</td>
+                    <td>{user.firstName}</td>
+                    <td>{user.lastName}</td>
+                    <td>{user.email}</td>
+                    <td>{user.phoneNumber}</td>
+                    <td>{user.licenseNumber}</td>
+                    <td>
+                      <a
+                        href={user.licenseFrontUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View
+                      </a>
+                    </td>
+                    <td>
+                      <a
+                        href={user.licenseBackUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View
+                      </a>
+                    </td>
+                    <td>
+                      <a
+                        href={user.citizenshipFrontUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View
+                      </a>
+                    </td>
+                    <td>
+                      <a
+                        href={user.citizenshipBackUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View
+                      </a>
+                    </td>
+                  </>
+                )}
+              />
+            </Tab>
+
             {/* All Listed Cars */}
             <Tab
               eventKey="cars"
@@ -107,6 +244,10 @@ const AdminDashboard = () => {
                   "Owner Name",
                   "Email",
                   "Phone",
+                  "Blue Book",
+                  "Approval",
+                  "Status",
+                  "Delete",
                 ]}
                 renderRow={(car) => (
                   <>
@@ -119,6 +260,66 @@ const AdminDashboard = () => {
                     </td>
                     <td>{car.email}</td>
                     <td>{car.phoneNumber}</td>
+                    <td>
+                      <a
+                        href={car.blueBookUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View Bluebook
+                      </a>
+                    </td>
+
+                    {/* Approval column */}
+                    <td>
+                      {car.approvalStatus === "pending" ? (
+                        <>
+                          <Button
+                            variant="success"
+                            size="sm"
+                            onClick={() => handleAccept(car.carId)}
+                            className="me-2"
+                          >
+                            Accept
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleReject(car.carId)}
+                          >
+                            Reject
+                          </Button>
+                        </>
+                      ) : (
+                        <span
+                          className={`text-${
+                            car.approvalStatus === "accepted"
+                              ? "success"
+                              : "danger"
+                          }`}
+                        >
+                          {car.approvalStatus}
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Status column */}
+                    <td
+                      className={car.isBooked ? "text-danger" : "text-success"}
+                    >
+                      {car.isBooked ? "Booked" : "Available"}
+                    </td>
+
+                    {/* Delete column */}
+                    <td>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleDeleteClick(car.carId)}
+                      >
+                        Delete
+                      </Button>
+                    </td>
                   </>
                 )}
               />
@@ -172,7 +373,6 @@ const AdminDashboard = () => {
                 )}
               />
             </Tab>
-
             {/* All Ride Shares */}
             <Tab
               eventKey="rideshares"
@@ -213,8 +413,7 @@ const AdminDashboard = () => {
                 )}
               />
             </Tab>
-
-            {/* Cancelled Bookings
+            {/* Cancelled Bookings */}
             <Tab
               eventKey="cancelled"
               title={
@@ -226,17 +425,28 @@ const AdminDashboard = () => {
               <Section
                 title="Cancelled Bookings"
                 data={cancelled}
-                columns={["Booking ID", "Car ID", "User ID", "Cancelled On"]}
+                columns={[
+                  "Booking ID",
+                  "Car Name",
+                  "Car Company",
+                  "Renter Name",
+                  "Renter Email",
+                  "Renter Phone Number",
+                  "Cancelled On",
+                ]}
                 renderRow={(c) => (
                   <>
                     <td>{c.bookingId}</td>
-                    <td>{c.carId}</td>
-                    <td>{c.userId}</td>
-                    <td>{c.cancelDate}</td>
+                    <td>{c.carName}</td>
+                    <td>{c.company}</td>
+                    <td>{`${c.userFirstName} ${c.userLastName}`}</td>
+                    <td>{c.userEmail}</td>
+                    <td>{c.userPhoneNumber}</td>
+                    <td>{new Date(c.cancelledAt).toLocaleDateString()}</td>
                   </>
                 )}
               />
-            </Tab> */}
+            </Tab>
 
             {/* Active Bookings */}
             <Tab
@@ -253,24 +463,61 @@ const AdminDashboard = () => {
                 columns={[
                   "Booking ID",
                   "Car ID",
-                  "User ID",
+                  "Renter Name",
+                  "Renter Email",
+                  "Phone Number",
                   "Start Date",
                   "End Date",
                 ]}
-                renderRow={(a) => (
-                  <>
-                    <td>{a.bookingId}</td>
-                    <td>{a.carId}</td>
-                    <td>{a.userId}</td>
-                    <td>{a.startDate}</td>
-                    <td>{a.endDate}</td>
-                  </>
-                )}
+                renderRow={(a) => {
+                  const today = new Date();
+                  const endDate = new Date(a.endDate);
+                  const isOverdue = today > endDate;
+
+                  return (
+                    <>
+                      <td>{a.bookingId}</td>
+                      <td>{a.carId}</td>
+                      <td>{`${a.renterFirstName} ${a.renterLastName}`}</td>
+                      <td>{a.renterEmail}</td>
+                      <td>{a.renterPhoneNumber}</td>
+                      <td>{new Date(a.startDate).toLocaleDateString()}</td>
+                      <td>
+                        {new Date(a.endDate).toLocaleDateString()}{" "}
+                        {isOverdue && (
+                          <span style={{ color: "red", fontWeight: "bold" }}>
+                            {" "}
+                            (Overdue)
+                          </span>
+                        )}
+                      </td>
+                    </>
+                  );
+                }}
               />
             </Tab>
           </Tabs>
         </Card>
       </Container>
+
+      <Modal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Car Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this car?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };

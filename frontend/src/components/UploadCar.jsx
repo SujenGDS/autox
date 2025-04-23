@@ -79,6 +79,11 @@ const UploadCar = ({ setShow, setRefresh }) => {
       .min(MIN_IMAGE_LINKS, `Minimum ${MIN_IMAGE_LINKS} photo links required`)
       .max(MAX_IMAGE_LINKS, `Maximum ${MAX_IMAGE_LINKS} photo links allowed`)
       .required(`At least ${MIN_IMAGE_LINKS} photo links are required`), // Make the array itself required
+
+    blueBookUrl: yup
+      .string()
+      .url("Must be a valid URL")
+      .required("Bluebook URL is required"),
     // Feature checkboxes
     air_conditioning: yup.bool(),
     gps_navigation: yup.bool(),
@@ -96,7 +101,6 @@ const UploadCar = ({ setShow, setRefresh }) => {
       .filter((feature) => values[feature.name] === true)
       .map((feature) => feature.name); // Extract just the names
 
-    // Construct the payload, ensuring 'imageLinks' from values is included
     const payload = {
       carName: values.carName,
       company: values.company,
@@ -109,14 +113,11 @@ const UploadCar = ({ setShow, setRefresh }) => {
       km: values.km,
       transmission: values.transmission,
       fuelType: values.fuelType,
-      imageLinks: values.imageLinks, // Use the imageLinks array from Formik values
-      featuresArray: featuresArray, // Add the features array
-      terms: values.terms, // Only include if your backend explicitly needs it
+      imageLinks: values.imageLinks,
+      featuresArray: featuresArray,
+      terms: values.terms,
+      blueBookUrl: values.blueBookUrl,
     };
-    // Note: The individual boolean feature flags (air_conditioning etc.) are
-    // implicitly included via '...values' if not explicitly listed like above.
-    // Decide if you want them or just the `features` array based on your backend needs.
-    // If you only want the 'features' array, construct the payload manually like above.
 
     console.log("Submitting Payload:", payload);
 
@@ -169,6 +170,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
         transmission: "",
         fuelType: "",
         imageLinks: [], // Initialize imageLinks as an empty array (matching schema/DB)
+        bluebookUrl: "",
         terms: false,
         air_conditioning: false,
         gps_navigation: false,
@@ -190,10 +192,8 @@ const UploadCar = ({ setShow, setRefresh }) => {
       }) => {
         // Helper function to add a URL
         const handleAddImageUrl = () => {
-          const trimmedUrl = currentImageUrl.trim(); // Trim whitespace
+          const trimmedUrl = currentImageUrl.trim();
           if (trimmedUrl && !values.imageLinks.includes(trimmedUrl)) {
-            // Optional: Basic check if it looks like a URL before adding
-            // This is less strict than Yup's validation but can catch simple typos
             if (
               !trimmedUrl.startsWith("http://") &&
               !trimmedUrl.startsWith("https://")
@@ -221,7 +221,6 @@ const UploadCar = ({ setShow, setRefresh }) => {
         // Helper function to remove a URL
         const handleRemoveImageUrl = (index) => {
           const updatedUrls = values.imageLinks.filter((_, i) => i !== index);
-          // Use setFieldValue to update Formik's state for 'imageLinks'
           setFieldValue("imageLinks", updatedUrls);
         };
 
@@ -591,8 +590,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
                   ))}
                 </ListGroup>
               )}
-              {/* Explicitly show errors related to individual URLs if Yup provides them */}
-              {/* Note: errors.imageLinks might be an array of errors if individual items fail */}
+
               {touched.imageLinks &&
                 typeof errors.imageLinks === "object" &&
                 Array.isArray(errors.imageLinks) && (
@@ -607,7 +605,21 @@ const UploadCar = ({ setShow, setRefresh }) => {
                   </div>
                 )}
             </Form.Group>
-            {/* --- End Image URL Input Section --- */}
+
+            <Form.Group className="mb-3">
+              <Form.Label>Bluebook URL</Form.Label>
+              <Form.Control
+                type="url"
+                name="blueBookUrl"
+                placeholder="https://example.com/bluebook.pdf"
+                value={values.blueBookUrl}
+                onChange={handleChange}
+                isInvalid={touched.blueBookUrl && !!errors.bluebookUrl}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.bluebookUrl}
+              </Form.Control.Feedback>
+            </Form.Group>
 
             <hr />
             <h3>Features</h3>

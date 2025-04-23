@@ -1,9 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useState } from "react";
 import {
-  Avatar,
   Box,
   Button,
   Container,
@@ -12,10 +10,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ImageUpload from "../components/ImageUpload";
 
 const Register = () => {
   const [values, setValues] = useState({
@@ -25,11 +21,23 @@ const Register = () => {
     phoneNumber: "",
     licenseNumber: "",
     password: "",
+    citizenshipFrontUrl: "",
+    citizenshipBackUrl: "",
+    licenseFrontUrl: "",
+    licenseBackUrl: "",
   });
 
   const navigate = useNavigate();
+
   const handleChanges = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
+  };
+
+  const handleRemoveImageUrl = (fieldName) => {
+    setValues((prevValues) => ({
+      ...prevValues,
+      [fieldName]: "",
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -39,14 +47,11 @@ const Register = () => {
         "http://localhost:3000/auth/register",
         values
       );
-      // if (response.status === 201) {
-      //   navigate("/sujen-login");
       if (response.status === 201) {
         toast.success("Registration successful!");
         setTimeout(() => navigate("/sujen-login"), 2000); // Redirect after 2 seconds
       }
     } catch (err) {
-      // Check if the error is due to a conflict (user already exists)
       if (err.response && err.response.status === 409) {
         toast.error("User already exists! Please use a different email.");
       } else {
@@ -69,8 +74,6 @@ const Register = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-
-        // filter: "blur(5px)",
       }}
     >
       <div
@@ -121,7 +124,6 @@ const Register = () => {
                   label="First Name"
                   size="medium"
                   fullWidth
-                  // required
                   autoFocus
                   sx={{ mb: 1 }}
                 />
@@ -130,12 +132,10 @@ const Register = () => {
               <Grid2 item size={6}>
                 <TextField
                   name="lastName"
-                  // placeholder="Enter last name"
                   onChange={handleChanges}
                   label="Last Name"
                   size="medium"
                   fullWidth
-                  // required
                   autoFocus
                   sx={{ mb: 2 }}
                 />
@@ -144,12 +144,10 @@ const Register = () => {
               <Grid2 item size={6}>
                 <TextField
                   name="email"
-                  // placeholder="Enter email"
                   onChange={handleChanges}
                   label="Email"
                   size="medium"
                   fullWidth
-                  // required
                   autoFocus
                   sx={{ mb: 2 }}
                 />
@@ -158,12 +156,10 @@ const Register = () => {
               <Grid2 item size={6}>
                 <TextField
                   name="phoneNumber"
-                  // placeholder="Enter Phone number"
                   onChange={handleChanges}
                   label="Phone Number"
                   size="medium"
                   fullWidth
-                  // required
                   autoFocus
                   sx={{ mb: 2 }}
                 />
@@ -172,12 +168,10 @@ const Register = () => {
               <Grid2 item size={6}>
                 <TextField
                   name="licenseNumber"
-                  // placeholder="Enter license Number"
                   onChange={handleChanges}
                   label="License Number"
                   size="medium"
                   fullWidth
-                  // required
                   type="text"
                   sx={{ mb: 2 }}
                 />
@@ -186,25 +180,131 @@ const Register = () => {
               <Grid2 item size={6}>
                 <TextField
                   name="password"
-                  // placeholder="Enter password"
                   onChange={handleChanges}
                   label="Password"
                   size="medium"
                   fullWidth
-                  // required
                   type="password"
                   sx={{ mb: 2 }}
                 />
               </Grid2>
 
-              {/* <Grid2 item size={6}>
-                <ImageUpload label="license photo front" />
-              </Grid2> */}
+              {/* Add URL guidance below each URL field */}
+              <Grid2 item size={6}>
+                <Box display="flex" alignItems="center">
+                  <TextField
+                    name="citizenshipFrontUrl"
+                    label="Citizenship Front URL"
+                    value={values.citizenshipFrontUrl}
+                    onChange={handleChanges}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  {values.citizenshipFrontUrl && (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      onClick={() =>
+                        handleRemoveImageUrl("citizenshipFrontUrl")
+                      }
+                      sx={{ ml: 1, height: "40px" }}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </Box>
+                <Typography variant="body2" sx={{ color: "gray" }}>
+                  Give access to <strong>autox.verify@gmail.com</strong> and
+                  paste the link here.
+                </Typography>
+              </Grid2>
 
-              {/* <Grid2 item size={6}>
-                <ImageUpload label="license photo back" />
-              </Grid2> */}
+              <Grid2 item size={6}>
+                <Box display="flex" alignItems="center">
+                  <TextField
+                    name="citizenshipBackUrl"
+                    label="Citizenship Back URL"
+                    value={values.citizenshipBackUrl}
+                    onChange={handleChanges}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  {values.citizenshipBackUrl && (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      onClick={() => handleRemoveImageUrl("citizenshipBackUrl")}
+                      sx={{ ml: 1, height: "40px", mb: 2 }}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </Box>
+                <Typography variant="body2" sx={{ color: "gray" }}>
+                  Give access to <strong>autox.verify@gmail.com</strong> and
+                  paste the link here.
+                </Typography>
+              </Grid2>
+
+              <Grid2 item size={6}>
+                <Box display="flex" alignItems="center">
+                  <TextField
+                    name="licenseFrontUrl"
+                    label="License Front URL"
+                    value={values.licenseFrontUrl}
+                    onChange={handleChanges}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  {values.licenseFrontUrl && (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      onClick={() => handleRemoveImageUrl("licenseFrontUrl")}
+                      sx={{ ml: 1, height: "40px", mb: 2 }}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </Box>
+                <Typography variant="body2" sx={{ color: "gray" }}>
+                  Give access to <strong>autox.verify@gmail.com</strong> and
+                  paste the link here.
+                </Typography>
+              </Grid2>
+
+              <Grid2 item size={6}>
+                <Box display="flex" alignItems="center">
+                  <TextField
+                    name="licenseBackUrl"
+                    label="License Back URL"
+                    value={values.licenseBackUrl}
+                    onChange={handleChanges}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  />
+                  {values.licenseBackUrl && (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      onClick={() => handleRemoveImageUrl("licenseBackUrl")}
+                      sx={{ ml: 1, height: "40px", mb: 2 }}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </Box>
+                <Typography variant="body2" sx={{ color: "gray" }}>
+                  Give access to <strong>autox.verify@gmail.com</strong> and
+                  paste the link here.
+                </Typography>
+              </Grid2>
             </Grid2>
+
             <Button
               type="submit"
               variant="outlined"
