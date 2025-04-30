@@ -30,7 +30,7 @@ carRouter.post("/upload-car", async (req, res) => {
       featuresArray,
       imageLinks,
       terms,
-      blueBookUrl, // Add blueBookUrl to the destructuring
+      blueBookUrl,
     } = req.body;
 
     if (!terms) {
@@ -40,8 +40,6 @@ carRouter.post("/upload-car", async (req, res) => {
     }
 
     const db = await connectToDataBase();
-
-    // Include blueBookUrl in the query
     await db.query(
       "INSERT INTO cars (carName, company, makeYear, type, seatCapacity, carPlateNumber, pricePerDay, mileage, currentKm, transmission, fuelType, featuresArray, images, blueBookUrl, userId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [

@@ -275,34 +275,6 @@ const Register = () => {
                   paste the link here.
                 </Typography>
               </Grid2>
-
-              <Grid2 item size={6}>
-                <Box display="flex" alignItems="center">
-                  <TextField
-                    name="licenseBackUrl"
-                    label="License Back URL"
-                    value={values.licenseBackUrl}
-                    onChange={handleChanges}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                  />
-                  {values.licenseBackUrl && (
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      onClick={() => handleRemoveImageUrl("licenseBackUrl")}
-                      sx={{ ml: 1, height: "40px", mb: 2 }}
-                    >
-                      Remove
-                    </Button>
-                  )}
-                </Box>
-                <Typography variant="body2" sx={{ color: "gray" }}>
-                  Give access to <strong>autox.verify@gmail.com</strong> and
-                  paste the link here.
-                </Typography>
-              </Grid2>
             </Grid2>
 
             <Button

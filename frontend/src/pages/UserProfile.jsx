@@ -374,7 +374,7 @@ const UserProfile = () => {
           )}
         </div>
         {/* My Ride Shares Section */}
-        <div>
+        {/* <div>
           <h4 className="text-secondary mb-4">My Ride Shares</h4>
           {myRideShares.length === 0 ||
           myRideShares.filter((ride) => ride.status !== "Rejected").length ===
@@ -452,7 +452,7 @@ const UserProfile = () => {
                 );
               })
           )}
-        </div>
+        </div> */}
       </div>
 
       {/* Edit Car Modal */}
@@ -565,7 +565,14 @@ const UserProfile = () => {
         <Modal.Header closeButton>
           <Modal.Title>Cancel Booking</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to cancel this booking?</Modal.Body>
+        <Modal.Body>
+          Are you sure you want to cancel this booking?
+          <br />
+          <small className="text-muted">
+            Your refund will be processed within 48 hours after cancellation.
+          </small>
+        </Modal.Body>
+
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowCancelModal(false)}>
             Close

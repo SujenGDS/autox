@@ -430,7 +430,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 md="4"
                 controlId="validationFormikPricePerDay"
               >
-                <Form.Label>Price per day ($)</Form.Label>
+                <Form.Label>Price per day </Form.Label>
                 <Form.Control
                   type="number"
                   name="pricePerDay"

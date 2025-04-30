@@ -10,7 +10,7 @@ import adminRouter from "./routes/adminRoutes.js";
 const app = express();
 
 app.use((req, res, next) => {
-  res.setHeader("Cache-Control", "no-store"); // Disable caching for development
+  res.setHeader("Cache-Control", "no-store");
   next();
 });
 

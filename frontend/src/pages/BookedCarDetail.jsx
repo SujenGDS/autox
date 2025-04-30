@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import NavBar from "../components/NavBar";
-import { Card, Container, Row, Col, Table } from "react-bootstrap"; // Using Bootstrap components for better layout
+import { Card, Container, Row, Col, Table } from "react-bootstrap";
 
 const BookedCarDetailsPage = () => {
-  const { bookingId } = useParams(); // Fetching the bookingId from URL params
+  const { bookingId } = useParams();
   const [bookingDetails, setBookingDetails] = useState(null);
   const [refresh, setRefresh] = useState(false);
 

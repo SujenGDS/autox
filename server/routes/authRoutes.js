@@ -36,39 +36,6 @@ export const decodeToken = (token) => {
   }
 };
 
-const checkForNewNotifications = async (userId) => {
-  const db = await connectToDataBase();
-  try {
-    const [notifications] = await db.query(
-      "SELECT * FROM notification WHERE userId = ? AND isCancelled = 0",
-      [userId]
-    );
-    return notifications;
-  } catch (err) {
-    console.error("Error fetching notifications:", err);
-    return [];
-  }
-};
-
-// API Route
-router.get("/notifications", async (req, res) => {
-  try {
-    const token = req.headers["authorization"]?.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    const userId = decoded.id;
-
-    const newNotification = await checkForNewNotifications(userId);
-    if (newNotification.length > 0) {
-      res.json(newNotification);
-    } else {
-      res.json({ message: "No new notifications" });
-    }
-  } catch (error) {
-    console.error("Error fetching notifications:", error); // Log the error for more insight
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
 // Registration
 router.post("/register", async (req, res) => {
   // console.log(req);
@@ -82,10 +49,8 @@ router.post("/register", async (req, res) => {
     citizenshipFrontUrl,
     citizenshipBackUrl,
     licenseFrontUrl,
-    licenseBackUrl,
   } = req.body;
 
-  // Validate input
   if (
     !firstName ||
     !lastName ||
@@ -95,31 +60,24 @@ router.post("/register", async (req, res) => {
     !password ||
     !citizenshipFrontUrl ||
     !citizenshipBackUrl ||
-    !licenseFrontUrl ||
-    !licenseBackUrl
+    !licenseFrontUrl
   ) {
     return res.status(400).json({ message: "Missing required fields" });
   }
   try {
     const db = await connectToDataBase();
 
-    //Check if a user with the provided email already exists
     const [rows] = await db.query(
       "SELECT * FROM authentication WHERE email = ?",
       [email]
     );
-
-    // If a user already exists, return a error
     if (rows.length > 0) {
       return res.status(409).json({ message: "User already exists" });
     }
-
-    // Hash the password
     const hashPassword = await bcrypt.hash(password, 10);
 
-    // Insert user data into database
     await db.query(
-      "INSERT INTO authentication (firstName, lastName, email, phoneNumber, licenseNumber, password, citizenshipFrontUrl, citizenshipBackUrl, licenseFrontUrl, licenseBackUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO authentication (firstName, lastName, email, phoneNumber, licenseNumber, password, citizenshipFrontUrl, citizenshipBackUrl, licenseFrontUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         firstName,
         lastName,
@@ -130,7 +88,7 @@ router.post("/register", async (req, res) => {
         citizenshipFrontUrl,
         citizenshipBackUrl,
         licenseFrontUrl,
-        licenseBackUrl,
+        ,
       ]
     );
 
@@ -322,6 +280,39 @@ router.post("/cancel-notification/:notificationId", async (req, res) => {
   } catch (err) {
     console.error("Error cancelling notification:", err);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+const checkForNewNotifications = async (userId) => {
+  const db = await connectToDataBase();
+  try {
+    const [notifications] = await db.query(
+      "SELECT * FROM notification WHERE userId = ? AND isCancelled = 0",
+      [userId]
+    );
+    return notifications;
+  } catch (err) {
+    console.error("Error fetching notifications:", err);
+    return [];
+  }
+};
+
+// API Route
+router.get("/notifications", async (req, res) => {
+  try {
+    const token = req.headers["authorization"]?.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const userId = decoded.id;
+
+    const newNotification = await checkForNewNotifications(userId);
+    if (newNotification.length > 0) {
+      res.json(newNotification);
+    } else {
+      res.json({ message: "No new notifications" });
+    }
+  } catch (error) {
+    console.error("Error fetching notifications:", error); // Log the error for more insight
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

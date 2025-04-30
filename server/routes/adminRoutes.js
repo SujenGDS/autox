@@ -16,8 +16,7 @@ adminRouter.get("/all-users", async (req, res) => {
         licenseNumber, 
         citizenshipFrontUrl,
         citizenshipBackUrl,
-        licenseFrontUrl,
-        licenseBackUrl
+        licenseFrontUrl
       FROM authentication
     `);
     return res.status(200).json({ users });
@@ -27,7 +26,6 @@ adminRouter.get("/all-users", async (req, res) => {
   }
 });
 
-// Admin route to get all listed cars
 adminRouter.get("/all-listed-cars", async (req, res) => {
   try {
     const db = await connectToDataBase();
@@ -120,7 +118,7 @@ adminRouter.get("/cancelled-bookings", async (req, res) => {
         b.userId,
         b.startDate,
         b.endDate,
-        b.cancelledAt, -- 👈 Include the cancel date
+        b.cancelledAt, 
         c.carName, 
         c.company, 
         u.firstName AS userFirstName, 

@@ -1,5 +1,5 @@
 import express from "express";
-import { connectToDataBase } from "../lib/db.js"; // Assuming this correctly handles DB connection
+import { connectToDataBase } from "../lib/db.js";
 import jwt from "jsonwebtoken";
 
 const rideShareRouter = express.Router();
@@ -36,8 +36,6 @@ rideShareRouter.post("/request-lift", verifyToken, async (req, res) => {
     }
 
     const db = await connectToDataBase();
-
-    // Check if the booking exists and ride-sharing is enabled
     const [[booking]] = await db.query(
       "SELECT userId, carId, isRideShareEnabled FROM booking WHERE bookingId = ?",
       [bookingId]
@@ -46,15 +44,12 @@ rideShareRouter.post("/request-lift", verifyToken, async (req, res) => {
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
-
-    // Prevent requester from requesting their own ride
     if (booking.userId === req.userId) {
       return res
         .status(401)
         .json({ message: "You cannot request a lift for a booking you made." });
     }
 
-    // Check for existing request
     const [existingRequest] = await db.query(
       "SELECT * FROM lift WHERE passengerId = ? AND bookingId = ?",
       [req.userId, bookingId]
@@ -66,7 +61,6 @@ rideShareRouter.post("/request-lift", verifyToken, async (req, res) => {
       });
     }
 
-    // Insert new lift request
     const [liftInsert] = await db.query(
       "INSERT INTO lift (passengerId, bookingId, isAccepted) VALUES (?, ?, 0)",
       [req.userId, bookingId]
@@ -74,7 +68,6 @@ rideShareRouter.post("/request-lift", verifyToken, async (req, res) => {
 
     const rideShareId = liftInsert.insertId;
 
-    // Get requester's name
     const [[user]] = await db.query(
       "SELECT firstName, lastName FROM authentication WHERE userId = ?",
       [req.userId]
@@ -83,7 +76,6 @@ rideShareRouter.post("/request-lift", verifyToken, async (req, res) => {
     const passengerName = `${user.firstName} ${user.lastName}`;
     const sentAt = new Date().toISOString().slice(0, 19).replace("T", " ");
 
-    // Send notification to the ride owner
     await db.query(
       "INSERT  INTO notification (bookingId, rideShareId, sentAt, message, userId) VALUES (?, ?, ?, ?, ?)",
       [
@@ -110,12 +102,9 @@ rideShareRouter.post("/respond", async (req, res) => {
 
   try {
     if (isAccepted) {
-      // Accept = Update lift and notify passenger
       await db.query(`UPDATE lift SET isAccepted = 1 WHERE rideshareId = ?`, [
         rideshareId,
       ]);
-
-      // Fetch the passengerId
       const [[liftRow]] = await db.query(
         `SELECT passengerId FROM lift WHERE rideshareId = ?`,
         [rideshareId]
@@ -129,7 +118,7 @@ rideShareRouter.post("/respond", async (req, res) => {
          VALUES (?, ?, ?, ?)`,
         [
           rideshareId,
-          liftRow.passengerId, // Notifying the passenger
+          liftRow.passengerId,
           sentAt,
           "Your rideshare request has been accepted.",
         ]
@@ -140,7 +129,6 @@ rideShareRouter.post("/respond", async (req, res) => {
         [rideshareId]
       );
     } else {
-      // Reject = delete from lift and notify passenger
       const [[liftRow]] = await db.query(
         `SELECT passengerId FROM lift WHERE rideshareId = ?`,
         [rideshareId]
@@ -153,13 +141,11 @@ rideShareRouter.post("/respond", async (req, res) => {
 
         [
           rideshareId,
-          liftRow.passengerId, // Notifying the passenger
+          liftRow.passengerId,
           sentAt,
           "Your rideshare request was rejected.",
         ]
       );
-
-      // Optionally delete the row or mark it as rejected
       await db.query(`DELETE FROM lift WHERE rideshareId = ?`, [rideshareId]);
 
       return res.json({ message: "Ride request rejected and user notified." });
@@ -175,7 +161,6 @@ rideShareRouter.get("/:rideshareId", async (req, res) => {
     const { rideshareId } = req.params;
     const db = await connectToDataBase();
 
-    // Join lift → booking → cars → authentication (as driver)
     const [result] = await db.query(
       `SELECT lift.*, 
               booking.carId, booking.rideShareDestination, booking.pickUpLocation, booking.dropOffLocation, 

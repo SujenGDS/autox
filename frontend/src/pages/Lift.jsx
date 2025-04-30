@@ -96,6 +96,11 @@ const LiftPage = () => {
                         <strong>{ride.startDestination}</strong> ➝{" "}
                         <strong>{ride.rideShareDestination}</strong>
                       </li>
+                      <li>
+                        Departing date:{" "}
+                        {new Date(ride.startDate).toLocaleDateString()}
+                      </li>
+
                       <li>Description: {ride.rideShareDescription}</li>
                       <li>Price: {ride.rideSharePrice}</li>
                     </ul>

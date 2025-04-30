@@ -171,7 +171,6 @@ const AdminDashboard = () => {
                   "Phone Number",
                   "License Number",
                   "License Front",
-                  "License Back",
                   "Citizenship front",
                   "Citizenship back",
                 ]}
@@ -192,15 +191,7 @@ const AdminDashboard = () => {
                         View
                       </a>
                     </td>
-                    <td>
-                      <a
-                        href={user.licenseBackUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        View
-                      </a>
-                    </td>
+
                     <td>
                       <a
                         href={user.citizenshipFrontUrl}

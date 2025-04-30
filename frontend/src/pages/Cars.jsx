@@ -11,14 +11,11 @@ import axios from "axios";
 const Cars = () => {
   const [cars, setCars] = useState([]);
   const [refresh, setRefresh] = useState(false);
-
-  // Filter states
   const [vehicleType, setVehicleType] = useState("");
   const [company, setCompany] = useState("");
   const [maxPrice, setMaxPrice] = useState(3000000);
   const [filteredCars, setFilteredCars] = useState([]);
 
-  // Fetch cars from the backend
   useEffect(() => {
     const fetchCars = async () => {
       try {
@@ -33,7 +30,6 @@ const Cars = () => {
     fetchCars();
   }, [refresh]);
 
-  // Apply filters
   const applyFilters = () => {
     console.log("Applying Filters:", {
       vehicleType,
@@ -135,6 +131,7 @@ const Cars = () => {
                   <option value="Bentley">Bentley</option>
                   <option value="McLaren">McLaren</option>
                   <option value="Aston Martin">Aston Martin</option>
+                  <option value="Audi">Audi</option>
                 </Form.Select>
               </Form.Group>
 
