@@ -184,8 +184,8 @@ const Cars = () => {
                         transmission={car.transmission}
                         carId={car.carId}
                         price={`${car.pricePerDay}/day`}
-                        imgLink={firstImage} // Replace with a real image
-                        isBooked={car.isBooked} // Pass isBooked here
+                        imgLink={firstImage}
+                        isBooked={car.isBooked}
                         setRefresh={setRefresh}
                       />
                     </Col>

@@ -51,7 +51,6 @@ adminRouter.get("/all-listed-cars", async (req, res) => {
   }
 });
 
-// Admin route to get all bookings with car owner and renter info
 adminRouter.get("/all-bookings", async (req, res) => {
   try {
     const db = await connectToDataBase();
@@ -82,7 +81,6 @@ adminRouter.get("/all-bookings", async (req, res) => {
   }
 });
 
-// Admin route to get all rideshare bookings with passenger info
 adminRouter.get("/all-rideshares", async (req, res) => {
   try {
     const db = await connectToDataBase();

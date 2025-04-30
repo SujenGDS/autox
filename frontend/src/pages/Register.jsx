@@ -49,7 +49,7 @@ const Register = () => {
       );
       if (response.status === 201) {
         toast.success("Registration successful!");
-        setTimeout(() => navigate("/sujen-login"), 2000); // Redirect after 2 seconds
+        setTimeout(() => navigate("/sujen-login"), 2000);
       }
     } catch (err) {
       if (err.response && err.response.status === 409) {
@@ -83,7 +83,7 @@ const Register = () => {
           color: "white",
           lineHeight: "1.3",
           padding: "10px",
-          background: "rgba(0, 0, 0, 0.1)", // Glass effect
+          background: "rgba(0, 0, 0, 0.1)",
           backdropFilter: "blur(5px)",
           borderRadius: "10px",
           border: "1px solid rgba(0, 0, 0, 0.02)",
@@ -189,7 +189,6 @@ const Register = () => {
                 />
               </Grid2>
 
-              {/* Add URL guidance below each URL field */}
               <Grid2 item size={6}>
                 <Box display="flex" alignItems="center">
                   <TextField

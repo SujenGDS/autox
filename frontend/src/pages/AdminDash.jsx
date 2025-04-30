@@ -19,7 +19,7 @@ import {
   FaShareAlt,
   FaBan,
   FaCheckCircle,
-  FaUsers, // Add FaUsers icon for User tab
+  FaUsers,
 } from "react-icons/fa";
 
 const AdminDashboard = () => {
@@ -40,7 +40,7 @@ const AdminDashboard = () => {
         const carsRes = await axios.get(
           "http://localhost:3000/admin/all-listed-cars"
         );
-        console.log(carsRes.data.cars); // Add this line to log the cars data
+        console.log(carsRes.data.cars);
         setCars(carsRes.data.cars);
 
         const bookingsRes = await axios.get(

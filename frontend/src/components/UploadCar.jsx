@@ -8,10 +8,9 @@ import * as yup from "yup";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { ListGroup, Modal } from "react-bootstrap"; // Import ListGroup
+import { ListGroup, Modal } from "react-bootstrap";
 
 const carFeatures = [
-  // ... (keep carFeatures array as is)
   {
     id: 1,
     feature: "Air Conditioning",
@@ -50,7 +49,6 @@ const carFeatures = [
   },
 ];
 
-// Define min/max link counts
 const MIN_IMAGE_LINKS = 3;
 const MAX_IMAGE_LINKS = 5;
 
@@ -70,14 +68,14 @@ const UploadCar = ({ setShow, setRefresh }) => {
     mileage: yup.number().required().typeError("Must be a number"),
     km: yup.number().required().typeError("Must be a number"),
     transmission: yup.string().required(),
-    fuelType: yup.string().required(), // Use string, not mixed if it's from a select
-    // Validation for the array of image URLs (using 'imageLinks' key)
-    imageLinks: yup // Changed key name to match DB
+    fuelType: yup.string().required(),
+
+    imageLinks: yup
       .array()
-      .of(yup.string().url("Must be a valid URL").required()) // Each item must be a valid URL
+      .of(yup.string().url("Must be a valid URL").required())
       .min(MIN_IMAGE_LINKS, `Minimum ${MIN_IMAGE_LINKS} photo links required`)
       .max(MAX_IMAGE_LINKS, `Maximum ${MAX_IMAGE_LINKS} photo links allowed`)
-      .required(`At least ${MIN_IMAGE_LINKS} photo links are required`), // Make the array itself required
+      .required(`At least ${MIN_IMAGE_LINKS} photo links are required`),
 
     blueBookUrl: yup
       .string()
@@ -95,10 +93,9 @@ const UploadCar = ({ setShow, setRefresh }) => {
   });
 
   const handleSubmit = async (values) => {
-    // Filter selected features based on the carFeatures definition
     const featuresArray = carFeatures
       .filter((feature) => values[feature.name] === true)
-      .map((feature) => feature.name); // Extract just the names
+      .map((feature) => feature.name);
 
     const payload = {
       carName: values.carName,
@@ -128,22 +125,21 @@ const UploadCar = ({ setShow, setRefresh }) => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json", // Add Content-Type header
+            "Content-Type": "application/json",
           },
         }
       );
 
       if (response.status === 201) {
         toast.success("Your car has been uploaded successfully");
-        setShow(false); // Close modal on success
-        setRefresh((prev) => !prev); // Trigger data refresh
+        setShow(false);
+        setRefresh((prev) => !prev);
       } else {
-        // Use response data for more specific error message if available
         toast.error(response.data?.message || "Error Uploading Car");
       }
     } catch (err) {
       console.error("Upload Error:", err);
-      // Provide more specific feedback based on error response
+
       const errorMessage =
         err.response?.data?.message ||
         err.message ||
@@ -168,7 +164,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
         km: "",
         transmission: "",
         fuelType: "",
-        imageLinks: [], // Initialize imageLinks as an empty array (matching schema/DB)
+        imageLinks: [],
         bluebookUrl: "",
         terms: false,
         air_conditioning: false,
@@ -178,8 +174,8 @@ const UploadCar = ({ setShow, setRefresh }) => {
         sunroof: false,
         all_wheel_drive: false,
       }}
-      validateOnChange={true} // Enable onChange validation
-      validateOnBlur={true} // Enable onBlur validation
+      validateOnChange={true}
+      validateOnBlur={true}
     >
       {({
         handleSubmit,
@@ -189,7 +185,6 @@ const UploadCar = ({ setShow, setRefresh }) => {
         errors,
         setFieldValue,
       }) => {
-        // Helper function to add a URL
         const handleAddImageUrl = () => {
           const trimmedUrl = currentImageUrl.trim();
           if (trimmedUrl && !values.imageLinks.includes(trimmedUrl)) {
@@ -204,9 +199,8 @@ const UploadCar = ({ setShow, setRefresh }) => {
             }
 
             if (values.imageLinks.length < MAX_IMAGE_LINKS) {
-              // Use setFieldValue to update Formik's state for 'imageLinks'
               setFieldValue("imageLinks", [...values.imageLinks, trimmedUrl]);
-              setCurrentImageUrl(""); // Clear the input field
+              setCurrentImageUrl("");
             } else {
               toast.warn(`Maximum ${MAX_IMAGE_LINKS} photo links allowed.`);
             }
@@ -217,7 +211,6 @@ const UploadCar = ({ setShow, setRefresh }) => {
           }
         };
 
-        // Helper function to remove a URL
         const handleRemoveImageUrl = (index) => {
           const updatedUrls = values.imageLinks.filter((_, i) => i !== index);
           setFieldValue("imageLinks", updatedUrls);
@@ -330,7 +323,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
               <Form.Group as={Col} md="6" controlId="validationFormikMakeYear">
                 <Form.Label>Make Year</Form.Label>
                 <Form.Control
-                  type="number" // Use type number
+                  type="number"
                   placeholder="e.g., 2023"
                   name="makeYear"
                   value={values.makeYear}
@@ -387,7 +380,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
-            {/* --- More Car Detail Fields (Add validation feedback) --- */}
+
             <Row className="mb-3 g-3">
               <Form.Group
                 as={Col}
@@ -491,7 +484,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
-            {/* --- Image URL Input Section --- */}
+
             <Form.Group
               as={Col}
               md="12"
@@ -508,8 +501,6 @@ const UploadCar = ({ setShow, setRefresh }) => {
                   placeholder="Paste image URL here (e.g., https://.../image.jpg)"
                   value={currentImageUrl}
                   onChange={(e) => setCurrentImageUrl(e.target.value)}
-                  // Only mark the input itself invalid if the *whole array* has an error (min/max/required)
-                  // Individual URL validity is checked by Yup but doesn't invalidate this specific input
                   isInvalid={
                     touched.imageLinks &&
                     !!errors.imageLinks &&
@@ -517,7 +508,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
                   }
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
-                      e.preventDefault(); // Prevent form submission
+                      e.preventDefault();
                       handleAddImageUrl();
                     }
                   }}
@@ -525,9 +516,8 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 <Button variant="outline-secondary" onClick={handleAddImageUrl}>
                   Add Link
                 </Button>
-                {/* Display array-level errors below the Input Group */}
+
                 <Form.Control.Feedback type="invalid" className="d-block">
-                  {/* Show array error only if touched and it's a string (like min/max message) */}
                   {touched.imageLinks && typeof errors.imageLinks === "string"
                     ? errors.imageLinks
                     : null}
@@ -540,7 +530,6 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 Car photos must clearly display a valid number plate.
               </Form.Text>
 
-              {/* Display Added URLs and Previews */}
               {values.imageLinks.length > 0 && (
                 <ListGroup variant="flush" className="mt-2 mb-3 border rounded">
                   {values.imageLinks.map((url, index) => (
@@ -562,11 +551,10 @@ const UploadCar = ({ setShow, setRefresh }) => {
                             marginRight: "10px",
                             border: "1px solid #eee",
                           }}
-                          // Handle broken image links gracefully
                           onError={(e) => {
-                            e.target.onerror = null; // prevent infinite loop if placeholder fails
+                            e.target.onerror = null;
                             e.target.src =
-                              "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2260%22%20height%3D%2240%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2060%2040%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_15ec911398e%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A10pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_15ec911398e%22%3E%3Crect%20width%3D%2260%22%20height%3D%2240%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2210.5%22%20y%3D%2224.8%22%3EError%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E"; // Basic placeholder
+                              "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2260%22%20height%3D%2240%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2060%2040%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_15ec911398e%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A10pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_15ec911398e%22%3E%3Crect%20width%3D%2260%22%20height%3D%2240%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2210.5%22%20y%3D%2224.8%22%3EError%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E";
                             e.target.alt = "Image load error";
                           }}
                         />
@@ -580,7 +568,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
                         variant="outline-danger"
                         size="sm"
                         onClick={() => handleRemoveImageUrl(index)}
-                        className="mt-1 mt-md-0" // Add margin top on small screens
+                        className="mt-1 mt-md-0"
                       >
                         Remove
                       </Button>
@@ -624,12 +612,11 @@ const UploadCar = ({ setShow, setRefresh }) => {
                 <Col lg="4" md="6" sm={6} key={feature.id} className="mb-2">
                   <Form.Check
                     type="checkbox"
-                    id={`feature-${feature.name}`} // Unique id
+                    id={`feature-${feature.name}`}
                     label={feature.feature}
                     name={feature.name}
-                    checked={values[feature.name]} // Control checked state
+                    checked={values[feature.name]}
                     onChange={handleChange}
-                    // No need for isInvalid here usually
                   />
                 </Col>
               ))}
