@@ -185,7 +185,7 @@ const ViewRideShare = () => {
                           <td>
                             <strong>Ride Share Price</strong>
                           </td>
-                          <td>{rideShareDetails.liftDetails.rideSharePrice}</td>
+                          <td>{rideShareDetails.rideSharePrice}</td>
                         </tr>
                       </tbody>
                     </Table>

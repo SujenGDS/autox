@@ -61,17 +61,38 @@ const UserProfile = () => {
           }
         );
 
+        console.log("Ride Shares Data:", rideShares.data.rideDetails);
+
+        // Sort bookings by startDate in descending order
+        const sortedBookings = userBookings.data.bookings.sort((a, b) => 
+          new Date(b.startDate) - new Date(a.startDate)
+        );
+
         setMyRideShares(rideShares.data.rideDetails);
         setBookedCars(bookedCarsByOthers.data.cars);
         setUser(res.data.user);
         setCars(userCars.data.cars);
-        setBookings(userBookings.data.bookings);
+        setBookings(sortedBookings);
       } catch (err) {
         console.error("Failed to fetch data", err);
       }
     };
     fetchData();
   }, [refresh]);
+
+  useEffect(() => {
+    const updateBookingStatus = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.put("http://localhost:3000/booking/update-booking-status", {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.error("Failed to update booking status", err);
+      }
+    };
+    updateBookingStatus();
+  }, []);
 
   const getFirstImage = (imagesString) => {
     try {
@@ -165,6 +186,14 @@ const UserProfile = () => {
     }
   };
 
+  const handleViewRideShareDetail = (rideShareId) => {
+    if (!rideShareId) {
+      console.error("No ride share ID provided");
+      return;
+    }
+    navigate(`/rideshare/${rideShareId}`);
+  };
+
   return (
     <>
       <NavBar setRefresh={setRefresh} />
@@ -174,57 +203,54 @@ const UserProfile = () => {
         )}
 
         {/* My Bookings Section */}
-        {/* My Bookings Section */}
         <div className="mb-4">
           <h4 className="text-secondary mb-4">My Bookings</h4>
           {bookings.length === 0 ? (
             <p>No bookings found.</p>
           ) : (
             bookings.map((booking, index) => (
-              <div
-                key={index}
-                className="card mb-4 p-4 border-0 shadow-sm rounded"
-                style={{ cursor: "pointer" }}
-                onClick={() => handleViewBookingDetail(booking.bookingId)}
-              >
-                <div className="d-flex">
-                  <img
-                    src={getFirstImage(booking.images)}
-                    alt="Car"
-                    className="img-thumbnail rounded"
-                    style={{
-                      width: "200px",
-                      height: "fit-content",
-                      objectFit: "contain",
-                    }}
-                  />
-                  <div className="ms-4 flex-grow-1">
-                    <h5>{booking.carName}</h5>
-                    <p className="text-muted">
-                      <strong>From:</strong> {booking.startDate.split("T")[0]}
-                    </p>
-                    <p className="text-muted">
-                      <strong>To:</strong> {booking.endDate.split("T")[0]}
-                    </p>
-                    <p className="text-dark">
-                      <strong>Total:</strong> {`${booking.totalAmount}`}
-                    </p>
-                    {/* Cancel Booking Button */}
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      className="mt-2"
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent card's onClick from triggering
-                        setCurrentBooking(booking);
-                        setShowCancelModal(true); // Show Cancel Modal
+              <React.Fragment key={index}>
+                <div
+                  className="card mb-4 p-4 border-0 shadow-sm rounded"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handleViewBookingDetail(booking.bookingId)}
+                >
+                  <div className="d-flex">
+                    <img
+                      src={getFirstImage(booking.images)}
+                      alt="Car"
+                      className="img-thumbnail rounded"
+                      style={{
+                        width: "200px",
+                        height: "fit-content",
+                        objectFit: "contain",
                       }}
-                    >
-                      Cancel Booking
-                    </Button>
+                    />
+                    <div className="ms-4">
+                      <h5>{booking.carName}</h5>
+                      <p>Start Date: {new Date(booking.startDate).toLocaleDateString()}</p>
+                      <p>End Date: {new Date(booking.endDate).toLocaleDateString()}</p>
+                      <p>Status: {booking.bookingStatus}</p>
+                      {booking.bookingStatus === 'upcoming' ? (
+                        <Button
+                          variant="danger"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentBooking(booking);
+                            setShowCancelModal(true);
+                          }}
+                        >
+                          Cancel Booking
+                        </Button>
+                      ) : (
+                        <p className="text-muted">
+                          {booking.bookingStatus === 'ongoing' ? 'Booking is ongoing' : 'Booking completed'}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </React.Fragment>
             ))
           )}
         </div>
@@ -373,28 +399,27 @@ const UserProfile = () => {
             ))
           )}
         </div>
+
         {/* My Ride Shares Section */}
-        {/* <div>
+        <div className="mb-4">
           <h4 className="text-secondary mb-4">My Ride Shares</h4>
-          {myRideShares.length === 0 ||
-          myRideShares.filter((ride) => ride.status !== "Rejected").length ===
-            0 ? (
+          {myRideShares.length === 0 ? (
             <p>You haven't shared any rides yet.</p>
           ) : (
             myRideShares
               .filter((ride) => ride.status !== "Rejected")
               .map((ride, index) => {
-                const isDriver = ride.driverId === user.userId; // compare IDs
+                const isDriver = ride.driverId === user.userId;
                 return (
                   <div
                     key={index}
                     className="card mb-4 p-4 border-0 shadow-sm rounded"
                     style={{ cursor: "pointer" }}
-                    onClick={() => handleViewBookingDetail(ride.bookingId)}
+                    onClick={() => handleViewRideShareDetail(ride.rideshareId)}
                   >
                     <div className="d-flex">
                       <img
-                        src={getFirstImage(car.images)}
+                        src={getFirstImage(ride.images)}
                         alt="Shared Ride Car"
                         className="img-thumbnail rounded"
                         style={{
@@ -404,47 +429,60 @@ const UserProfile = () => {
                         }}
                       />
                       <div className="ms-4 flex-grow-1">
-                        <h5>{ride.carName}</h5>
+                        <div className="d-flex justify-content-between align-items-start">
+                          <h5>{ride.carName}</h5>
+                          <span className={`badge ${isDriver ? 'bg-primary' : 'bg-success'} text-white`}>
+                            {isDriver ? 'Driver' : 'Passenger'}
+                          </span>
+                        </div>
+                        
                         <p className="text-muted">
-                          <strong>Destination:</strong>{" "}
-                          {ride.rideShareDestination}
+                          <strong>Destination:</strong> {ride.rideShareDestination}
+                        </p>
+                        <p className="text-muted">
+                          <strong>From:</strong> {new Date(ride.startDate).toLocaleDateString()}
+                        </p>
+                        <p className="text-muted">
+                          <strong>To:</strong> {new Date(ride.endDate).toLocaleDateString()}
+                        </p>
+                        <p className="text-dark">
+                          <strong>Ride Price:</strong> {ride.rideSharePrice}
                         </p>
 
                         {isDriver ? (
                           <>
                             <p className="text-muted">
-                              <strong>Passenger:</strong>{" "}
-                              {ride.passengerFirstName}
+                              <strong>Passenger:</strong> {ride.passengerFirstName} {ride.passengerLastName}
                             </p>
                             <p className="text-muted">
-                              <strong>Passenger Phone:</strong>{" "}
-                              {ride.passengerPhoneNumber}
+                              <strong>Passenger Phone:</strong> {ride.passengerPhoneNumber}
                             </p>
                           </>
                         ) : (
                           <>
                             <p className="text-muted">
-                              <strong>Driver:</strong> {ride.driverFirstName}
+                              <strong>Driver:</strong> {ride.driverFirstName} {ride.driverLastName}
                             </p>
                             <p className="text-muted">
-                              <strong>Driver Phone:</strong>{" "}
-                              {ride.driverPhoneNumber}
+                              <strong>Driver Phone:</strong> {ride.driverPhoneNumber}
                             </p>
                           </>
                         )}
 
                         <p className="text-muted">
-                          <strong>Request status:</strong> {ride.status}
-                        </p>
-
-                        <p className="text-muted">
-                          <strong>From:</strong> {ride.startDate.split("T")[0]}
-                        </p>
-                        <p className="text-muted">
-                          <strong>To:</strong> {ride.endDate.split("T")[0]}
-                        </p>
-                        <p className="text-dark">
-                          <strong>Ride Price:</strong> {ride.rideSharePrice}
+                          <strong>Status:</strong>{" "}
+                          <span className={`badge ${
+                            new Date(ride.endDate) < new Date() ? 'bg-secondary' :
+                            new Date(ride.startDate) <= new Date() ? 'bg-success' :
+                            ride.status === 'Accepted' ? 'bg-primary' :
+                            ride.status === 'Pending' ? 'bg-warning' :
+                            'bg-secondary'
+                          } text-white`}>
+                            {new Date(ride.endDate) < new Date() ? 'Completed' :
+                             new Date(ride.startDate) <= new Date() ? 'Ongoing' :
+                             ride.status === 'Accepted' ? 'Upcoming' :
+                             ride.status}
+                          </span>
                         </p>
                       </div>
                     </div>
@@ -452,7 +490,7 @@ const UserProfile = () => {
                 );
               })
           )}
-        </div> */}
+        </div>
       </div>
 
       {/* Edit Car Modal */}

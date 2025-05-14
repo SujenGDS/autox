@@ -74,12 +74,8 @@ const Cars = () => {
                   onChange={(e) => setVehicleType(e.target.value)}
                 >
                   <option value="">All</option>
-                  <option value="Sedan">Sedan</option>
-                  <option value="Hatchback">Hatchback</option>
                   <option value="SUV">SUV</option>
-                  <option value="Pick Up">Pick up</option>
-
-                  <option value="Coupe">Coupe</option>
+                  <option value="Sedan">Sedan</option>
                 </Form.Select>
               </Form.Group>
 
@@ -89,38 +85,13 @@ const Cars = () => {
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                 >
-                  <option value=""> Select company</option>
-                  <option value="Hyundai">Hyundai</option>
-                  <option value="Tata">Tata</option>
-                  <option value="Mahindra">Mahindra</option>
-                  <option value="Maruti Suzuki">Maruti Suzuki</option>
-                  <option value="Honda">Honda</option>
-                  <option value="Kia">Kia</option>
-                  <option value="Toyota">Toyota</option>
-                  <option value="Nissan">Nissan</option>
-                  <option value="Datsun">Datsun</option>
-                  <option value="Ford">Ford</option>
-                  <option value="Renault">Renault</option>
-                  <option value="MG">MG</option>
-                  <option value="Skoda">Skoda</option>
-                  <option value="Volkswagen">Volkswagen</option>
-                  <option value="Peugeot">Peugeot</option>
-                  <option value="Jeep">Jeep</option>
-                  <option value="Isuzu">Isuzu</option>
-                  <option value="BYD">BYD</option>
-                  <option value="Changan">Changan</option>
-                  <option value="GWM (Great Wall Motors)">
-                    GWM (Great Wall Motors)
-                  </option>
-                  <option value="Haval">Haval</option>
-                  <option value="DFSK">DFSK</option>
-                  <option value="Citroën">Citroën</option>
-                  <option value="Mitsubishi">Mitsubishi</option>
-                  <option value="Subaru">Subaru</option>
-                  <option value="Land Rover">Land Rover</option>
-                  <option value="Lexus">Lexus</option>
-                  <option value="Jaguar">Jaguar</option>
+                  <option value="">All</option>
+                  <option value="Ferrari">Ferrari</option>
                   <option value="Mercedes-Benz">Mercedes-Benz</option>
+                  <option value="Audi">Audi</option>
+                  <option value="Toyota">Toyota</option>
+                  <option value="Bugatti">Bugatti</option>
+                  <option value="Chevrolet">Chevrolet</option>
                   <option value="BMW">BMW</option>
                   <option value="Porsche">Porsche</option>
                   <option value="Volvo">Volvo</option>
@@ -131,7 +102,60 @@ const Cars = () => {
                   <option value="Bentley">Bentley</option>
                   <option value="McLaren">McLaren</option>
                   <option value="Aston Martin">Aston Martin</option>
-                  <option value="Audi">Audi</option>
+                  <option value="Hyundai">Hyundai</option>
+                  <option value="Kia">Kia</option>
+                  <option value="Nissan">Nissan</option>
+                  <option value="Honda">Honda</option>
+                  <option value="Ford">Ford</option>
+                  <option value="Volkswagen">Volkswagen</option>
+                  <option value="Lexus">Lexus</option>
+                  <option value="Infiniti">Infiniti</option>
+                  <option value="Acura">Acura</option>
+                  <option value="Genesis">Genesis</option>
+                  <option value="Land Rover">Land Rover</option>
+                  <option value="Jaguar">Jaguar</option>
+                  <option value="Mini">Mini</option>
+                  <option value="Alfa Romeo">Alfa Romeo</option>
+                  <option value="Jeep">Jeep</option>
+                  <option value="Dodge">Dodge</option>
+                  <option value="Chrysler">Chrysler</option>
+                  <option value="Ram">Ram</option>
+                  <option value="Lincoln">Lincoln</option>
+                  <option value="Buick">Buick</option>
+                  <option value="Cadillac">Cadillac</option>
+                  <option value="GMC">GMC</option>
+                  <option value="Subaru">Subaru</option>
+                  <option value="Mitsubishi">Mitsubishi</option>
+                  <option value="Suzuki">Suzuki</option>
+                  <option value="Mazda">Mazda</option>
+                  <option value="Skoda">Skoda</option>
+                  <option value="Seat">Seat</option>
+                  <option value="Renault">Renault</option>
+                  <option value="Peugeot">Peugeot</option>
+                  <option value="Citroen">Citroen</option>
+                  <option value="DS">DS</option>
+                  <option value="Opel">Opel</option>
+                  <option value="Vauxhall">Vauxhall</option>
+                  <option value="Lancia">Lancia</option>
+                  <option value="Lamborghini">Lamborghini</option>
+                  <option value="Pagani">Pagani</option>
+                  <option value="Koenigsegg">Koenigsegg</option>
+                  <option value="Rimac">Rimac</option>
+                  <option value="Lucid">Lucid</option>
+                  <option value="Rivian">Rivian</option>
+                  <option value="Polestar">Polestar</option>
+                  <option value="BYD">BYD</option>
+                  <option value="NIO">NIO</option>
+                  <option value="XPeng">XPeng</option>
+                  <option value="Li Auto">Li Auto</option>
+                  <option value="Great Wall">Great Wall</option>
+                  <option value="Geely">Geely</option>
+                  <option value="Lynk & Co">Lynk & Co</option>
+                  <option value="Zeekr">Zeekr</option>
+                  <option value="Ora">Ora</option>
+                  <option value="Tata">Tata</option>
+                  <option value="Mahindra">Mahindra</option>
+                  <option value="Maruti Suzuki">Maruti Suzuki</option>
                 </Form.Select>
               </Form.Group>
 

@@ -89,7 +89,7 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
     const totalAmount = rentalDays * pricePerDay;
 
     const [bookingResult] = await db.query(
-      "INSERT INTO booking (userId, carId, startDate, endDate, pickUpLocation, dropOffLocation, totalAmount, rideSharePrice, rideShareDestination, isRideShareEnabled, rideShareDescription, startDestination) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO booking (userId, carId, startDate, endDate, pickUpLocation, dropOffLocation, totalAmount, rideSharePrice, rideShareDestination, isRideShareEnabled, rideShareDescription, startDestination, bookingStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         req.userId,
         carId,
@@ -103,6 +103,7 @@ bookingRouter.post("/book", verifyToken, async (req, res) => {
         isRideShareEnabled ? 1 : 0,
         isRideShareEnabled ? rideShareDescription : null,
         isRideShareEnabled ? startDestination : null,
+        'upcoming' // Default bookingStatus
       ]
     );
 
@@ -408,6 +409,37 @@ bookingRouter.put("/return/:carId", async (req, res) => {
     res
       .status(500)
       .json({ message: "Internal server error", error: error.message });
+  }
+});
+
+// Add new endpoint to update booking status
+bookingRouter.put("/update-booking-status", verifyToken, async (req, res) => {
+  try {
+    const db = await connectToDataBase();
+    const currentDate = new Date();
+    const [bookings] = await db.query(
+      "SELECT bookingId, startDate, endDate FROM booking WHERE isCancelled = 0 AND isReturned = 0"
+    );
+    for (const booking of bookings) {
+      const startDate = new Date(booking.startDate);
+      const endDate = new Date(booking.endDate);
+      let newStatus;
+      if (currentDate >= startDate && currentDate <= endDate) {
+        newStatus = 'ongoing';
+      } else if (currentDate > endDate) {
+        newStatus = 'completed';
+      } else {
+        newStatus = 'upcoming';
+      }
+      await db.query(
+        "UPDATE booking SET bookingStatus = ? WHERE bookingId = ?",
+        [newStatus, booking.bookingId]
+      );
+    }
+    return res.status(200).json({ message: "Booking statuses updated successfully" });
+  } catch (err) {
+    console.error("Error in /update-booking-status:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

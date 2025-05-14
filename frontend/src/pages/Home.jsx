@@ -1,5 +1,5 @@
 import axios from "axios";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import NavBar from "../components/NavBar";
@@ -11,56 +11,20 @@ import Col from "react-bootstrap/Col";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [cars, setCars] = useState([]);
 
-  const carList = [
-    {
-      title: "Maybach",
-      fuel: "Petrol",
-      transmission: "Automatic",
-      price: "1200/day",
-      imgLink:
-        "https://cdn.jdpower.com/JDP_2023%20Mercedes-Maybach%20S680%20Cashmere%20White%20Magno%20Front%20Quarter%20View.jpg",
-    },
-    {
-      title: "Verna",
-      fuel: "Petrol",
-      transmission: "Automatic",
-      price: "1200",
-      imgLink: "https://apollo.olx.in/v1/files/ugjab7o17e8x1-IN/image;s=360x0",
-    },
-    {
-      title: "Rolls Royce",
-      fuel: "Petrol",
-      transmission: "Automatic",
-      price: "74747",
-      imgLink:
-        "https://res.cloudinary.com/unix-center/image/upload/c_limit,dpr_3.0,f_auto,fl_progressive,g_center,h_240,q_auto:good,w_385/pnv7ncbgaqvsstbfkjr8.jpg",
-    },
-    {
-      title: "Flying Spur",
-      fuel: "Petrol",
-      transmission: "Automatic",
-      price: "74747",
-      imgLink:
-        "https://assets.bwbx.io/images/users/iqjWHBFdfxIU/i.Bj4m.V11iQ/v1/-1x-1.webp",
-    },
-    {
-      title: "McLaren",
-      fuel: "Petrol",
-      transmission: "Automatic",
-      price: "74747",
-      imgLink:
-        "https://auto.cdn-rivamedia.com/photos/annoncecli/big/mclaren-720s-coupe-luxury-launch-edition-v8-4-0-720-146742811.jpg",
-    },
-    {
-      title: "G-Wagon",
-      fuel: "Petrol",
-      transmission: "Automatic",
-      price: "74747",
-      imgLink:
-        "https://static1.topspeedimages.com/wordpress/wp-content/uploads/2023/01/mercedes-g-wagen.jpg",
-    },
-  ];
+  useEffect(() => {
+    const fetchCars = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/car/get-cars");
+        setCars(response.data.cars);
+      } catch (error) {
+        console.error("Error fetching cars:", error);
+      }
+    };
+
+    fetchCars();
+  }, []);
 
   return (
     <>
@@ -82,11 +46,31 @@ const Home = () => {
           className="d-flex gap-4 overflow-x-scroll px-2"
           style={{ scrollbarWidth: "none" }}
         >
-          {carList.map((car, index) => (
-            <div key={index} style={{ width: "290px", flexShrink: 0 }}>
-              <CarCard {...car} />
-            </div>
-          ))}
+          {cars.slice(0, 6).map((car, index) => {
+            let firstImage = "";
+            try {
+              const imagesArray = JSON.parse(car.images.replace(/&quot;/g, '"'));
+              if (Array.isArray(imagesArray) && imagesArray.length > 0) {
+                firstImage = imagesArray[0];
+              }
+            } catch (error) {
+              console.error("Error parsing car images:", error);
+              firstImage = "path/to/default-image.jpg";
+            }
+            return (
+              <div key={index} style={{ width: "290px", flexShrink: 0 }}>
+                <CarCard
+                  title={car.carName}
+                  fuel={car.fuelType}
+                  transmission={car.transmission}
+                  carId={car.carId}
+                  price={`${car.pricePerDay}/day`}
+                  imgLink={firstImage}
+                  isBooked={car.isBooked}
+                />
+              </div>
+            );
+          })}
         </div>
       </Container>
 
@@ -110,7 +94,7 @@ const Home = () => {
               We believe renting a car should be as luxurious as driving one.
               Our platform connects customers with premium and affordable
               vehicles with just a few clicks. Whether you're cruising the city
-              or taking a weekend escape, we’re here to get you there in style.
+              or taking a weekend escape, we're here to get you there in style.
             </p>
           </Col>
         </Row>
@@ -122,11 +106,31 @@ const Home = () => {
           Explore Our Fleet
         </h2>
         <Row xs={1} md={3} className="g-4">
-          {carList.slice(0, 3).map((car, idx) => (
-            <Col key={idx}>
-              <CarCard {...car} />
-            </Col>
-          ))}
+          {cars.slice(0, 3).map((car, idx) => {
+            let firstImage = "";
+            try {
+              const imagesArray = JSON.parse(car.images.replace(/&quot;/g, '"'));
+              if (Array.isArray(imagesArray) && imagesArray.length > 0) {
+                firstImage = imagesArray[0];
+              }
+            } catch (error) {
+              console.error("Error parsing car images:", error);
+              firstImage = "path/to/default-image.jpg";
+            }
+            return (
+              <Col key={idx}>
+                <CarCard
+                  title={car.carName}
+                  fuel={car.fuelType}
+                  transmission={car.transmission}
+                  carId={car.carId}
+                  price={`${car.pricePerDay}/day`}
+                  imgLink={firstImage}
+                  isBooked={car.isBooked}
+                />
+              </Col>
+            );
+          })}
         </Row>
         <div className="text-center mt-4">
           <Button variant="outline-dark" onClick={() => navigate("/Cars")}>
