@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const Success = () => {
@@ -21,6 +22,26 @@ const Success = () => {
   };
 
   const transactionData = getTransactionData();
+
+  useEffect(() => {
+    const notifyBackend = async () => {
+      if (transactionData) {
+        try {
+          const token = localStorage.getItem('token');
+          await axios.post('http://localhost:3000/esewa/payment/success', transactionData, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          console.log('Successfully notified backend about payment');
+        } catch (error) {
+          console.error('Failed to notify backend:', error);
+        }
+      }
+    };
+
+    notifyBackend();
+  }, [transactionData]);
 
   if (!transactionData) {
     return (

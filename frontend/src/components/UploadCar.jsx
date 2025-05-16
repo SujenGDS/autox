@@ -131,7 +131,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
       );
 
       if (response.status === 201) {
-        toast.success("Your car has been uploaded successfully");
+        toast.success("Car uploaded successfully! It will be listed once approved by the admin.");
         setShow(false);
         setRefresh((prev) => !prev);
       } else {

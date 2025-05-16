@@ -13,8 +13,6 @@ const CarDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [price, setPrice] = useState(0);
-  const [title, setTitle] = useState("Car");
   const [recommendedCars, setRecommendedCars] = useState([]);
 
   const carFeatures = {
@@ -109,10 +107,26 @@ const CarDetail = () => {
   return (
     <>
       <BookNowModal
-        title={title}
-        price={price}
+        carId={carId}
+        title={car?.carName}
+        price={car?.pricePerDay}
         showModal={showModal}
         setShowModal={setShowModal}
+        setRefresh={() => {
+          // Refresh car details after booking
+          const fetchCarDetail = async () => {
+            try {
+              const response = await axios.get(`http://localhost:3000/car/${carId}`);
+              let car_res = response.data.car;
+              car_res.imagesArray = JSON.parse(car_res.images);
+              car_res.featuresArray = JSON.parse(car_res.featuresArray);
+              setCar(car_res);
+            } catch (error) {
+              console.error("Error refreshing car details:", error);
+            }
+          };
+          fetchCarDetail();
+        }}
       />
       <NavBar />
       <Row className="d-flex align-items-center m-4">
