@@ -37,6 +37,7 @@ adminRouter.get("/all-listed-cars", async (req, res) => {
         cars.carPlateNumber,
         cars.blueBookUrl,
         cars.approvalStatus,
+        cars.isBooked,
         cars.images,
         cars.createdAt,              
         auth.firstName,

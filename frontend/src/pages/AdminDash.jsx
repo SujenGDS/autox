@@ -321,10 +321,10 @@ const AdminDashboard = () => {
 
                     {/* Status column */}
                     <td
-                      className={car.isBooked ? "text-danger" : "text-success"}
-                    >
-                      {car.isBooked ? "Booked" : "Available"}
-                    </td>
+  className={car.isBooked == 1 ? "text-danger" : "text-success"} 
+>
+  {car.isBooked == 1 ? "Booked" : "Available"}
+</td>
 
                     {/* Delete column */}
                     <td>

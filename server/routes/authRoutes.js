@@ -231,6 +231,27 @@ router.get("/my-ride-share", verifyToken, async (req, res) => {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
     const userId = decoded.id;
 
+    console.log("Fetching ride shares for userId:", userId);
+
+    // First check if we have any records in the lift table
+    const [liftRecords] = await db.query("SELECT * FROM lift");
+    console.log("All lift records:", liftRecords);
+
+    // Then check if we have any records for this user
+    const [userLiftRecords] = await db.query(
+      "SELECT * FROM lift WHERE passengerId = ?",
+      [userId]
+    );
+    console.log("User's lift records:", userLiftRecords);
+
+    // Check bookings table
+    const [userBookings] = await db.query(
+      "SELECT * FROM booking WHERE userId = ?",
+      [userId]
+    );
+    console.log("User's bookings:", userBookings);
+
+    // Modified query to be more lenient and include all necessary fields
     const [rideshare] = await db.query(
       `SELECT 
          l.rideshareId,
@@ -251,25 +272,28 @@ router.get("/my-ride-share", verifyToken, async (req, res) => {
          c.carName,
          c.images
        FROM lift l
-       JOIN booking b ON l.bookingId = b.bookingId
-       JOIN authentication driver ON b.userId = driver.userId
-       JOIN authentication passenger ON l.passengerId = passenger.userId
-       JOIN cars c ON b.carId = c.carId
-       WHERE (b.userId = ? OR l.passengerId = ?) AND b.isCancelled = 0
+       LEFT JOIN booking b ON l.bookingId = b.bookingId
+       LEFT JOIN authentication driver ON b.userId = driver.userId
+       LEFT JOIN authentication passenger ON l.passengerId = passenger.userId
+       LEFT JOIN cars c ON b.carId = c.carId
+       WHERE (b.userId = ? OR l.passengerId = ?)
        ORDER BY l.rideshareId DESC`,
       [userId, userId]
     );
 
-    console.log("Rideshare data:", rideshare);
+    console.log("Final rideshare query results:", rideshare);
+
+    // Process the results
     const rideDetails = rideshare.map((ride) => ({
       ...ride,
-      status: ride.isAccepted == "accepted" ? "Accepted" : "Pending",
+      status: ride.isAccepted === 1 ? "Accepted" : "Pending"
     }));
 
+    console.log("Processed rideDetails:", rideDetails);
     return res.status(200).json({ rideDetails });
   } catch (err) {
-    console.error("error in /my-ride-share:", err);
-    return res.status(500).json(err);
+    console.error("Error in /my-ride-share:", err);
+    return res.status(500).json({ error: "Internal server error", details: err.message });
   }
 });
 
