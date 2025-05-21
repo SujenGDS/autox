@@ -250,25 +250,28 @@ bookingRouter.get("/lifts", async (req, res) => {
     const db = await connectToDataBase();
 
     const [rides] = await db.query(`
-      SELECT 
-        b.bookingId, 
-        b.userId AS bookerId, 
-        b.carId, 
-        b.rideSharePrice, 
-        b.rideShareDestination, 
+      SELECT
+        b.bookingId,
+        b.userId AS bookerId,
+        b.carId,
+        b.rideSharePrice,
+        b.rideShareDestination,
         b.rideShareDescription,
         b.startDestination,
-        b.startDate, 
-        b.endDate, 
-        b.pickUpLocation, 
-        b.dropOffLocation, 
-        c.carName, 
-        c.fuelType, 
-        c.transmission 
+        b.startDate,
+        b.endDate,
+        b.pickUpLocation,
+        b.dropOffLocation,
+        c.carName,
+        c.fuelType,
+        c.transmission
       FROM booking b
       JOIN cars c ON b.carId = c.carId
-      WHERE b.isRideShareEnabled = 1 AND c.isBooked = 1
+      WHERE b.isRideShareEnabled = 1
+        AND c.isBooked = 1
+        AND b.isCancelled = 0
     `);
+    
 
     return res.status(200).json({ rides });
   } catch (err) {
