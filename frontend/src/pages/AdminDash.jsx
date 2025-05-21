@@ -235,6 +235,7 @@ const AdminDashboard = () => {
                   "Owner Name",
                   "Email",
                   "Phone",
+                  "Images",
                   "Blue Book",
                   "Approval",
                   "Status",
@@ -251,6 +252,30 @@ const AdminDashboard = () => {
                     </td>
                     <td>{car.email}</td>
                     <td>{car.phoneNumber}</td>
+                    <td>
+                      {car.images && JSON.parse(car.images).map((image, index) => (
+                        <a
+                          key={index}
+                          href={image}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="me-2"
+                          style={{ maxWidth: "150px" }}
+                        >
+                          <img
+      src={image}
+      alt={`Car ${index + 1}`}
+      style={{
+        width: "100%",
+        height: "auto",
+        borderRadius: "8px",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+        marginBottom: "10px",
+      }}
+    />
+                        </a>
+                      ))}
+                    </td>
                     <td>
                       <a
                         href={car.blueBookUrl}

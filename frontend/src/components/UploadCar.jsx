@@ -135,7 +135,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
         setShow(false);
         setRefresh((prev) => !prev);
       } else {
-        toast.error(response.data?.message || "Error Uploading Car");
+        console.error(response.data?.message || "Error Uploading Car");
       }
     } catch (err) {
       console.error("Upload Error:", err);
@@ -144,7 +144,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
         err.response?.data?.message ||
         err.message ||
         "An unexpected error occurred.";
-      toast.error(`Upload failed: ${errorMessage}`);
+      console.error(`Upload failed: ${errorMessage}`);
     }
   };
 
@@ -352,6 +352,7 @@ const UploadCar = ({ setShow, setRefresh }) => {
                   <option value="Crossover">Crossover</option>
                   <option value="Pick Up">Pick Up</option>
                   <option value="Coupe">Coupe</option>
+                
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
                   {errors.type}

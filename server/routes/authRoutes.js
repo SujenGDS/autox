@@ -111,7 +111,7 @@ router.post("/login", async (req, res) => {
     const db = await connectToDataBase();
 
     const [rows] = await db.query(
-      "SELECT * FROM authentication WHERE email = ?",
+      "SELECT * FROM authentication WHERE email = ? AND isDeleted = 0",
       [email]
     );
 
@@ -135,7 +135,7 @@ router.post("/login", async (req, res) => {
     return res.status(201).json({ token: token });
   } catch (err) {
     console.error("Error in /login:", err.message);
-    return res.status(500).json({ error: "Internal Server   Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -144,12 +144,12 @@ router.get("/home", verifyToken, async (req, res) => {
   try {
     const db = await connectToDataBase();
     const [rows] = await db.query(
-      "SELECT * FROM authentication WHERE email = ?",
+      "SELECT * FROM authentication WHERE email = ? AND isDeleted = 0",
       [req.email]
     );
 
     if (rows.length === 0) {
-      return res.status(400).json({ message: "Bad Request " });
+      return res.status(400).json({ message: "Bad Request" });
     }
 
     return res.status(201).json({ user: rows[0] });
@@ -162,9 +162,12 @@ router.get("/home", verifyToken, async (req, res) => {
 router.get("/my-cars", verifyToken, async (req, res) => {
   try {
     const db = await connectToDataBase();
-    const [cars] = await db.query("SELECT * From cars WHERE userId = ?", [
-      req.userId,
-    ]);
+    const [cars] = await db.query(`
+      SELECT c.* 
+      FROM cars c
+      JOIN authentication a ON c.userId = a.userId
+      WHERE c.userId = ? AND a.isDeleted = 0
+    `, [req.userId]);
 
     return res.status(200).json({ cars });
   } catch (err) {
@@ -204,7 +207,12 @@ router.get("/my-booked-cars", verifyToken, async (req, res) => {
        FROM booking b
        JOIN cars c ON b.carId = c.carId
        JOIN authentication u ON b.userId = u.userId
-       WHERE c.userId = ? AND c.isBooked = 1 AND b.isCancelled = 0
+       JOIN authentication owner ON c.userId = owner.userId
+       WHERE c.userId = ? 
+       AND c.isBooked = 1 
+       AND b.isCancelled = 0
+       AND u.isDeleted = 0
+       AND owner.isDeleted = 0
        ORDER BY b.bookingID DESC`,
       [userId]
     );
@@ -315,7 +323,5 @@ router.get("/notifications", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
-
 
 export default router;

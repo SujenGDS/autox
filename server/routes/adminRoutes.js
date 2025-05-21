@@ -36,13 +36,16 @@ adminRouter.get("/all-listed-cars", async (req, res) => {
         cars.company,
         cars.carPlateNumber,
         cars.blueBookUrl,
-        cars.approvalStatus,              
+        cars.approvalStatus,
+        cars.images,
+        cars.createdAt,              
         auth.firstName,
         auth.lastName,
         auth.email,
         auth.phoneNumber
       FROM cars
       JOIN authentication auth ON cars.userId = auth.userId
+      ORDER BY cars.carId DESC
     `);
     return res.status(200).json({ cars });
   } catch (err) {
